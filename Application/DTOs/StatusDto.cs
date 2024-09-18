@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.DTOs
-{
-    public class StatusDto
-    {
-        public string? Name { get; set; }
+namespace Application.DTOs;
 
-        public ICollection<TaskDto> Tasks { get; set; } = new List<TaskDto>();
-    }
+public class StatusDto
+{
+    public int Id { get; set; }
+    public string? Name { get; set; }
+    public ICollection<int> TaskIds { get; set; } = new List<int>();
 }
