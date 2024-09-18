@@ -1,4 +1,4 @@
-﻿/Application/obj/
-/Domain/obj/
-/Infrastructure/obj/
-/WebAPI/obj/
+﻿/.vs
+/Application/bin/Debug/net8.0
+/Domain/bin/Debug/net8.0
+/WebAPI/bin/Debug/net8.0
