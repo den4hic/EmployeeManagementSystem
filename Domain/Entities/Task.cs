@@ -7,21 +7,21 @@ public partial class Task
 {
     public int Id { get; set; }
 
-    public int? EmployeeId { get; set; }
+    public int ProjectId { get; set; }
 
-    public int? ProjectId { get; set; }
+    public int? AssignedToEmployeeId { get; set; }
 
-    public string? Name { get; set; }
+    public string Title { get; set; } = null!;
 
     public string? Description { get; set; }
 
-    public DateTime? DueDate { get; set; }
+    public int StatusId { get; set; }
 
-    public int? StatusId { get; set; }
+    public DateOnly? DueDate { get; set; }
 
-    public virtual Employee? Employee { get; set; }
+    public virtual Employee? AssignedToEmployee { get; set; }
 
-    public virtual Project? Project { get; set; }
+    public virtual Project Project { get; set; } = null!;
 
-    public virtual Status? Status { get; set; }
+    public virtual Status Status { get; set; } = null!;
 }

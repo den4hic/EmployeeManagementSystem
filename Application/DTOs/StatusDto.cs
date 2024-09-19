@@ -9,6 +9,5 @@ namespace Application.DTOs;
 public class StatusDto
 {
     public int Id { get; set; }
-    public string? Name { get; set; }
-    public ICollection<int> TaskIds { get; set; } = new List<int>();
+    public string Name { get; set; }
 }

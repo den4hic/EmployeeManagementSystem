@@ -10,39 +10,32 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<Manager, ManagerDto>()
-                .ForMember(dest => dest.EmployeeIds, opt => opt.MapFrom(src => src.Employees.Select(e => e.Id)))
-                .ForMember(dest => dest.ProjectIds, opt => opt.MapFrom(src => src.Projects.Select(p => p.Id)));
-
-        CreateMap<ManagerDto, Manager>()
-            .ForMember(dest => dest.Employees, opt => opt.Ignore())
-            .ForMember(dest => dest.Projects, opt => opt.Ignore());
+        CreateMap<User, UserDto>().ReverseMap();
 
         CreateMap<Employee, EmployeeDto>()
-                .ForMember(dest => dest.TaskIds, opt => opt.MapFrom(src => src.Tasks.Select(t => t.Id)));
+            .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User))
+            .ForMember(dest => dest.Tasks, opt => opt.MapFrom(src => src.Tasks))
+            .ForMember(dest => dest.Projects, opt => opt.MapFrom(src => src.Projects))
+            .ReverseMap();
 
-        CreateMap<EmployeeDto, Employee>()
-            .ForMember(dest => dest.Tasks, opt => opt.Ignore())
-            .ForMember(dest => dest.Manager, opt => opt.Ignore());
+        CreateMap<Manager, ManagerDto>()
+            .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User))
+            .ForMember(dest => dest.Projects, opt => opt.MapFrom(src => src.Projects))
+            .ReverseMap();
 
         CreateMap<Project, ProjectDto>()
-                .ForMember(dest => dest.TaskIds, opt => opt.MapFrom(src => src.Tasks.Select(t => t.Id)));
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+            .ForMember(dest => dest.Tasks, opt => opt.MapFrom(src => src.Tasks))
+            .ForMember(dest => dest.Employees, opt => opt.MapFrom(src => src.Employees))
+            .ForMember(dest => dest.Managers, opt => opt.MapFrom(src => src.Managers))
+            .ReverseMap();
 
-        CreateMap<ProjectDto, Project>()
-            .ForMember(dest => dest.Tasks, opt => opt.Ignore())
-            .ForMember(dest => dest.Manager, opt => opt.Ignore());
+        CreateMap<Status, StatusDto>().ReverseMap();
 
-        CreateMap<Status, StatusDto>()
-                .ForMember(dest => dest.TaskIds, opt => opt.MapFrom(src => src.Tasks.Select(t => t.Id)));
-
-        CreateMap<StatusDto, Status>()
-            .ForMember(dest => dest.Tasks, opt => opt.Ignore());
-
-        CreateMap<Task, TaskDto>();
-
-        CreateMap<TaskDto, Task>()
-            .ForMember(dest => dest.Employee, opt => opt.Ignore())
-            .ForMember(dest => dest.Project, opt => opt.Ignore())
-            .ForMember(dest => dest.Status, opt => opt.Ignore());
+        CreateMap<Task, TaskDto>()
+            .ForMember(dest => dest.AssignedToEmployee, opt => opt.MapFrom(src => src.AssignedToEmployee))
+            .ForMember(dest => dest.Project, opt => opt.MapFrom(src => src.Project))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+            .ReverseMap();
     }
 }

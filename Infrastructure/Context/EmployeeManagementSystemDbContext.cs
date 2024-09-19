@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace Infrastructure.Context;
 
@@ -21,81 +22,138 @@ public partial class EmployeeManagementSystemDbContext : IdentityContext
 
     public virtual DbSet<Domain.Entities.Task> Tasks { get; set; }
 
+    public virtual DbSet<User> Users { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<Employee>(entity =>
         {
+            entity.HasKey(e => e.Id).HasName("PK__Employee__3214EC07F754F81E");
+
             entity.ToTable("Employee");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
-            entity.Property(e => e.HireDate).HasMaxLength(50);
-            entity.Property(e => e.Name).HasMaxLength(50);
-            entity.Property(e => e.PhoneNumber).HasMaxLength(50);
-            entity.Property(e => e.Surname).HasMaxLength(50);
+            entity.Property(e => e.Position).HasMaxLength(100);
+            entity.Property(e => e.Salary).HasColumnType("decimal(10, 2)");
 
-            entity.HasOne(d => d.Manager).WithMany(p => p.Employees)
-                .HasForeignKey(d => d.ManagerId)
-                .HasConstraintName("FK_Employee_Employee");
+            entity.HasOne(d => d.User).WithMany(p => p.Employees)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Employee_User");
         });
 
         modelBuilder.Entity<Manager>(entity =>
         {
+            entity.HasKey(e => e.Id).HasName("PK__Manager__3214EC0733BFF013");
+
             entity.ToTable("Manager");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
-            entity.Property(e => e.HireDate).HasColumnType("datetime");
-            entity.Property(e => e.Name).HasMaxLength(50);
-            entity.Property(e => e.PhoneNumber).HasMaxLength(50);
-            entity.Property(e => e.Surname).HasMaxLength(50);
+            entity.Property(e => e.Department).HasMaxLength(100);
+
+            entity.HasOne(d => d.User).WithMany(p => p.Managers)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Manager_User");
         });
 
         modelBuilder.Entity<Project>(entity =>
         {
+            entity.HasKey(e => e.Id).HasName("PK__Project__3214EC0775EB0870");
+
             entity.ToTable("Project");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
-            entity.Property(e => e.Description).HasColumnType("text");
-            entity.Property(e => e.EndDate).HasColumnType("datetime");
-            entity.Property(e => e.Name).HasMaxLength(50);
-            entity.Property(e => e.StartDate).HasColumnType("datetime");
+            entity.Property(e => e.Name).HasMaxLength(100);
 
-            entity.HasOne(d => d.Manager).WithMany(p => p.Projects)
-                .HasForeignKey(d => d.ManagerId)
-                .HasConstraintName("FK_Project_Manager");
+            entity.HasOne(d => d.Status).WithMany(p => p.Projects)
+                .HasForeignKey(d => d.StatusId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Project_Status");
+
+            entity.HasMany(d => d.Employees).WithMany(p => p.Projects)
+                .UsingEntity<Dictionary<string, object>>(
+                    "ProjectEmployee",
+                    r => r.HasOne<Employee>().WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_ProjectEmployee_Employee"),
+                    l => l.HasOne<Project>().WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_ProjectEmployee_Project"),
+                    j =>
+                    {
+                        j.HasKey("ProjectId", "EmployeeId").HasName("PK__ProjectE__71B7BA018DEBC603");
+                        j.ToTable("ProjectEmployee");
+                    });
+
+            entity.HasMany(d => d.Managers).WithMany(p => p.Projects)
+                .UsingEntity<Dictionary<string, object>>(
+                    "ProjectManager",
+                    r => r.HasOne<Manager>().WithMany()
+                        .HasForeignKey("ManagerId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_ProjectManager_Manager"),
+                    l => l.HasOne<Project>().WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_ProjectManager_Project"),
+                    j =>
+                    {
+                        j.HasKey("ProjectId", "ManagerId").HasName("PK__ProjectM__75A0945E642EB1EF");
+                        j.ToTable("ProjectManager");
+                    });
         });
 
         modelBuilder.Entity<Status>(entity =>
         {
+            entity.HasKey(e => e.Id).HasName("PK__Status__3214EC07F5CE7DF3");
+
             entity.ToTable("Status");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Name).HasMaxLength(50);
         });
 
         modelBuilder.Entity<Domain.Entities.Task>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK_Table_1");
+            entity.HasKey(e => e.Id).HasName("PK__Task__3214EC0702DF9774");
 
             entity.ToTable("Task");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
-            entity.Property(e => e.Description).HasColumnType("text");
-            entity.Property(e => e.DueDate).HasColumnType("datetime");
-            entity.Property(e => e.Name).HasMaxLength(50);
+            entity.Property(e => e.Title).HasMaxLength(100);
 
-            entity.HasOne(d => d.Employee).WithMany(p => p.Tasks)
-                .HasForeignKey(d => d.EmployeeId)
+            entity.HasOne(d => d.AssignedToEmployee).WithMany(p => p.Tasks)
+                .HasForeignKey(d => d.AssignedToEmployeeId)
                 .HasConstraintName("FK_Task_Employee");
 
             entity.HasOne(d => d.Project).WithMany(p => p.Tasks)
                 .HasForeignKey(d => d.ProjectId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Task_Project");
 
             entity.HasOne(d => d.Status).WithMany(p => p.Tasks)
                 .HasForeignKey(d => d.StatusId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Task_Status");
+        });
+
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__User__3214EC0756D47F41");
+
+            entity.ToTable("User");
+
+            entity.Property(e => e.AspNetUserId).HasMaxLength(450);
+            entity.Property(e => e.Email).HasMaxLength(256);
+            entity.Property(e => e.FirstName).HasMaxLength(50);
+            entity.Property(e => e.LastName).HasMaxLength(50);
+            entity.Property(e => e.PhoneNumber).HasMaxLength(20);
+
+            entity.HasOne<IdentityUser>()
+                  .WithMany()
+                  .HasForeignKey(d => d.AspNetUserId)
+                  .OnDelete(DeleteBehavior.ClientSetNull)
+                  .HasConstraintName("FK_User_AspNetUsers");
         });
 
         OnModelCreatingPartial(modelBuilder);

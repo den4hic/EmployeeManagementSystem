@@ -3,13 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35303.130
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPI", "WebAPI\WebAPI.csproj", "{F1F8D445-0446-4945-807D-85E26BF54DEB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAPI", "WebAPI\WebAPI.csproj", "{F1F8D445-0446-4945-807D-85E26BF54DEB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{7D260D3A-6862-42C1-8589-C3BD54026623}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Domain\Domain.csproj", "{7D260D3A-6862-42C1-8589-C3BD54026623}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\Application.csproj", "{9CDE781B-E2F2-4948-A646-01833783CBCF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application", "Application\Application.csproj", "{9CDE781B-E2F2-4948-A646-01833783CBCF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{1881684D-A62E-4B21-8832-0CBF97832258}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{1881684D-A62E-4B21-8832-0CBF97832258}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "ProjectDatabase", "ProjectDatabase\ProjectDatabase.sqlproj", "{6A0FFBC3-9714-416F-988A-14A7E5C035DC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,12 @@ Global
 		{1881684D-A62E-4B21-8832-0CBF97832258}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1881684D-A62E-4B21-8832-0CBF97832258}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1881684D-A62E-4B21-8832-0CBF97832258}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A0FFBC3-9714-416F-988A-14A7E5C035DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A0FFBC3-9714-416F-988A-14A7E5C035DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A0FFBC3-9714-416F-988A-14A7E5C035DC}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{6A0FFBC3-9714-416F-988A-14A7E5C035DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A0FFBC3-9714-416F-988A-14A7E5C035DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A0FFBC3-9714-416F-988A-14A7E5C035DC}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

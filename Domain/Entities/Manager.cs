@@ -7,15 +7,11 @@ public partial class Manager
 {
     public int Id { get; set; }
 
-    public string? Name { get; set; }
+    public int UserId { get; set; }
 
-    public string? Surname { get; set; }
+    public string Department { get; set; } = null!;
 
-    public string? PhoneNumber { get; set; }
-
-    public DateTime? HireDate { get; set; }
-
-    public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
+    public virtual User User { get; set; } = null!;
 
     public virtual ICollection<Project> Projects { get; set; } = new List<Project>();
 }
