@@ -24,11 +24,11 @@ public partial class EmployeeManagementSystemDbContext : IdentityContext
 
     public virtual DbSet<User> Users { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        base.OnModelCreating(modelBuilder);
+        base.OnModelCreating(builder);
 
-        modelBuilder.Entity<Employee>(entity =>
+        builder.Entity<Employee>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Employee__3214EC07F754F81E");
 
@@ -43,7 +43,7 @@ public partial class EmployeeManagementSystemDbContext : IdentityContext
                 .HasConstraintName("FK_Employee_User");
         });
 
-        modelBuilder.Entity<Manager>(entity =>
+        builder.Entity<Manager>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Manager__3214EC0733BFF013");
 
@@ -57,7 +57,7 @@ public partial class EmployeeManagementSystemDbContext : IdentityContext
                 .HasConstraintName("FK_Manager_User");
         });
 
-        modelBuilder.Entity<Project>(entity =>
+        builder.Entity<Project>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Project__3214EC0775EB0870");
 
@@ -105,7 +105,7 @@ public partial class EmployeeManagementSystemDbContext : IdentityContext
                     });
         });
 
-        modelBuilder.Entity<Status>(entity =>
+        builder.Entity<Status>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Status__3214EC07F5CE7DF3");
 
@@ -114,7 +114,7 @@ public partial class EmployeeManagementSystemDbContext : IdentityContext
             entity.Property(e => e.Name).HasMaxLength(50);
         });
 
-        modelBuilder.Entity<Domain.Entities.Task>(entity =>
+        builder.Entity<Domain.Entities.Task>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Task__3214EC0702DF9774");
 
@@ -137,7 +137,7 @@ public partial class EmployeeManagementSystemDbContext : IdentityContext
                 .HasConstraintName("FK_Task_Status");
         });
 
-        modelBuilder.Entity<User>(entity =>
+        builder.Entity<User>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__User__3214EC0756D47F41");
 
@@ -149,14 +149,14 @@ public partial class EmployeeManagementSystemDbContext : IdentityContext
             entity.Property(e => e.LastName).HasMaxLength(50);
             entity.Property(e => e.PhoneNumber).HasMaxLength(20);
 
-            entity.HasOne<IdentityUser>()
-                  .WithMany()
-                  .HasForeignKey(d => d.AspNetUserId)
-                  .OnDelete(DeleteBehavior.ClientSetNull)
-                  .HasConstraintName("FK_User_AspNetUsers");
+            //entity.HasOne<AspNetUser>()
+            //      .WithMany()
+            //      .HasForeignKey(d => d.AspNetUserId)
+            //      .OnDelete(DeleteBehavior.ClientSetNull)
+            //      .HasConstraintName("FK_User_AspNetUsers");
         });
 
-        OnModelCreatingPartial(modelBuilder);
+        OnModelCreatingPartial(builder);
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);

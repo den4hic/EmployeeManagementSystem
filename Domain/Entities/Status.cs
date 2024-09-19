@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Domain.Common;
+using System;
 using System.Collections.Generic;
 
 namespace Domain.Entities;
 
-public partial class Status
+public partial class Status : IEntity<int>
 {
     public int Id { get; set; }
 

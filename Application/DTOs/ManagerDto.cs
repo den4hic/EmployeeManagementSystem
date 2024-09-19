@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Application.Common;
+using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,11 +8,9 @@ using System.Threading.Tasks;
 
 namespace Application.DTOs;
 
-public class ManagerDto
+public class ManagerDto : BaseDto<int>
 {
-    public int Id { get; set; }
     public int UserId { get; set; }
     public string Department { get; set; }
-    public UserDto User { get; set; }
     public ICollection<ProjectDto> Projects { get; set; }
 }

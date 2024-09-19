@@ -1,6 +1,7 @@
 ﻿using Application.DTOs;
 using AutoMapper;
 using Domain.Entities;
+using Infrastructure.Abstractions;
 using Infrastructure.Context;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,13 +13,11 @@ namespace WebAPI.Controllers;
 [Route("api/[controller]")]
 public class ProjectController : ControllerBase
 {
-    private readonly EmployeeManagementSystemDbContext _context;
-    private readonly IMapper _mapper;
+    private readonly ICRUDRepository<ProjectDto, int> _projectRepository;
 
-    public ProjectController(EmployeeManagementSystemDbContext context, IMapper mapper)
+    public ProjectController(ICRUDRepository<ProjectDto, int> projectRepository)
     {
-        _context = context;
-        _mapper = mapper;
+        _projectRepository = projectRepository;
     }
 
     [HttpPost]
@@ -29,42 +28,50 @@ public class ProjectController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var project = _mapper.Map<Project>(projectDto);
+        var createdProject = await _projectRepository.CreateAsync(projectDto);
 
-        _context.Projects.Add(project);
-        await _context.SaveChangesAsync();
-
-        var createdProjectDto = _mapper.Map<ProjectDto>(project);
-
-        return CreatedAtAction(nameof(GetProject), new { id = createdProjectDto.Id }, createdProjectDto);
+        return CreatedAtAction(nameof(GetProject), new { id = createdProject.Id }, createdProject);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<ProjectDto>> GetProject(int id)
+    public async Task<ActionResult> GetProject(int id)
     {
-        var project = await _context.Projects
-            .Include(p => p.Tasks)
-            .FirstOrDefaultAsync(p => p.Id == id);
+        var project = await _projectRepository.GetByIdAsync(id);
 
         if (project == null)
         {
             return NotFound();
         }
 
-        var projectDto = _mapper.Map<ProjectDto>(project);
-
-        return Ok(projectDto);
+        return Ok(project);
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ProjectDto>>> GetAllProjects()
+    public async Task<ActionResult> GetAllProjects()
     {
-        var projects = await _context.Projects
-            .Include(p => p.Tasks)
-            .ToListAsync();
+        var projects = await _projectRepository.GetAllAsync();
 
-        var projectDtos = _mapper.Map<IEnumerable<ProjectDto>>(projects);
+        return Ok(projects);
+    }
 
-        return Ok(projectDtos);
+    [HttpPut]
+    public async Task<ActionResult> UpdateProject(ProjectDto projectDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        await _projectRepository.UpdateAsync(projectDto);
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteProject(int id)
+    {
+        await _projectRepository.DeleteAsync(id);
+
+        return NoContent();
     }
 }

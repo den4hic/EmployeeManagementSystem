@@ -5,6 +5,7 @@ using AutoMapper;
 using Domain.Entities;
 using Application.DTOs;
 using Infrastructure.Context;
+using Infrastructure.Abstractions;
 
 namespace WebAPI.Controllers;
 
@@ -12,13 +13,11 @@ namespace WebAPI.Controllers;
 [Route("api/[controller]")]
 public class ManagerController : ControllerBase
 {
-    private readonly EmployeeManagementSystemDbContext _context;
-    private readonly IMapper _mapper;
+    private readonly ICRUDRepository<ManagerDto, int> _managerRepository;
 
-    public ManagerController(EmployeeManagementSystemDbContext context, IMapper mapper)
+    public ManagerController(ICRUDRepository<ManagerDto, int> managerRepository)
     {
-        _context = context;
-        _mapper = mapper;
+        _managerRepository = managerRepository;
     }
 
     [HttpPost]
@@ -29,44 +28,57 @@ public class ManagerController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var manager = _mapper.Map<Manager>(managerDto);
+        var createdManager = await _managerRepository.CreateAsync(managerDto);
 
-        _context.Managers.Add(manager);
-        await _context.SaveChangesAsync();
-
-        var createdManagerDto = _mapper.Map<ManagerDto>(manager);
-
-        return CreatedAtAction(nameof(GetManager), new { id = createdManagerDto.Id }, createdManagerDto);
+        return CreatedAtAction(nameof(GetManager), new { id = createdManager.Id }, createdManager);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<ManagerDto>> GetManager(int id)
+    public async Task<ActionResult> GetManager(int id)
     {
-        var manager = await _context.Managers
-            .Include(m => m.Employees)
-            .Include(m => m.Projects)
-            .FirstOrDefaultAsync(m => m.Id == id);
+        var manager = await _managerRepository.GetByIdAsync(id);
 
         if (manager == null)
         {
             return NotFound();
         }
 
-        var managerDto = _mapper.Map<ManagerDto>(manager);
-
-        return Ok(managerDto);
+        return Ok(manager);
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ManagerDto>>> GetAllManagers()
+    public async Task<ActionResult> GetAllManagers()
     {
-        var managers = await _context.Managers
-            .Include(m => m.Employees)
-            .Include(m => m.Projects)
-            .ToListAsync();
+        var managers = await _managerRepository.GetAllAsync();
 
-        var managerDtos = _mapper.Map<IEnumerable<ManagerDto>>(managers);
+        return Ok(managers);
+    }
 
-        return Ok(managerDtos);
+    [HttpPut]
+    public async Task<ActionResult> UpdateManager(ManagerDto managerDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        await _managerRepository.UpdateAsync(managerDto);
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteManager(int id)
+    {
+        var manager = await _managerRepository.GetByIdAsync(id);
+
+        if (manager == null)
+        {
+            return NotFound();
+        }
+
+        await _managerRepository.DeleteAsync(id);
+
+        return NoContent();
     }
 }

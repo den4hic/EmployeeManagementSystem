@@ -1,6 +1,7 @@
 ﻿using Application.DTOs;
 using AutoMapper;
 using Domain.Entities;
+using Infrastructure.Abstractions;
 using Infrastructure.Context;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -14,13 +15,11 @@ namespace WebAPI.Controllers;
 [Route("api/[controller]")]
 public class EmployeeController : ControllerBase
 {
-    private readonly EmployeeManagementSystemDbContext _context;
-    private readonly IMapper _mapper;
+    private readonly ICRUDRepository<EmployeeDto, int> _employeeRepository;
 
-    public EmployeeController(EmployeeManagementSystemDbContext context, IMapper mapper)
+    public EmployeeController(ICRUDRepository<EmployeeDto, int> employeeRepository)
     {
-        _context = context;
-        _mapper = mapper;
+        _employeeRepository = employeeRepository;
     }
 
     [HttpPost]
@@ -31,42 +30,51 @@ public class EmployeeController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var employee = _mapper.Map<Employee>(employeeDto);
+        var createdEmployee = await _employeeRepository.CreateAsync(employeeDto);
 
-        _context.Employees.Add(employee);
-        await _context.SaveChangesAsync();
 
-        var createdEmployeeDto = _mapper.Map<EmployeeDto>(employee);
-
-        return CreatedAtAction(nameof(GetEmployee), new { id = createdEmployeeDto.Id }, createdEmployeeDto);
+        return CreatedAtAction(nameof(GetEmployee), new { id = createdEmployee.Id }, createdEmployee);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<EmployeeDto>> GetEmployee(int id)
+    public async Task<ActionResult> GetEmployee(int id)
     {
-        var employee = await _context.Employees
-            .Include(e => e.Tasks)
-            .FirstOrDefaultAsync(e => e.Id == id);
+        var employee = await _employeeRepository.GetByIdAsync(id);
 
         if (employee == null)
         {
             return NotFound();
         }
 
-        var employeeDto = _mapper.Map<EmployeeDto>(employee);
-
-        return Ok(employeeDto);
+        return Ok(employee);
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<EmployeeDto>>> GetAllEmployees()
+    public async Task<ActionResult> GetAllEmployees()
     {
-        var employees = await _context.Employees
-            .Include(e => e.Tasks)
-            .ToListAsync();
+        var employees = await _employeeRepository.GetAllAsync();
 
-        var employeeDtos = _mapper.Map<IEnumerable<EmployeeDto>>(employees);
+        return Ok(employees);
+    }
 
-        return Ok(employeeDtos);
+    [HttpPut]
+    public async Task<ActionResult> UpdateEmployee(EmployeeDto employeeDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        await _employeeRepository.UpdateAsync(employeeDto);
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteEmployee(int id)
+    {
+        await _employeeRepository.DeleteAsync(id);
+
+        return NoContent();
     }
 }

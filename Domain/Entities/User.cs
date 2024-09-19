@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNet.Identity.EntityFramework;
+﻿using Domain.Common;
+using Microsoft.AspNet.Identity.EntityFramework;
 using System;
 using System.Collections.Generic;
 
 namespace Domain.Entities;
 
-public partial class User
+public partial class User : IEntity<int>
 {
     public int Id { get; set; }
 
@@ -17,8 +18,6 @@ public partial class User
     public string Email { get; set; } = null!;
 
     public string? PhoneNumber { get; set; }
-
-    public virtual IdentityUser AspNetUser { get; set; } = null!;
 
     public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
 
