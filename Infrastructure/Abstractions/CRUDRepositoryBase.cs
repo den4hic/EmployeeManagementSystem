@@ -1,15 +1,7 @@
 ﻿using Application.Common;
 using AutoMapper;
 using Domain.Common;
-using Infrastructure.Context;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DbContext = Microsoft.EntityFrameworkCore.DbContext;
 
 namespace Infrastructure.Abstractions;
