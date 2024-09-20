@@ -3,7 +3,6 @@ using AutoMapper;
 using Domain.Entities;
 using Infrastructure.Abstractions;
 using Infrastructure.Context;
-using Microsoft.AspNet.Identity.EntityFramework;
 using System;
 using System.Collections.Generic;
 using System.Linq;

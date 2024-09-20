@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
-using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure.Context;
 
@@ -149,11 +149,11 @@ public partial class EmployeeManagementSystemDbContext : IdentityContext
             entity.Property(e => e.LastName).HasMaxLength(50);
             entity.Property(e => e.PhoneNumber).HasMaxLength(20);
 
-            //entity.HasOne<AspNetUser>()
-            //      .WithMany()
-            //      .HasForeignKey(d => d.AspNetUserId)
-            //      .OnDelete(DeleteBehavior.ClientSetNull)
-            //      .HasConstraintName("FK_User_AspNetUsers");
+            entity.HasOne<IdentityUser>()
+                  .WithMany()
+                  .HasForeignKey(d => d.AspNetUserId)
+                  .OnDelete(DeleteBehavior.ClientSetNull)
+                  .HasConstraintName("FK_User_AspNetUsers");
         });
 
         OnModelCreatingPartial(builder);

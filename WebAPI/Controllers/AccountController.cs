@@ -66,5 +66,12 @@ namespace WebAPI.Controllers
             }
             return BadRequest(ModelState);
         }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return Ok(new { Message = "Logged out successfully" });
+        }
     }
 }

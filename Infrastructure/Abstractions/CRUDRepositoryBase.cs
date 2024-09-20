@@ -47,7 +47,8 @@ public abstract class CRUDRepositoryBase<TEntity, TDto, TContext, TId> : ICRUDRe
     {
         var entity = await _dbSet.FindAsync(dto.Id);
         if (entity == null) throw new Exception("Entity not found");
-        _mapper.Map(dto, entity);
+
+        _dbSet.Update(entity);
         await _context.SaveChangesAsync();
     }
 
