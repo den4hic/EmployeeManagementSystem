@@ -13,9 +13,9 @@ namespace WebAPI.Controllers;
 [Route("api/[controller]")]
 public class ManagerController : ControllerBase
 {
-    private readonly ICRUDRepository<ManagerDto, int> _managerRepository;
+    private readonly IManagerRepository _managerRepository;
 
-    public ManagerController(ICRUDRepository<ManagerDto, int> managerRepository)
+    public ManagerController(IManagerRepository managerRepository)
     {
         _managerRepository = managerRepository;
     }

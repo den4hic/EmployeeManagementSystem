@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories;
 
-public class StatusRepository : CRUDRepositoryBase<Status, StatusDto, EmployeeManagementSystemDbContext, int>
+public class StatusRepository : CRUDRepositoryBase<Status, StatusDto, EmployeeManagementSystemDbContext, int>, IStatusRepository
 {
     public StatusRepository(EmployeeManagementSystemDbContext context, IMapper mapper) : base(context, mapper)
     {

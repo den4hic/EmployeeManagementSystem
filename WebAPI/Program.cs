@@ -14,12 +14,12 @@ builder.Services.AddDbContext<EmployeeManagementSystemDbContext>(options => opti
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<EmployeeManagementSystemDbContext>();
 
-builder.Services.AddScoped<ICRUDRepository<EmployeeDto, int>, EmployeeRepository>();
-builder.Services.AddScoped<ICRUDRepository<StatusDto, int>, StatusRepository>();
-builder.Services.AddScoped<ICRUDRepository<UserDto, int>, UserRepository>();
-builder.Services.AddScoped<ICRUDRepository<ProjectDto, int>, ProjectRepository>();
-builder.Services.AddScoped<ICRUDRepository<ManagerDto, int>, ManagerRepository>();
-builder.Services.AddScoped<ICRUDRepository<TaskDto, int>, TaskRepository>();
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IStatusRepository, StatusRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+builder.Services.AddScoped<IManagerRepository, ManagerRepository>();
+builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddControllers();

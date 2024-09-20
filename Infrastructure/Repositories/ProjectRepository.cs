@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories;
 
-public class ProjectRepository : CRUDRepositoryBase<Project, ProjectDto, EmployeeManagementSystemDbContext, int>
+public class ProjectRepository : CRUDRepositoryBase<Project, ProjectDto, EmployeeManagementSystemDbContext, int>, IProjectRepository
 {
     public ProjectRepository(EmployeeManagementSystemDbContext context, IMapper mapper) : base(context, mapper)
     {

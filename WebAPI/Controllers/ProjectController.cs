@@ -13,9 +13,9 @@ namespace WebAPI.Controllers;
 [Route("api/[controller]")]
 public class ProjectController : ControllerBase
 {
-    private readonly ICRUDRepository<ProjectDto, int> _projectRepository;
+    private readonly IProjectRepository _projectRepository;
 
-    public ProjectController(ICRUDRepository<ProjectDto, int> projectRepository)
+    public ProjectController(IProjectRepository projectRepository)
     {
         _projectRepository = projectRepository;
     }

@@ -12,9 +12,9 @@ namespace WebAPI.Controllers;
 [Route("api/[controller]")]
 public class TaskController : ControllerBase
 {
-    private readonly ICRUDRepository<TaskDto, int> _taskRepository;
+    private readonly ITaskRepository _taskRepository;
 
-    public TaskController(ICRUDRepository<TaskDto, int> taskRepository)
+    public TaskController(ITaskRepository taskRepository)
     {
         _taskRepository = taskRepository;
     }

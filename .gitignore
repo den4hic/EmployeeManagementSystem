@@ -2,3 +2,11 @@
 /Application/bin/Debug/net8.0
 /Domain/bin/Debug/net8.0
 /WebAPI/bin/Debug/net8.0
+/Infrastructure/bin/Debug/net8.0
+/Infrastructure/obj
+/Domain/obj/Debug/net8.0
+/Domain/obj
+/Application/obj
+/WebAPI/obj
+/ProjectDatabase/bin/Debug
+/ProjectDatabase/obj/Debug

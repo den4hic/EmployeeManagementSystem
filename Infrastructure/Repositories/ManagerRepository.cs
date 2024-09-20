@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories;
 
-public class ManagerRepository : CRUDRepositoryBase<Manager, ManagerDto, EmployeeManagementSystemDbContext, int>
+public class ManagerRepository : CRUDRepositoryBase<Manager, ManagerDto, EmployeeManagementSystemDbContext, int>, IManagerRepository
 {
     public ManagerRepository(EmployeeManagementSystemDbContext context, IMapper mapper) : base(context, mapper)
     {

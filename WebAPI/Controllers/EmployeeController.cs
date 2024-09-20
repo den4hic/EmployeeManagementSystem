@@ -15,9 +15,9 @@ namespace WebAPI.Controllers;
 [Route("api/[controller]")]
 public class EmployeeController : ControllerBase
 {
-    private readonly ICRUDRepository<EmployeeDto, int> _employeeRepository;
+    private readonly IEmployeeRepository _employeeRepository;
 
-    public EmployeeController(ICRUDRepository<EmployeeDto, int> employeeRepository)
+    public EmployeeController(IEmployeeRepository employeeRepository)
     {
         _employeeRepository = employeeRepository;
     }

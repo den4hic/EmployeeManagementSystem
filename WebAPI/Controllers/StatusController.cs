@@ -9,9 +9,9 @@ namespace WebAPI.Controllers;
 [ApiController]
 public class StatusController : ControllerBase
 {
-    private readonly ICRUDRepository<StatusDto, int> _statusRepository;
+    private readonly IStatusRepository _statusRepository;
 
-    public StatusController(ICRUDRepository<StatusDto, int> statusRepository)
+    public StatusController(IStatusRepository statusRepository)
     {
         _statusRepository = statusRepository;
     }

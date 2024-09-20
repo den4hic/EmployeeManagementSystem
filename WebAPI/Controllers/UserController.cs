@@ -9,9 +9,9 @@ namespace WebAPI.Controllers;
 [ApiController]
 public class UserController : ControllerBase
 {
-    private readonly ICRUDRepository<UserDto, int> _userRepository;
+    private readonly IUserRepository _userRepository;
 
-    public UserController(ICRUDRepository<UserDto, int> userRepository)
+    public UserController(IUserRepository userRepository)
     {
         _userRepository = userRepository;
     }
