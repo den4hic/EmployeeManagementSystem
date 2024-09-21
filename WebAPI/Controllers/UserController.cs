@@ -1,6 +1,7 @@
 ﻿using Application.DTOs;
 using Infrastructure.Abstractions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers;
@@ -9,11 +10,13 @@ namespace WebAPI.Controllers;
 [ApiController]
 public class UserController : ControllerBase
 {
+    private readonly UserManager<IdentityUser> _userManager;
     private readonly IUserRepository _userRepository;
 
-    public UserController(IUserRepository userRepository)
+    public UserController(IUserRepository userRepository, UserManager<IdentityUser> userManager)
     {
         _userRepository = userRepository;
+        _userManager = userManager;
     }
 
     [HttpPost]

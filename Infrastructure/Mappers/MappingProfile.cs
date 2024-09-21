@@ -21,5 +21,7 @@ public class MappingProfile : Profile
         CreateMap<Status, StatusDto>().ReverseMap();
 
         CreateMap<Task, TaskDto>().ReverseMap();
+
+        CreateMap<RegisterDto, UserDto>().ReverseMap();
     }
 }
