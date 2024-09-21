@@ -1,19 +1,20 @@
-﻿using Application.DTOs;
-using Infrastructure.Abstractions;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using Application.DTOs;
+using System.Collections.Generic;
+using Application.Abstractions;
 
 namespace WebAPI.Controllers;
 
-[Route("api/[controller]")]
 [ApiController]
+[Route("api/[controller]")]
 public class StatusController : ControllerBase
 {
-    private readonly IStatusRepository _statusRepository;
+    private readonly IStatusService _statusService;
 
-    public StatusController(IStatusRepository statusRepository)
+    public StatusController(IStatusService statusService)
     {
-        _statusRepository = statusRepository;
+        _statusService = statusService;
     }
 
     [HttpPost]
@@ -24,15 +25,14 @@ public class StatusController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var createdStatus = await _statusRepository.CreateAsync(statusDto);
-
+        var createdStatus = await _statusService.CreateStatusAsync(statusDto);
         return CreatedAtAction(nameof(GetStatus), new { id = createdStatus.Id }, createdStatus);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult> GetStatus(int id)
+    public async Task<ActionResult<StatusDto>> GetStatus(int id)
     {
-        var status = await _statusRepository.GetByIdAsync(id);
+        var status = await _statusService.GetStatusByIdAsync(id);
 
         if (status == null)
         {
@@ -43,10 +43,9 @@ public class StatusController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult> GetAllStatuses()
+    public async Task<ActionResult<IEnumerable<StatusDto>>> GetAllStatuses()
     {
-        var statuses = await _statusRepository.GetAllAsync();
-
+        var statuses = await _statusService.GetAllStatusesAsync();
         return Ok(statuses);
     }
 
@@ -58,16 +57,14 @@ public class StatusController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        await _statusRepository.UpdateAsync(statusDto);
-
+        await _statusService.UpdateStatusAsync(statusDto);
         return NoContent();
     }
 
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteStatus(int id)
     {
-        await _statusRepository.DeleteAsync(id);
-
+        await _statusService.DeleteStatusAsync(id);
         return NoContent();
     }
 }

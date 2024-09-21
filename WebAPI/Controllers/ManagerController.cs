@@ -1,11 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using AutoMapper;
-using Domain.Entities;
 using Application.DTOs;
-using Infrastructure.Context;
-using Infrastructure.Abstractions;
+using Application.Abstractions;
 
 namespace WebAPI.Controllers;
 
@@ -13,11 +9,11 @@ namespace WebAPI.Controllers;
 [Route("api/[controller]")]
 public class ManagerController : ControllerBase
 {
-    private readonly IManagerRepository _managerRepository;
+    private readonly IManagerService _managerService;
 
-    public ManagerController(IManagerRepository managerRepository)
+    public ManagerController(IManagerService managerService)
     {
-        _managerRepository = managerRepository;
+        _managerService = managerService;
     }
 
     [HttpPost]
@@ -28,15 +24,15 @@ public class ManagerController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var createdManager = await _managerRepository.CreateAsync(managerDto);
+        var createdManager = await _managerService.CreateManagerAsync(managerDto);
 
         return CreatedAtAction(nameof(GetManager), new { id = createdManager.Id }, createdManager);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult> GetManager(int id)
+    public async Task<ActionResult<ManagerDto>> GetManager(int id)
     {
-        var manager = await _managerRepository.GetByIdAsync(id);
+        var manager = await _managerService.GetManagerByIdAsync(id);
 
         if (manager == null)
         {
@@ -47,9 +43,9 @@ public class ManagerController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult> GetAllManagers()
+    public async Task<ActionResult<IEnumerable<ManagerDto>>> GetAllManagers()
     {
-        var managers = await _managerRepository.GetAllAsync();
+        var managers = await _managerService.GetAllManagersAsync();
 
         return Ok(managers);
     }
@@ -62,7 +58,7 @@ public class ManagerController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        await _managerRepository.UpdateAsync(managerDto);
+        await _managerService.UpdateManagerAsync(managerDto);
 
         return NoContent();
     }
@@ -70,14 +66,14 @@ public class ManagerController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteManager(int id)
     {
-        var manager = await _managerRepository.GetByIdAsync(id);
+        var manager = await _managerService.GetManagerByIdAsync(id);
 
         if (manager == null)
         {
             return NotFound();
         }
 
-        await _managerRepository.DeleteAsync(id);
+        await _managerService.DeleteManagerAsync(id);
 
         return NoContent();
     }

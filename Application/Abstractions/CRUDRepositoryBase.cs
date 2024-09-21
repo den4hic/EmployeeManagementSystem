@@ -4,7 +4,7 @@ using Domain.Common;
 using Microsoft.EntityFrameworkCore;
 using DbContext = Microsoft.EntityFrameworkCore.DbContext;
 
-namespace Infrastructure.Abstractions;
+namespace Application.Abstractions;
 
 public abstract class CRUDRepositoryBase<TEntity, TDto, TContext, TId> : ICRUDRepository<TDto, TId>
             where TEntity : class, IEntity<TId>

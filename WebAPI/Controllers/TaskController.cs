@@ -1,10 +1,8 @@
-﻿using Application.DTOs;
-using AutoMapper;
-using Infrastructure.Abstractions;
-using Infrastructure.Context;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using Application.DTOs;
+using System.Collections.Generic;
+using Application.Abstractions;
 
 namespace WebAPI.Controllers;
 
@@ -12,11 +10,11 @@ namespace WebAPI.Controllers;
 [Route("api/[controller]")]
 public class TaskController : ControllerBase
 {
-    private readonly ITaskRepository _taskRepository;
+    private readonly ITaskService _taskService;
 
-    public TaskController(ITaskRepository taskRepository)
+    public TaskController(ITaskService taskService)
     {
-        _taskRepository = taskRepository;
+        _taskService = taskService;
     }
 
     [HttpPost]
@@ -27,15 +25,14 @@ public class TaskController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var createdTask = await _taskRepository.CreateAsync(taskDto);
-
+        var createdTask = await _taskService.CreateTaskAsync(taskDto);
         return CreatedAtAction(nameof(GetTask), new { id = createdTask.Id }, createdTask);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult> GetTask(int id)
+    public async Task<ActionResult<TaskDto>> GetTask(int id)
     {
-        var task = await _taskRepository.GetByIdAsync(id);
+        var task = await _taskService.GetTaskByIdAsync(id);
 
         if (task == null)
         {
@@ -46,10 +43,9 @@ public class TaskController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult> GetAllTasks()
+    public async Task<ActionResult<IEnumerable<TaskDto>>> GetAllTasks()
     {
-        var tasks = await _taskRepository.GetAllAsync();
-
+        var tasks = await _taskService.GetAllTasksAsync();
         return Ok(tasks);
     }
 
@@ -61,23 +57,19 @@ public class TaskController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        await _taskRepository.UpdateAsync(taskDto);
-
+        await _taskService.UpdateTaskAsync(taskDto);
         return NoContent();
     }
 
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteTask(int id)
     {
-        var task = await _taskRepository.GetByIdAsync(id);
-
+        var task = await _taskService.GetTaskByIdAsync(id);
         if (task == null)
         {
             return NotFound();
         }
-
-        await _taskRepository.DeleteAsync(id);
-
+        await _taskService.DeleteTaskAsync(id);
         return NoContent();
     }
 }

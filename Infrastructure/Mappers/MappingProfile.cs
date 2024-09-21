@@ -23,5 +23,9 @@ public class MappingProfile : Profile
         CreateMap<Task, TaskDto>().ReverseMap();
 
         CreateMap<RegisterDto, UserDto>().ReverseMap();
+
+        CreateMap<EmployeeDto, EmployeeManagerRoleDto>().ReverseMap();
+
+        CreateMap<ManagerDto, EmployeeManagerRoleDto>().ReverseMap();
     }
 }

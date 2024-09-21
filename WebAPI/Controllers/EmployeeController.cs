@@ -1,12 +1,8 @@
 ﻿using Application.DTOs;
-using AutoMapper;
-using Domain.Entities;
-using Infrastructure.Abstractions;
-using Infrastructure.Context;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
+using Application.Abstractions;
 
 namespace WebAPI.Controllers;
 
@@ -15,11 +11,11 @@ namespace WebAPI.Controllers;
 [Route("api/[controller]")]
 public class EmployeeController : ControllerBase
 {
-    private readonly IEmployeeRepository _employeeRepository;
+    private readonly IEmployeeService _employeeService;
 
-    public EmployeeController(IEmployeeRepository employeeRepository)
+    public EmployeeController(IEmployeeService employeeService)
     {
-        _employeeRepository = employeeRepository;
+        _employeeService = employeeService;
     }
 
     [HttpPost]
@@ -29,31 +25,25 @@ public class EmployeeController : ControllerBase
         {
             return BadRequest(ModelState);
         }
-
-        var createdEmployee = await _employeeRepository.CreateAsync(employeeDto);
-
-
+        var createdEmployee = await _employeeService.CreateEmployeeAsync(employeeDto);
         return CreatedAtAction(nameof(GetEmployee), new { id = createdEmployee.Id }, createdEmployee);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult> GetEmployee(int id)
+    public async Task<ActionResult<EmployeeDto>> GetEmployee(int id)
     {
-        var employee = await _employeeRepository.GetByIdAsync(id);
-
+        var employee = await _employeeService.GetEmployeeByIdAsync(id);
         if (employee == null)
         {
             return NotFound();
         }
-
         return Ok(employee);
     }
 
     [HttpGet]
-    public async Task<ActionResult> GetAllEmployees()
+    public async Task<ActionResult<IEnumerable<EmployeeDto>>> GetAllEmployees()
     {
-        var employees = await _employeeRepository.GetAllAsync();
-
+        var employees = await _employeeService.GetAllEmployeesAsync();
         return Ok(employees);
     }
 
@@ -64,17 +54,14 @@ public class EmployeeController : ControllerBase
         {
             return BadRequest(ModelState);
         }
-
-        await _employeeRepository.UpdateAsync(employeeDto);
-
+        await _employeeService.UpdateEmployeeAsync(employeeDto);
         return NoContent();
     }
 
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteEmployee(int id)
     {
-        await _employeeRepository.DeleteAsync(id);
-
+        await _employeeService.DeleteEmployeeAsync(id);
         return NoContent();
     }
 }

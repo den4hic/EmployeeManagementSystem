@@ -1,22 +1,20 @@
-﻿using Application.DTOs;
-using Infrastructure.Abstractions;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using Application.DTOs;
+using System.Collections.Generic;
+using Application.Abstractions;
 
 namespace WebAPI.Controllers;
 
-[Route("api/[controller]")]
 [ApiController]
+[Route("api/[controller]")]
 public class UserController : ControllerBase
 {
-    private readonly UserManager<IdentityUser> _userManager;
-    private readonly IUserRepository _userRepository;
+    private readonly IUserService _userService;
 
-    public UserController(IUserRepository userRepository, UserManager<IdentityUser> userManager)
+    public UserController(IUserService userService)
     {
-        _userRepository = userRepository;
-        _userManager = userManager;
+        _userService = userService;
     }
 
     [HttpPost]
@@ -27,15 +25,14 @@ public class UserController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var createdUser = await _userRepository.CreateAsync(userDto);
-
+        var createdUser = await _userService.CreateUserAsync(userDto);
         return CreatedAtAction(nameof(GetUser), new { id = createdUser.Id }, createdUser);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult> GetUser(int id)
+    public async Task<ActionResult<UserDto>> GetUser(int id)
     {
-        var user = await _userRepository.GetByIdAsync(id);
+        var user = await _userService.GetUserByIdAsync(id);
 
         if (user == null)
         {
@@ -46,10 +43,9 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult> GetAllUsers()
+    public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
     {
-        var users = await _userRepository.GetAllAsync();
-
+        var users = await _userService.GetAllUsersAsync();
         return Ok(users);
     }
 
@@ -61,16 +57,14 @@ public class UserController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        await _userRepository.UpdateAsync(userDto);
-
+        await _userService.UpdateUserAsync(userDto);
         return NoContent();
     }
 
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteUser(int id)
     {
-        await _userRepository.DeleteAsync(id);
-
+        await _userService.DeleteUserAsync(id);
         return NoContent();
     }
 }

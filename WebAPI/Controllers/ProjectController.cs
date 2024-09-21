@@ -1,11 +1,7 @@
-﻿using Application.DTOs;
-using AutoMapper;
-using Domain.Entities;
-using Infrastructure.Abstractions;
-using Infrastructure.Context;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using Application.DTOs;
+using Application.Abstractions;
 
 namespace WebAPI.Controllers;
 
@@ -13,11 +9,11 @@ namespace WebAPI.Controllers;
 [Route("api/[controller]")]
 public class ProjectController : ControllerBase
 {
-    private readonly IProjectRepository _projectRepository;
+    private readonly IProjectService _projectService;
 
-    public ProjectController(IProjectRepository projectRepository)
+    public ProjectController(IProjectService projectService)
     {
-        _projectRepository = projectRepository;
+        _projectService = projectService;
     }
 
     [HttpPost]
@@ -28,15 +24,14 @@ public class ProjectController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var createdProject = await _projectRepository.CreateAsync(projectDto);
-
+        var createdProject = await _projectService.CreateProjectAsync(projectDto);
         return CreatedAtAction(nameof(GetProject), new { id = createdProject.Id }, createdProject);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult> GetProject(int id)
+    public async Task<ActionResult<ProjectDto>> GetProject(int id)
     {
-        var project = await _projectRepository.GetByIdAsync(id);
+        var project = await _projectService.GetProjectByIdAsync(id);
 
         if (project == null)
         {
@@ -47,10 +42,9 @@ public class ProjectController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult> GetAllProjects()
+    public async Task<ActionResult<IEnumerable<ProjectDto>>> GetAllProjects()
     {
-        var projects = await _projectRepository.GetAllAsync();
-
+        var projects = await _projectService.GetAllProjectsAsync();
         return Ok(projects);
     }
 
@@ -62,16 +56,14 @@ public class ProjectController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        await _projectRepository.UpdateAsync(projectDto);
-
+        await _projectService.UpdateProjectAsync(projectDto);
         return NoContent();
     }
 
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteProject(int id)
     {
-        await _projectRepository.DeleteAsync(id);
-
+        await _projectService.DeleteProjectAsync(id);
         return NoContent();
     }
 }

@@ -1,11 +1,13 @@
 using Application.DTOs;
-using Infrastructure.Abstractions;
 using Infrastructure.Context;
 using Infrastructure.Mappers;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using Application.Abstractions;
+using Application.Services;
+using IEmployeeRepository = Application.Abstractions.IEmployeeRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("ManagementDbContextConnection") ?? throw new InvalidOperationException("Connection string 'ManagementDbContextConnection' not found.");
@@ -17,11 +19,18 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-builder.Services.AddScoped<IStatusRepository, StatusRepository>();
+builder.Services.AddScoped<IManagerRepository, ManagerRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
-builder.Services.AddScoped<IManagerRepository, ManagerRepository>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+builder.Services.AddScoped<IStatusRepository, StatusRepository>();
+
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<IManagerService, ManagerService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<IStatusService, StatusService>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddControllers();

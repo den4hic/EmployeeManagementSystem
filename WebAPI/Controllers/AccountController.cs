@@ -1,7 +1,7 @@
-﻿using Application.DTOs;
+﻿using Application.Abstractions;
+using Application.DTOs;
 using AutoMapper;
 using Domain.Entities;
-using Infrastructure.Abstractions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
