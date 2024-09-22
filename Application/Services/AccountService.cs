@@ -2,9 +2,13 @@
 using Application.DTOs;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,13 +20,15 @@ namespace Application.Services
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly IConfiguration _config;
 
-        public AccountService(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IUserRepository userRepository, IMapper mapper)
+        public AccountService(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IUserRepository userRepository, IMapper mapper, IConfiguration config)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _userRepository = userRepository;
             _mapper = mapper;
+            _config = config;
         }
 
         public async Task<bool> RegisterAsync(RegisterDto model)
@@ -63,7 +69,7 @@ namespace Application.Services
             if (user == null)
             {
                 return false;
-            }
+            }            
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
             if (!result.Succeeded)
@@ -111,6 +117,36 @@ namespace Application.Services
                 return false;
             }
             return true;
+        }
+
+        public async Task<string> GenereateJwtTokenAsync(LoginDto model)
+        {
+            var user = await _userManager.FindByNameAsync(model.Username);
+
+            var role = _userManager.GetRolesAsync(user).Result.FirstOrDefault();
+
+            IEnumerable<Claim> claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.UserData, user.UserName),
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Role, role)
+            };
+
+            SecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("Jwt:Key").Value));
+
+            SigningCredentials signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            SecurityToken securityToken = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(20),
+                issuer: _config.GetSection("Jwt:Issuer").Value,
+                audience: _config.GetSection("Jwt:Audience").Value,
+                signingCredentials: signingCredentials
+                );
+
+            string tokenString = new JwtSecurityTokenHandler().WriteToken(securityToken);
+
+            return tokenString;
         }
     }
 }

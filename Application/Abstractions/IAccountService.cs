@@ -1,4 +1,5 @@
 ﻿using Application.DTOs;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,4 +14,5 @@ public interface IAccountService
     Task<bool> LoginAsync(LoginDto model);
     Task LogoutAsync();
     Task<bool> CreateDefaultAdminAsync();
+    Task<string> GenereateJwtTokenAsync(LoginDto model);
 }

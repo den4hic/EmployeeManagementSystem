@@ -45,7 +45,8 @@ public class AccountController : ControllerBase
 
         if (result)
         {
-            return Ok("Logged in successfully");
+            var token = await _accountService.GenereateJwtTokenAsync(model);
+            return Ok(new { Token = token });
         }
 
         return Unauthorized("Invalid credentials");
