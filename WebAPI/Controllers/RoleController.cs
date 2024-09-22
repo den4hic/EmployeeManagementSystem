@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace WebAPI.Controllers;
 
-[Authorize(Roles = "Admin")]
 [Route("api/[controller]")]
 [ApiController]
 public class RoleController : ControllerBase
@@ -29,6 +28,7 @@ public class RoleController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreateRole(string roleName)
     {
         var success = await _roleService.CreateRoleAsync(roleName);
@@ -39,6 +39,7 @@ public class RoleController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetRoles()
     {
         var roles = await _roleService.GetRolesAsync();
@@ -46,6 +47,7 @@ public class RoleController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetRole(string id)
     {
         var role = await _roleService.GetRoleByIdAsync(id);
@@ -56,6 +58,7 @@ public class RoleController : ControllerBase
     }
 
     [HttpDelete("{roleName}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteRole(string roleName)
     {
         var success = await _roleService.DeleteRoleAsync(roleName);
@@ -66,6 +69,7 @@ public class RoleController : ControllerBase
     }
 
     [HttpPost("assign-role")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> AssignRole(string username, string role, [FromBody] EmployeeManagerRoleDto roleData)
     {
         await _roleService.AssignRoleAsync(username, role, roleData);

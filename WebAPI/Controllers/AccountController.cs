@@ -45,8 +45,8 @@ public class AccountController : ControllerBase
 
         if (result)
         {
-            var token = await _accountService.GenereateJwtTokenAsync(model);
-            return Ok(new { Token = token });
+            var token = await _accountService.GenereateJwtTokenAsync(model, true);
+            return Ok(token);
         }
 
         return Unauthorized("Invalid credentials");
@@ -70,5 +70,12 @@ public class AccountController : ControllerBase
         }
 
         return BadRequest("Problems with default admin creation");
+    }
+
+    [HttpPost("refresh-token")]
+    public async Task<IActionResult> RefreshToken(TokenDto tokenDto)
+    {
+        var token = await _accountService.RefreshToken(tokenDto);
+        return Ok(token);
     }
 }

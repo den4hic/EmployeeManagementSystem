@@ -19,7 +19,7 @@ public class UserRepository : CRUDRepositoryBase<User, UserDto, EmployeeManageme
     {
     }
 
-    public async Task<UserDto> GetByAspNetUserId(string id)
+    public async Task<UserDto> GetByAspNetUserIdAsync(string id)
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.AspNetUserId == id);
 

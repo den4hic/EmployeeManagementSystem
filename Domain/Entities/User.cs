@@ -18,6 +18,10 @@ public partial class User : IEntity<int>
 
     public string? PhoneNumber { get; set; }
 
+    public string? RefreshToken { get; set; }
+
+    public DateTime? RefreshTokenExpiryTime { get; set; }
+
     public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
 
     public virtual ICollection<Manager> Managers { get; set; } = new List<Manager>();

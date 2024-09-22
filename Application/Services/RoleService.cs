@@ -94,7 +94,7 @@ public class RoleService : IRoleService
 
         await _userManager.AddToRoleAsync(userIdentity, role);
 
-        var user = await _userRepository.GetByAspNetUserId(userIdentity.Id);
+        var user = await _userRepository.GetByAspNetUserIdAsync(userIdentity.Id);
 
         if (role == "Manager")
         {

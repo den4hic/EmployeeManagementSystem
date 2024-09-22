@@ -148,6 +148,7 @@ public partial class EmployeeManagementSystemDbContext : IdentityContext
             entity.Property(e => e.FirstName).HasMaxLength(50);
             entity.Property(e => e.LastName).HasMaxLength(50);
             entity.Property(e => e.PhoneNumber).HasMaxLength(20);
+            entity.Property(e => e.RefreshToken).HasMaxLength(50);
 
             entity.HasOne<IdentityUser>()
                   .WithMany()

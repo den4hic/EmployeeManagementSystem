@@ -14,5 +14,6 @@ public interface IAccountService
     Task<bool> LoginAsync(LoginDto model);
     Task LogoutAsync();
     Task<bool> CreateDefaultAdminAsync();
-    Task<string> GenereateJwtTokenAsync(LoginDto model);
+    Task<TokenDto> GenereateJwtTokenAsync(LoginDto model, bool populateExp);
+    Task<TokenDto> RefreshToken(TokenDto tokenDto);
 }
