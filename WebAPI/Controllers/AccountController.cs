@@ -27,10 +27,10 @@ public class AccountController : ControllerBase
 
         if (result)
         {
-            return Ok("User created successfully");
+            return Ok(new { message = "User created successfully" });
         }
 
-        return BadRequest("User creation failed");
+        return BadRequest(new { message = "User creation failed" });
     }
 
     [HttpPost("login")]
@@ -49,14 +49,14 @@ public class AccountController : ControllerBase
             return Ok(token);
         }
 
-        return Unauthorized("Invalid credentials");
+        return Unauthorized(new { message = "Invalid credentials" });
     }
 
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
     {
         await _accountService.LogoutAsync();
-        return Ok("Logged out successfully");
+        return Ok(new { message = "Logged out successfully" });
     }
 
     [HttpPost("default-admin")]
@@ -69,7 +69,7 @@ public class AccountController : ControllerBase
             return NoContent();
         }
 
-        return BadRequest("Problems with default admin creation");
+        return BadRequest(new { message = "Problems with default admin creation" });
     }
 
     [HttpPost("refresh-token")]
