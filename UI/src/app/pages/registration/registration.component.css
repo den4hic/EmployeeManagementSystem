@@ -2,13 +2,42 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: calc(100vh - 64px);
+  height: 90vh;
+  background-color: #f5f5f5;
 }
+
 mat-card {
-  max-width: 400px;
-  width: 100%;
+  max-width: 500px;
+  width: 90%;
+  padding: 20px;
 }
+
 form {
   display: flex;
   flex-direction: column;
+  gap: 10px;
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+}
+
+.form-row mat-form-field {
+  flex: 1;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+button {
+  height: 8vh;
+  margin-top: 10px;
+}
+
+@media (max-width: 600px) {
+  .form-row {
+    flex-direction: column;
+  }
 }
