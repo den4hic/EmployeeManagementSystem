@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {RouterLink, RouterModule, RouterOutlet} from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import {HttpClientModule, provideHttpClient, withInterceptors} from '@angular/common/http';
 
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -21,6 +21,7 @@ import {ToolbarComponent} from "./shared/toolbar/app.toolbar";
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {MatIcon} from "@angular/material/icon";
 import { ProfileComponent } from './pages/profile/profile.component';
+import {tokenInterceptor} from "./interceptor/token.interceptor";
 
 @NgModule({
   declarations: [
@@ -50,7 +51,9 @@ import { ProfileComponent } from './pages/profile/profile.component';
     MatMenuTrigger,
     MatIcon
   ],
-  providers: [],
+  providers: [
+    provideHttpClient(withInterceptors([tokenInterceptor]))
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
