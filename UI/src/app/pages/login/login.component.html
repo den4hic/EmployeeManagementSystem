@@ -8,11 +8,21 @@
         <mat-form-field appearance="fill">
           <mat-label>Username</mat-label>
           <input matInput formControlName="username" required>
+          <mat-error *ngIf="loginForm.controls['username'].hasError('required')">
+            Username is required
+          </mat-error>
         </mat-form-field>
         <mat-form-field appearance="fill">
           <mat-label>Password</mat-label>
           <input matInput formControlName="password" required type="password">
+          <mat-error *ngIf="loginForm.controls['password'].hasError('required')">
+            Password is required
+          </mat-error>
+          <mat-error *ngIf="loginForm.controls['password'].hasError('minLength')">
+            Minimal length is 6
+          </mat-error>
         </mat-form-field>
+
         <button mat-raised-button color="primary" type="submit" [disabled]="!loginForm.valid">Login</button>
       </form>
     </mat-card-content>

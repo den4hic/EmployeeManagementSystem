@@ -12,3 +12,7 @@ form {
   display: flex;
   flex-direction: column;
 }
+
+mat-form-field {
+  margin-bottom: 8px;
+}

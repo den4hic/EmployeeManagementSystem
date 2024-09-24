@@ -10,20 +10,35 @@
           <mat-form-field appearance="outline">
             <mat-label>Username</mat-label>
             <input matInput formControlName="username" required>
+            <mat-error *ngIf="registrationForm.controls['username'].hasError('required')">
+              Username is required
+            </mat-error>
           </mat-form-field>
           <mat-form-field appearance="outline">
             <mat-label>Email</mat-label>
             <input matInput formControlName="email" required type="email">
+            <mat-error *ngIf="registrationForm.controls['email'].hasError('required')">
+              Email is required
+            </mat-error>
+            <mat-error *ngIf="registrationForm.controls['email'].hasError('email')">
+              Invalid email address
+            </mat-error>
           </mat-form-field>
         </div>
         <div class="form-row">
           <mat-form-field appearance="outline">
             <mat-label>First Name</mat-label>
             <input matInput formControlName="firstName" required>
+            <mat-error *ngIf="registrationForm.controls['firstName'].hasError('required')">
+              First name is required
+            </mat-error>
           </mat-form-field>
           <mat-form-field appearance="outline">
             <mat-label>Last Name</mat-label>
             <input matInput formControlName="lastName" required>
+            <mat-error *ngIf="registrationForm.controls['lastName'].hasError('required')">
+              Last name is required
+            </mat-error>
           </mat-form-field>
         </div>
         <mat-form-field appearance="outline">
@@ -34,10 +49,22 @@
           <mat-form-field appearance="outline">
             <mat-label>Password</mat-label>
             <input matInput formControlName="password" required type="password">
+            <mat-error *ngIf="registrationForm.controls['password'].hasError('required')">
+              Password is required
+            </mat-error>
+            <mat-error *ngIf="registrationForm.controls['password'].hasError('minLength')">
+              Minimal length is 6
+            </mat-error>
           </mat-form-field>
           <mat-form-field appearance="outline">
             <mat-label>Confirm password</mat-label>
             <input matInput formControlName="confirmPassword" required type="password">
+            <mat-error *ngIf="registrationForm.controls['confirmPassword'].hasError('required')">
+              Confirm password is required
+            </mat-error>
+            <mat-error *ngIf="registrationForm.controls['confirmPassword'].hasError('minLength')">
+              Minimal length is 6
+            </mat-error>
           </mat-form-field>
         </div>
         <button mat-raised-button color="primary" type="submit" [disabled]="!registrationForm.valid">Register</button>
