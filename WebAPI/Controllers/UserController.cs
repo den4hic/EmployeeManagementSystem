@@ -67,4 +67,17 @@ public class UserController : ControllerBase
         await _userService.DeleteUserAsync(id);
         return NoContent();
     }
+
+    [HttpGet("current/{username}")]
+    public async Task<ActionResult<UserDto>> GetCurrentUser(string username)
+    {
+        var user = await _userService.GetUserByUsernameAsync(username);
+
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(user);
+    }
 }

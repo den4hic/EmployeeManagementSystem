@@ -19,6 +19,15 @@ export class JwtService {
     return null;
   }
 
+  public getUsername(): string | null {
+    const token = this.getToken();
+    if (token) {
+      const decodedToken: any = jwtDecode(token);
+      return decodedToken.username || null;
+    }
+    return null;
+  }
+
   public isInRole(role: string): boolean {
     const userRole = this.getUserRole();
     return userRole === role;

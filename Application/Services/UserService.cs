@@ -12,10 +12,12 @@ namespace Application.Services;
 public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
+    private readonly UserManager<IdentityUser> _userManager;
 
-    public UserService(IUserRepository userRepository)
+    public UserService(IUserRepository userRepository, UserManager<IdentityUser> userManager)
     {
         _userRepository = userRepository;
+        _userManager = userManager;
     }
 
     public async Task<UserDto> CreateUserAsync(UserDto userDto)
@@ -41,5 +43,17 @@ public class UserService : IUserService
     public async Task DeleteUserAsync(int id)
     {
         await _userRepository.DeleteAsync(id);
+    }
+
+    public async Task<UserDto> GetUserByUsernameAsync(string username)
+    {
+        var user = await _userManager.FindByNameAsync(username);
+
+        if (user == null)
+        {
+            return null;
+        }
+
+        return await _userRepository.GetByAspNetUserIdAsync(user.Id);
     }
 }

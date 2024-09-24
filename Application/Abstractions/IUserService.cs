@@ -14,5 +14,6 @@ namespace Application.Abstractions
         Task<IEnumerable<UserDto>> GetAllUsersAsync();
         Task UpdateUserAsync(UserDto userDto);
         Task DeleteUserAsync(int id);
+        Task<UserDto> GetUserByUsernameAsync(string username);
     }
 }

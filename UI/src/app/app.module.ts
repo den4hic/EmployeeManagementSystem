@@ -20,6 +20,7 @@ import { HomeComponent } from './pages/home/home.component';
 import {ToolbarComponent} from "./shared/toolbar/app.toolbar";
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {MatIcon} from "@angular/material/icon";
+import { ProfileComponent } from './pages/profile/profile.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import {MatIcon} from "@angular/material/icon";
     RegistrationComponent,
     LoginComponent,
     HomeComponent,
-    ToolbarComponent
+    ToolbarComponent,
+    ProfileComponent
   ],
   imports: [
     BrowserModule,
