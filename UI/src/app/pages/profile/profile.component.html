@@ -1,8 +1,11 @@
-<p>profile works!</p>
-
-<p>{{userModel?.id}}</p>
-<p>{{userModel?.username}}</p>
-<p>{{userModel?.firstName}}</p>
-<p>{{userModel?.lastName}}</p>
-<p>{{userModel?.email}}</p>
-<p>{{userModel?.phoneNumber}}</p>
+<div class="container">
+  <mat-card>
+    <mat-card-header>Hi, {{userModel?.username}}</mat-card-header>
+    <mat-card-content>
+      <p>First Name: {{userModel?.firstName}}</p>
+      <p>Last Name: {{userModel?.lastName}}</p>
+      <p>Email: {{userModel?.email}}</p>
+      <p>Phone Number: {{userModel?.phoneNumber}}</p>
+    </mat-card-content>
+  </mat-card>
+</div>
