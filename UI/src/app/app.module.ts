@@ -15,13 +15,20 @@ import { AppComponent } from './app.component';
 import {LandingComponent} from "./pages/landing/landing.component";
 import {RegistrationComponent} from "./pages/registration/registration.component";
 import {LoginComponent} from "./pages/login/login.component";
+import {AppRoutingModule} from "./app-routing.module";
+import { HomeComponent } from './pages/home/home.component';
+import {ToolbarComponent} from "./shared/toolbar/app.toolbar";
+import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
+import {MatIcon} from "@angular/material/icon";
 
 @NgModule({
   declarations: [
     AppComponent,
     LandingComponent,
     RegistrationComponent,
-    LoginComponent
+    LoginComponent,
+    HomeComponent,
+    ToolbarComponent
   ],
   imports: [
     BrowserModule,
@@ -35,11 +42,11 @@ import {LoginComponent} from "./pages/login/login.component";
     MatFormFieldModule,
     RouterOutlet,
     RouterLink,
-    RouterModule.forRoot([
-      { path: '', component: LandingComponent },
-      { path: 'register', component: RegistrationComponent },
-      { path: 'login', component: LoginComponent },
-    ])
+    AppRoutingModule,
+    MatMenu,
+    MatMenuItem,
+    MatMenuTrigger,
+    MatIcon
   ],
   providers: [],
   bootstrap: [AppComponent]

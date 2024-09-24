@@ -174,7 +174,7 @@ public class AccountService : IAccountService
         {
             new Claim(ClaimTypes.UserData, user.UserName),
             new Claim(ClaimTypes.Name, user.UserName),
-            new Claim(ClaimTypes.Role, role)
+            new Claim("role", role)
         };
     }
 

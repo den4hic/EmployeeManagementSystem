@@ -1,0 +1,13 @@
+.container {
+  max-width: 800px;
+}
+h1, h2 {
+  margin-bottom: 20px;
+}
+ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+li {
+  margin-bottom: 10px;
+}

@@ -44,4 +44,8 @@ export class AuthService {
       })
     );
   }
+
+  isAuthenticated(): boolean {
+    return !!localStorage.getItem('accessToken');
+  }
 }

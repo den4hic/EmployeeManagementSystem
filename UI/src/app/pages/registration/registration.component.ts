@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
+import {Component, inject} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {AuthService} from "../../services/auth.service";
-import {LoginDto} from "../../services/dtos/login.dto";
 import {RegisterDto} from "../../services/dtos/register.dto";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-registration',
@@ -11,6 +11,7 @@ import {RegisterDto} from "../../services/dtos/register.dto";
 })
 export class RegistrationComponent {
   registrationForm: FormGroup;
+  router = inject(Router);
 
   constructor(private authService: AuthService, private fb: FormBuilder) {
     this.registrationForm = this.fb.group({
@@ -30,6 +31,7 @@ export class RegistrationComponent {
       this.authService.register(registrationData).subscribe(
         response => {
           console.log('Register successful', response);
+          this.router.navigate(['/login']);
         },
         error => {
           console.error('Register failed', error);

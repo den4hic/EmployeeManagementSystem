@@ -1,0 +1,20 @@
+<div class="container mt-4">
+  <h1>Welcome to this management system</h1>
+  <div [ngSwitch]="userRole">
+    <div *ngSwitchCase="'Admin'">
+      <h1>You are admin</h1>
+    </div>
+    <div *ngSwitchCase="'Manager'">
+      <h1>You are manager</h1>
+    </div>
+    <div *ngSwitchCase="'User'">
+      <h1>You are user</h1>
+    </div>
+    <div *ngSwitchCase="'Employee'">
+      <h1>You are employee</h1>
+    </div>
+    <div *ngSwitchDefault>
+      <h1>Unknown role</h1>
+    </div>
+  </div>
+</div>

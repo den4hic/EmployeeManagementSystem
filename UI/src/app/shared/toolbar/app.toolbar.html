@@ -1,0 +1,20 @@
+<mat-toolbar color="primary">
+  <a mat-button routerLink="/">Employee Management System</a>
+  <span class="spacer"></span>
+
+  <ng-container *ngIf="isAuthenticated(); else loginRegister">
+    <button mat-icon-button [matMenuTriggerFor]="userMenu">
+      <mat-icon>account_circle</mat-icon>
+    </button>
+    <mat-menu #userMenu="matMenu">
+      <button mat-menu-item (click)="goToProfile()">Profile</button>
+      <button mat-menu-item (click)="logout()">Logout</button>
+    </mat-menu>
+  </ng-container>
+
+  <ng-template #loginRegister>
+    <a mat-button routerLink="/login">Login</a>
+    <a mat-button routerLink="/register">Register</a>
+  </ng-template>
+</mat-toolbar>
+<router-outlet></router-outlet>
