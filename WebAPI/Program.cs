@@ -13,9 +13,15 @@ var connectionString = builder.Configuration.GetConnectionString("ManagementDbCo
 
 builder.Services.AddDbContext<EmployeeManagementSystemDbContext>(options => options.UseSqlServer(connectionString));
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-                .AddEntityFrameworkStores<EmployeeManagementSystemDbContext>()
-                .AddDefaultTokenProviders();
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+                {
+                    options.Password.RequiredLength = 6;
+                    options.Password.RequireDigit = false;
+                    options.Password.RequireNonAlphanumeric = false;
+                    options.Password.RequireUppercase = false;
+
+                }).AddEntityFrameworkStores<EmployeeManagementSystemDbContext>()
+                    .AddDefaultTokenProviders();
 
 builder.Services.AddAuthentication(options =>
 {

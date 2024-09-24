@@ -2,9 +2,11 @@
 using System.Threading.Tasks;
 using Application.DTOs;
 using Application.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebAPI.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class ProjectController : ControllerBase

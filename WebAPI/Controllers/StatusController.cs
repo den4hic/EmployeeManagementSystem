@@ -3,9 +3,11 @@ using System.Threading.Tasks;
 using Application.DTOs;
 using System.Collections.Generic;
 using Application.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebAPI.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class StatusController : ControllerBase
