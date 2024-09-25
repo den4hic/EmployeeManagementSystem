@@ -24,7 +24,8 @@ public class UserDtoValidator : AbstractValidator<UserDto>
             .NotEmpty().WithMessage("Last name is required.")
             .MaximumLength(50).WithMessage("Last name must not exceed 50 characters.");
 
-        //RuleFor(x => x.PhoneNumber)
-        //    .Matches(@"^\+?[1-9]\d{1,14}$").WithMessage("Phone number must be in a valid international format.");
+        RuleFor(x => x.PhoneNumber)
+            .Matches(@"^0\d{9}$")
+            .WithMessage("Phone number must be in a valid format.");
     }
 }

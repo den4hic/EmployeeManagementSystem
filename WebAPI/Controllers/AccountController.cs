@@ -50,7 +50,8 @@ public class AccountController : ControllerBase
             return Ok(token);
         }
 
-        return Unauthorized(new { message = "Invalid credentials" });
+
+        return Unauthorized("Invalid credentials");
     }
 
     [HttpPost("logout")]

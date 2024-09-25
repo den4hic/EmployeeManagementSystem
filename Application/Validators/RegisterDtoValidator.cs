@@ -30,7 +30,7 @@ public class RegisterDtoValidator : AbstractValidator<RegisterDto>
 
         RuleFor(x => x.PhoneNumber)
             .Matches(@"^0\d{9}$")
-            .WithMessage("Phone number must be in a valid international format.");
+            .WithMessage("Phone number must be in a valid format.");
 
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage("Password is required.")
