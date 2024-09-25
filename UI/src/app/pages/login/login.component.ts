@@ -4,6 +4,7 @@ import {AuthService} from "../../services/auth.service";
 import {LoginDto} from "../../services/dtos/login.dto";
 import {JwtService} from "../../services/jwt.service";
 import {Router} from "@angular/router";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-login',
@@ -13,6 +14,7 @@ import {Router} from "@angular/router";
 export class LoginComponent {
   loginForm: FormGroup;
   router = inject(Router);
+  private snackBar = inject(MatSnackBar);
 
   constructor(private authService: AuthService, private jwtService: JwtService, private fb: FormBuilder) {
     this.loginForm = this.fb.group({
@@ -32,8 +34,26 @@ export class LoginComponent {
         },
         error => {
           console.error('Login failed', error);
+          let errorMessage = 'An unknown error occurred';
+          if (error.status === 401) {
+            errorMessage = 'Invalid credentials';
+          } else if (error.error && error.error.errors) {
+            const firstErrorKey = Object.keys(error.error.errors)[0];
+            if (firstErrorKey) {
+              errorMessage = error.error.errors[firstErrorKey][0];
+            }
+          }
+          this.showErrorMessage(errorMessage);
         }
       );
     }
+  }
+
+  private showErrorMessage(message: string) {
+    this.snackBar.open(message, 'Close', {
+      duration: 5000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom',
+    });
   }
 }
