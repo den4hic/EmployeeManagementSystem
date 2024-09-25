@@ -20,7 +20,8 @@ public class AccountController : ControllerBase
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest(ModelState);
+            var errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage));
+            return BadRequest(new { Errors = errors });
         }
 
         var result = await _accountService.RegisterAsync(model);
