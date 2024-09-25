@@ -7,14 +7,20 @@
     <mat-card-content>
       <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
         <div class="form-row">
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="fill">
             <mat-label>Username</mat-label>
-            <input matInput formControlName="username" required>
+            <input matInput formControlName="username" required type="text">
             <mat-error *ngIf="registrationForm.controls['username'].hasError('required')">
               Username is required
             </mat-error>
+            <mat-error *ngIf="registrationForm.controls['username'].hasError('minlength')">
+              At least 3 characters long
+            </mat-error>
+            <mat-error *ngIf="registrationForm.controls['username'].hasError('maxlength')">
+              Too much characters
+            </mat-error>
           </mat-form-field>
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="fill">
             <mat-label>Email</mat-label>
             <input matInput formControlName="email" required type="email">
             <mat-error *ngIf="registrationForm.controls['email'].hasError('required')">
@@ -26,44 +32,54 @@
           </mat-form-field>
         </div>
         <div class="form-row">
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="fill">
             <mat-label>First Name</mat-label>
             <input matInput formControlName="firstName" required>
             <mat-error *ngIf="registrationForm.controls['firstName'].hasError('required')">
               First name is required
             </mat-error>
+            <mat-error *ngIf="registrationForm.controls['firstName'].hasError('maxlength')">
+              Too much characters
+            </mat-error>
           </mat-form-field>
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="fill">
             <mat-label>Last Name</mat-label>
             <input matInput formControlName="lastName" required>
             <mat-error *ngIf="registrationForm.controls['lastName'].hasError('required')">
               Last name is required
             </mat-error>
+            <mat-error *ngIf="registrationForm.controls['lastName'].hasError('maxlength')">
+              Too much characters
+            </mat-error>
           </mat-form-field>
         </div>
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="fill">
           <mat-label>Phone Number</mat-label>
+          <span matTextPrefix>+38 &nbsp;</span>
           <input matInput formControlName="phoneNumber">
+          <mat-error *ngIf="registrationForm.controls['phoneNumber'].hasError('pattern')">
+            Invalid phone number format
+          </mat-error>
         </mat-form-field>
         <div class="form-row">
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="fill">
             <mat-label>Password</mat-label>
             <input matInput formControlName="password" required type="password">
             <mat-error *ngIf="registrationForm.controls['password'].hasError('required')">
               Password is required
             </mat-error>
-            <mat-error *ngIf="registrationForm.controls['password'].hasError('minLength')">
-              Minimal length is 6
+            <mat-error *ngIf="registrationForm.controls['password'].hasError('minlength')">
+              At least 6 characters long
             </mat-error>
           </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Confirm password</mat-label>
+          <mat-form-field appearance="fill">
+            <mat-label>Confirm Password</mat-label>
             <input matInput formControlName="confirmPassword" required type="password">
             <mat-error *ngIf="registrationForm.controls['confirmPassword'].hasError('required')">
-              Confirm password is required
+              Password is required
             </mat-error>
-            <mat-error *ngIf="registrationForm.controls['confirmPassword'].hasError('minLength')">
-              Minimal length is 6
+            <mat-error *ngIf="registrationForm.controls['confirmPassword'].hasError('minlength')">
+              At least 6 characters long
             </mat-error>
           </mat-form-field>
         </div>

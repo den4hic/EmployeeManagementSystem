@@ -11,6 +11,12 @@
           <mat-error *ngIf="loginForm.controls['username'].hasError('required')">
             Username is required
           </mat-error>
+          <mat-error *ngIf="loginForm.controls['username'].hasError('minlength')">
+            At least 3 characters long
+          </mat-error>
+          <mat-error *ngIf="loginForm.controls['username'].hasError('maxlength')">
+            Too much characters
+          </mat-error>
         </mat-form-field>
         <mat-form-field appearance="fill">
           <mat-label>Password</mat-label>
@@ -18,8 +24,8 @@
           <mat-error *ngIf="loginForm.controls['password'].hasError('required')">
             Password is required
           </mat-error>
-          <mat-error *ngIf="loginForm.controls['password'].hasError('minLength')">
-            Minimal length is 6
+          <mat-error *ngIf="loginForm.controls['password'].hasError('minlength')">
+            At least 6 characters long
           </mat-error>
         </mat-form-field>
 

@@ -16,7 +16,7 @@ export class LoginComponent {
 
   constructor(private authService: AuthService, private jwtService: JwtService, private fb: FormBuilder) {
     this.loginForm = this.fb.group({
-      username: ['', Validators.required],
+      username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
     });
   }
