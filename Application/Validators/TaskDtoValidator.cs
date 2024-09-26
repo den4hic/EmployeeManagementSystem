@@ -18,6 +18,6 @@ public class TaskDtoValidator : AbstractValidator<TaskDto>
             .NotEmpty().WithMessage("StatusId is required");
 
         RuleFor(x => x.DueDate)
-            .GreaterThanOrEqualTo(DateTime.Now).WithMessage("Due date must be today or later");
+            .GreaterThanOrEqualTo(DateTime.Now.Date).WithMessage("Due date must be today or later");
     }
 }
