@@ -14,5 +14,6 @@ public partial class Manager : IEntity<int>
     public virtual User User { get; set; } = null!;
 
 
-    public virtual ICollection<Project> Projects { get; set; } = new List<Project>();
+    public virtual ICollection<ProjectManager> ProjectManagers { get; set; } = new List<ProjectManager>();
+
 }

@@ -18,7 +18,7 @@ public class ProjectController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<ProjectDto>> CreateProject(ProjectDto projectDto)
+    public async Task<ActionResult<ProjectDto>> CreateProject([FromBody] ProjectCreateDto projectDto)
     {
         if (!ModelState.IsValid)
         {

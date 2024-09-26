@@ -22,5 +22,5 @@ public partial class Project : IEntity<int>
 
     public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
 
-    public virtual ICollection<Manager> Managers { get; set; } = new List<Manager>();
+    public virtual ICollection<ProjectManager> ProjectManagers { get; set; } = new List<ProjectManager>();
 }

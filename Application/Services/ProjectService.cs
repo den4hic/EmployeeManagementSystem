@@ -1,5 +1,6 @@
 ﻿using Application.Abstractions;
 using Application.DTOs;
+using Domain.Entities;
 
 namespace Application.Services;
 
@@ -12,9 +13,10 @@ public class ProjectService : IProjectService
         _projectRepository = projectRepository;
     }
 
-    public async Task<ProjectDto> CreateProjectAsync(ProjectDto projectDto)
+    public async Task<ProjectDto> CreateProjectAsync(ProjectCreateDto projectDto)
     {
-        return await _projectRepository.CreateAsync(projectDto);
+
+        return await _projectRepository.CreateCustomAsync(projectDto);
     }
 
     public async Task<ProjectDto> GetProjectByIdAsync(int id)
@@ -27,12 +29,12 @@ public class ProjectService : IProjectService
         return await _projectRepository.GetAllAsync();
     }
 
-    public async Task UpdateProjectAsync(ProjectDto projectDto)
+    public async System.Threading.Tasks.Task UpdateProjectAsync(ProjectDto projectDto)
     {
         await _projectRepository.UpdateAsync(projectDto);
     }
 
-    public async Task DeleteProjectAsync(int id)
+    public async System.Threading.Tasks.Task DeleteProjectAsync(int id)
     {
         await _projectRepository.DeleteAsync(id);
     }
