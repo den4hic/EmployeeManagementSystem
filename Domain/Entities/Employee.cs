@@ -12,7 +12,7 @@ public partial class Employee : IEntity<int>
 
     public string Position { get; set; } = null!;
 
-    public DateOnly HireDate { get; set; }
+    public DateTime HireDate { get; set; }
 
     public decimal Salary { get; set; }
 

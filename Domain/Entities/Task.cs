@@ -18,7 +18,7 @@ public partial class Task : IEntity<int>
 
     public int StatusId { get; set; }
 
-    public DateOnly? DueDate { get; set; }
+    public DateTime? DueDate { get; set; }
 
     public virtual Employee? AssignedToEmployee { get; set; }
 

@@ -31,7 +31,7 @@ public class AccountController : ControllerBase
             return Ok(new { message = "User created successfully" });
         }
 
-        return BadRequest(new { message = "User creation failed" });
+        return BadRequest(new { Errors = new List<string> { "User creation failed" } });
     }
 
     [HttpPost("login")]
