@@ -1,11 +1,10 @@
-import {inject, Injectable} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
-import {AuthService} from "./auth.service";
-import {JwtService} from "./jwt.service";
-import {Observable} from "rxjs";
-import {TokenDto} from "./dtos/token.dto";
-import {UserDto} from "./dtos/user.dto";
-import {tap} from "rxjs/operators";
+import { inject, Injectable } from '@angular/core';
+import { HttpClient } from "@angular/common/http";
+import { AuthService } from "./auth.service";
+import { JwtService } from "./jwt.service";
+import { Observable, of, throwError } from "rxjs";
+import { UserDto } from "./dtos/user.dto";
+import { tap, catchError } from "rxjs/operators";
 
 @Injectable({
   providedIn: 'root'
@@ -16,15 +15,52 @@ export class UserService {
   private jwtService = inject(JwtService);
   private http = inject(HttpClient);
 
-  constructor() { }
+  private currentUser: UserDto | null = null;
 
-  getUserInfo() : Observable<UserDto> | null {
+  constructor() {
+    this.loadUserFromStorage();
+  }
+
+  getUserInfo(): Observable<UserDto> {
+    if (this.currentUser) {
+      return of(this.currentUser);
+    }
+
     const username = this.jwtService.getUsername();
-    if (!username) return null;
+    if (!username) {
+      return throwError(() => new Error('User is not authenticated'));
+    }
+
     return this.http.get<UserDto>(`${this.apiUrl}/current/${username}`).pipe(
       tap(user => {
         user.username = username;
+        const role = this.jwtService.getUserRole();
+        if (role) {
+          user.role = role;
+        }
+        this.currentUser = user;
+        this.saveUserToStorage(user);
+      }),
+      catchError(error => {
+        console.error('Failed to get user info', error);
+        return throwError(() => error);
       })
     );
+  }
+
+  private saveUserToStorage(user: UserDto): void {
+    localStorage.setItem('currentUser', JSON.stringify(user));
+  }
+
+  private loadUserFromStorage(): void {
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+      this.currentUser = JSON.parse(storedUser);
+    }
+  }
+
+  clearUserInfo(): void {
+    this.currentUser = null;
+    localStorage.removeItem('currentUser');
   }
 }

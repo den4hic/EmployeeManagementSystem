@@ -1,34 +1,29 @@
-import {Component, inject} from '@angular/core';
-import {UserService} from "../../services/user.service";
-import {UserModel} from "../models/user.model";
-import {UserDto} from "../../services/dtos/user.dto";
+import { Component, inject, OnInit } from '@angular/core';
+import { UserService } from "../../services/user.service";
+import { UserDto } from "../../services/dtos/user.dto";
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
-export class ProfileComponent {
+export class ProfileComponent implements OnInit {
   private userService = inject(UserService);
-  // private userModel : UserModel;
+  public userModel: UserDto | null = null;
 
-  public userModel : UserDto | null = null;
   ngOnInit() {
-    const user = this.userService.getUserInfo();
+    this.loadUserInfo();
+  }
 
-    if (!user) {
-      console.error('User is not authenticated');
-      return;
-    }
-
-    user.subscribe(
-      user => {
+  private loadUserInfo(): void {
+    this.userService.getUserInfo().subscribe({
+      next: (user) => {
         this.userModel = user;
         console.log('User info', user);
       },
-      error => {
+      error: (error) => {
         console.error('Failed to get user info', error);
       }
-    );
+    });
   }
 }
