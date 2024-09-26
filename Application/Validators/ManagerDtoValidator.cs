@@ -13,7 +13,8 @@ public class ManagerDtoValidator : AbstractValidator<ManagerDto>
     public ManagerDtoValidator()
     {
         RuleFor(x => x.Department)
-            .NotEmpty().WithMessage("Department is required");
+            .NotEmpty().WithMessage("Department is required")
+            .MaximumLength(100).WithMessage("Department must not exceed 100 characters");
 
         RuleFor(x => x.UserId)
             .NotEmpty().WithMessage("User ID is required");

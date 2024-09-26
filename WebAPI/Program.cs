@@ -60,8 +60,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddRepositories();
 builder.Services.AddServices();
-builder.Services.AddScoped<IValidator<RegisterDto>, RegisterDtoValidator>();
-builder.Services.AddScoped<IValidator<LoginDto>, LoginDtoValidator>();
+builder.Services.AddValidators();
 builder.Services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));

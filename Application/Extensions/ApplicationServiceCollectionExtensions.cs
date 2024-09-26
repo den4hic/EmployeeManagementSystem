@@ -1,5 +1,8 @@
 ﻿using Application.Abstractions;
+using Application.DTOs;
 using Application.Services;
+using Application.Validators;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -21,6 +24,19 @@ public static class ApplicationServiceCollectionExtensions
         services.AddScoped<IStatusService, StatusService>();
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<IRoleService, RoleService>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddValidators(this IServiceCollection services)
+    {
+        services.AddScoped<IValidator<RegisterDto>, RegisterDtoValidator>();
+        services.AddScoped<IValidator<LoginDto>, LoginDtoValidator>();
+        services.AddScoped<IValidator<EmployeeDto>, EmployeeDtoValidator>();
+        services.AddScoped<IValidator<ManagerDto>, ManagerDtoValidator>();
+        services.AddScoped<IValidator<ProjectDto>, ProjectDtoValidator>();
+        services.AddScoped<IValidator<StatusDto>, StatusDtoValidator>();
+        services.AddScoped<IValidator<TaskDto>, TaskDtoValidator>();
 
         return services;
     }
