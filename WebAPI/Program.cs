@@ -1,16 +1,13 @@
+using Application.Extensions;
+using FluentValidation.AspNetCore;
 using Infrastructure.Context;
+using Infrastructure.Extensions;
 using Infrastructure.Mappers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Application.Extensions;
-using Infrastructure.Extensions;
-using Application.DTOs;
-using Application.Validators;
-using FluentValidation.AspNetCore;
-using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("ManagementDbContextConnection") ?? throw new InvalidOperationException("Connection string 'ManagementDbContextConnection' not found.");

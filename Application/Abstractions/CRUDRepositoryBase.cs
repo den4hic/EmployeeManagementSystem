@@ -13,7 +13,7 @@ public abstract class CRUDRepositoryBase<TEntity, TDto, TContext, TId> : ICRUDRe
 {
     protected readonly TContext _context;
     protected readonly IMapper _mapper;
-    private readonly Microsoft.EntityFrameworkCore.DbSet<TEntity> _dbSet;
+    private readonly DbSet<TEntity> _dbSet;
 
     protected CRUDRepositoryBase(TContext context, IMapper mapper)
     {

@@ -1,15 +1,9 @@
 ﻿using Application.Common;
-using Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.DTOs;
 
 public class TaskDto : BaseDto<int>
-{   
+{
     public int ProjectId { get; set; }
     public int? AssignedToEmployeeId { get; set; }
     public string Title { get; set; }

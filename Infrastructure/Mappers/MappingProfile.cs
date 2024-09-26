@@ -1,7 +1,6 @@
 ﻿using Application.DTOs;
 using AutoMapper;
 using Domain.Entities;
-using System.Net;
 using Task = Domain.Entities.Task;
 
 namespace Infrastructure.Mappers;

@@ -1,5 +1,4 @@
 ﻿using Application.Common;
-using Domain.Entities;
 
 namespace Application.DTOs;
 
