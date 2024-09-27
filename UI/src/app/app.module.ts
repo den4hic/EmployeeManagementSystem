@@ -22,6 +22,17 @@ import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {MatIcon} from "@angular/material/icon";
 import { ProfileComponent } from './pages/profile/profile.component';
 import {tokenInterceptor} from "./interceptor/token.interceptor";
+import { UserTableComponent } from './pages/user-table/user-table.component';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow, MatHeaderRowDef, MatRow, MatRowDef, MatTable
+} from "@angular/material/table";
+import {MatSort} from "@angular/material/sort";
+import {MatPaginator} from "@angular/material/paginator";
 
 @NgModule({
   declarations: [
@@ -31,7 +42,8 @@ import {tokenInterceptor} from "./interceptor/token.interceptor";
     LoginComponent,
     HomeComponent,
     ToolbarComponent,
-    ProfileComponent
+    ProfileComponent,
+    UserTableComponent
   ],
   imports: [
     BrowserModule,
@@ -49,7 +61,19 @@ import {tokenInterceptor} from "./interceptor/token.interceptor";
     MatMenu,
     MatMenuItem,
     MatMenuTrigger,
-    MatIcon
+    MatIcon,
+    MatColumnDef,
+    MatHeaderCell,
+    MatCell,
+    MatHeaderCellDef,
+    MatCellDef,
+    MatHeaderRow,
+    MatRow,
+    MatTable,
+    MatSort,
+    MatPaginator,
+    MatRowDef,
+    MatHeaderRowDef
   ],
   providers: [
     provideHttpClient(withInterceptors([tokenInterceptor]))

@@ -6,6 +6,7 @@ import {LoginComponent} from "./pages/login/login.component";
 import {HomeComponent} from "./pages/home/home.component";
 import {authGuard} from "./guards/auth.guard";
 import {ProfileComponent} from "./pages/profile/profile.component";
+import {UserTableComponent} from "./pages/user-table/user-table.component";
 
 const routes: Routes = [
   {
@@ -29,6 +30,10 @@ const routes: Routes = [
     path: '',
     component: HomeComponent,
     canActivate: [authGuard]
+  },
+  {
+    path: 'users',
+    component: UserTableComponent,
   }
 ];
 

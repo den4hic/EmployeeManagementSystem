@@ -30,6 +30,7 @@ public static class ApplicationServiceCollectionExtensions
         services.AddScoped<IValidator<EmployeeDto>, EmployeeDtoValidator>();
         services.AddScoped<IValidator<ManagerDto>, ManagerDtoValidator>();
         services.AddScoped<IValidator<ProjectDto>, ProjectDtoValidator>();
+        services.AddScoped<IValidator<ProjectCreateDto>, ProjectCreateDtoValidator>();
         services.AddScoped<IValidator<StatusDto>, StatusDtoValidator>();
         services.AddScoped<IValidator<TaskDto>, TaskDtoValidator>();
 
