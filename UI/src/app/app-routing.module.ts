@@ -7,6 +7,7 @@ import {HomeComponent} from "./pages/home/home.component";
 import {authGuard} from "./guards/auth.guard";
 import {ProfileComponent} from "./pages/profile/profile.component";
 import {UserTableComponent} from "./pages/user-table/user-table.component";
+import {roleGuard} from "./guards/role.guard";
 
 const routes: Routes = [
   {
@@ -34,6 +35,10 @@ const routes: Routes = [
   {
     path: 'users',
     component: UserTableComponent,
+    canActivate: [roleGuard],
+    data: {
+      roles: ['Admin']
+    }
   }
 ];
 
