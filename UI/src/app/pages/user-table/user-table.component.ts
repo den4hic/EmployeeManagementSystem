@@ -11,7 +11,7 @@ import {UserService} from "../../services/user.service";
   styleUrls: ['./user-table.component.scss']
 })
 export class UserTableComponent implements OnInit {
-  displayedColumns: string[] = ['id', 'firstName', 'lastName', 'email', 'phoneNumber', 'username', 'role', 'actions'];
+  displayedColumns: string[] = ['id', 'firstName', 'lastName', 'email', 'phoneNumber', 'hireDate', 'role', 'actions'];
   dataSource = new MatTableDataSource<UserDto>();
   private userService = inject(UserService);
 
@@ -19,20 +19,17 @@ export class UserTableComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  users: UserDto[] = [
-    { id: 1, firstName: 'John', lastName: 'Doe', email: 'john.doe@example.com', phoneNumber: '1234567890', username: 'johndoe', role: 'Admin' },
-    { id: 2, firstName: 'Jane', lastName: 'Smith', email: 'jane.smith@example.com', phoneNumber: '0987654321', username: 'janesmith', role: 'User' },
-  ];
+  users: UserDto[] = [];
 
   ngOnInit() {
-    const res = this.userService.getUsers();
+    const res = this.userService.getUsersWithDetails();
 
     console.log(res);
     res.subscribe((users) => {
       this.users = users;
       this.dataSource.data = this.users;
+      console.log(this.users);
     });
-
   }
 
   ngAfterViewInit() {
@@ -43,5 +40,16 @@ export class UserTableComponent implements OnInit {
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
+  }
+
+  deleteUser(userId: number) {
+    this.userService.deleteUser(userId).subscribe({
+      next: () => {
+        this.dataSource.data = this.dataSource.data.filter(user => user.id !== userId);
+      },
+      error: (error) => {
+        console.error('Error deleting user', error);
+      }
+    });
   }
 }

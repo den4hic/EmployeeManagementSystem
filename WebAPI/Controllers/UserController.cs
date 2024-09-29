@@ -80,4 +80,11 @@ public class UserController : ControllerBase
 
         return Ok(user);
     }
+
+    [HttpGet("details")]
+    public async Task<ActionResult<IEnumerable<UserDto>>> GetUsersWithDetails()
+    {
+        var users = await _userService.GetUsersWithDetailsAsync();
+        return Ok(users);
+    }
 }
