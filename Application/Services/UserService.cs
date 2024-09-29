@@ -37,7 +37,10 @@ public class UserService : IUserService
 
     public async Task DeleteUserAsync(int id)
     {
-        await _userRepository.DeleteAsync(id);
+        var user = await _userRepository.GetByIdAsync(id);
+        var aspnetUser = await _userManager.FindByIdAsync(user.AspNetUserId);
+        if (aspnetUser != null)
+            await _userManager.DeleteAsync(aspnetUser);
     }
 
     public async Task<UserDto> GetUserByUsernameAsync(string username)
