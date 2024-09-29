@@ -10,6 +10,10 @@ export class JwtService {
     return localStorage.getItem('accessToken');
   }
 
+  public getRefreshToken(): string | null {
+    return localStorage.getItem('refreshToken');
+  }
+
   public getUserRole(): string | null {
     const token = this.getToken();
     if (token) {
