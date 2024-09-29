@@ -71,22 +71,22 @@ public partial class EmployeeManagementSystemDbContext : IdentityContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Project_Status");
 
-            entity.HasMany(d => d.Employees).WithMany(p => p.Projects)
-                .UsingEntity<Dictionary<string, object>>(
-                    "ProjectEmployee",
-                    r => r.HasOne<Employee>().WithMany()
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK_ProjectEmployee_Employee"),
-                    l => l.HasOne<Project>().WithMany()
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK_ProjectEmployee_Project"),
-                    j =>
-                    {
-                        j.HasKey("ProjectId", "EmployeeId").HasName("PK__ProjectE__71B7BA018DEBC603");
-                        j.ToTable("ProjectEmployee");
-                    });
+            //entity.HasMany(d => d.Employees).WithMany(p => p.Projects)
+            //    .UsingEntity<Dictionary<string, object>>(
+            //        "ProjectEmployee",
+            //        r => r.HasOne<Employee>().WithMany()
+            //            .HasForeignKey("EmployeeId")
+            //            .OnDelete(DeleteBehavior.ClientSetNull)
+            //            .HasConstraintName("FK_ProjectEmployee_Employee"),
+            //        l => l.HasOne<Project>().WithMany()
+            //            .HasForeignKey("ProjectId")
+            //            .OnDelete(DeleteBehavior.ClientSetNull)
+            //            .HasConstraintName("FK_ProjectEmployee_Project"),
+            //        j =>
+            //        {
+            //            j.HasKey("ProjectId", "EmployeeId").HasName("PK__ProjectE__71B7BA018DEBC603");
+            //            j.ToTable("ProjectEmployee");
+            //        });
 
             //entity.HasMany(d => d.Managers).WithMany(p => p.Projects)
             //    .UsingEntity<Dictionary<string, object>>(
@@ -172,6 +172,23 @@ public partial class EmployeeManagementSystemDbContext : IdentityContext
             entity.HasOne(pm => pm.Manager)
                   .WithMany(m => m.ProjectManagers)
                   .HasForeignKey(pm => pm.ManagerId)
+                  .OnDelete(DeleteBehavior.ClientSetNull);
+        });
+
+        builder.Entity<ProjectEmployee>(entity =>
+        {
+            entity.HasKey(pm => new { pm.ProjectId, pm.EmployeeId });
+
+            entity.ToTable("ProjectEmployee");
+
+            entity.HasOne(pm => pm.Project)
+                  .WithMany(p => p.ProjectEmployees)
+                  .HasForeignKey(pm => pm.ProjectId)
+                  .OnDelete(DeleteBehavior.ClientSetNull);
+
+            entity.HasOne(pm => pm.Employee)
+                  .WithMany(m => m.ProjectEmployees)
+                  .HasForeignKey(pm => pm.EmployeeId)
                   .OnDelete(DeleteBehavior.ClientSetNull);
         });
 

@@ -9,5 +9,6 @@ public class ProjectCreateDto
     public int StatusId { get; set; }
 
     public List<int> ManagerIds { get; set; } = new List<int>();
+    public List<int> EmployeeIds { get; set; } = new List<int>();
 
 }

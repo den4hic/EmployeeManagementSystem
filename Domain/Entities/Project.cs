@@ -20,7 +20,7 @@ public partial class Project : IEntity<int>
 
     public virtual ICollection<Task> Tasks { get; set; } = new List<Task>();
 
-    public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
+    public virtual ICollection<ProjectEmployee> ProjectEmployees { get; set; } = new List<ProjectEmployee>();
 
     public virtual ICollection<ProjectManager> ProjectManagers { get; set; } = new List<ProjectManager>();
 }

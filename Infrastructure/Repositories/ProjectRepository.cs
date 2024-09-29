@@ -14,16 +14,8 @@ public class ProjectRepository : CRUDRepositoryBase<Project, ProjectDto, Employe
 
     public async Task<ProjectDto> CreateCustomAsync(ProjectCreateDto projectDto)
     {
-        var project = new Project
-        {
-            Name = projectDto.Name,
-            Description = projectDto.Description,
-            StartDate = projectDto.StartDate,
-            EndDate = projectDto.EndDate,
-            StatusId = projectDto.StatusId
-        };
+        var project = _mapper.Map<Project>(projectDto);
 
-        // Додаємо зв'язок із існуючими менеджерами через ProjectManager
         foreach (var managerId in projectDto.ManagerIds)
         {
             var manager = await _context.Managers.FindAsync(managerId);
@@ -35,6 +27,20 @@ public class ProjectRepository : CRUDRepositoryBase<Project, ProjectDto, Employe
                     Manager = manager
                 };
                 project.ProjectManagers.Add(projectManager);
+            }
+        }
+
+        foreach (var managerId in projectDto.EmployeeIds)
+        {
+            var employee = await _context.Employees.FindAsync(managerId);
+            if (employee != null)
+            {
+                var projectEmployee = new ProjectEmployee
+                {
+                    Project = project,
+                    Employee = employee
+                };
+                project.ProjectEmployees.Add(projectEmployee);
             }
         }
 

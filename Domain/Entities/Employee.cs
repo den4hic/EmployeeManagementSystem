@@ -18,5 +18,5 @@ public partial class Employee : IEntity<int>
 
     public virtual User User { get; set; } = null!;
 
-    public virtual ICollection<Project> Projects { get; set; } = new List<Project>();
+    public virtual ICollection<ProjectEmployee> ProjectEmployees { get; set; } = new List<ProjectEmployee>();
 }
