@@ -33,6 +33,8 @@ import {
 } from "@angular/material/table";
 import {MatSort} from "@angular/material/sort";
 import {MatPaginator} from "@angular/material/paginator";
+import { ConfirmDialogComponent } from './shared/confirm-dialog/confirm-dialog.component';
+import {MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle} from "@angular/material/dialog";
 
 @NgModule({
   declarations: [
@@ -43,7 +45,8 @@ import {MatPaginator} from "@angular/material/paginator";
     HomeComponent,
     ToolbarComponent,
     ProfileComponent,
-    UserTableComponent
+    UserTableComponent,
+    ConfirmDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -73,7 +76,11 @@ import {MatPaginator} from "@angular/material/paginator";
     MatSort,
     MatPaginator,
     MatRowDef,
-    MatHeaderRowDef
+    MatHeaderRowDef,
+    MatDialogContent,
+    MatDialogActions,
+    MatDialogClose,
+    MatDialogTitle
   ],
   providers: [
     provideHttpClient(withInterceptors([tokenInterceptor]))
