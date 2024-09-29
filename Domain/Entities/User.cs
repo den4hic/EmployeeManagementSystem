@@ -1,4 +1,5 @@
 ﻿using Domain.Common;
+using Microsoft.AspNetCore.Identity;
 
 namespace Domain.Entities;
 
@@ -20,7 +21,9 @@ public partial class User : IEntity<int>
 
     public DateTime? RefreshTokenExpiryTime { get; set; }
 
-    public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
+    public virtual IdentityUser AspNetUser { get; set; } = null!;
 
-    public virtual ICollection<Manager> Managers { get; set; } = new List<Manager>();
+    public virtual Employee? Employee { get; set; }
+
+    public virtual Manager? Manager { get; set; }
 }

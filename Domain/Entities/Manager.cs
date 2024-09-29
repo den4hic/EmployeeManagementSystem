@@ -12,8 +12,6 @@ public partial class Manager : IEntity<int>
     public DateTime HireDate { get; set; }
 
     public virtual User User { get; set; } = null!;
-
-
     public virtual ICollection<ProjectManager> ProjectManagers { get; set; } = new List<ProjectManager>();
 
 }

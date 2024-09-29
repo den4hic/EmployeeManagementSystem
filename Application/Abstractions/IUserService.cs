@@ -10,5 +10,6 @@ namespace Application.Abstractions
         Task UpdateUserAsync(UserDto userDto);
         Task DeleteUserAsync(int id);
         Task<UserDto> GetUserByUsernameAsync(string username);
+        Task<IEnumerable<UserDto>> GetUsersWithDetailsAsync();
     }
 }

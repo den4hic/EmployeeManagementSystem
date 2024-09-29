@@ -4,5 +4,6 @@ namespace Application.Abstractions;
 
 public interface IUserRepository : ICRUDRepository<UserDto, int>
 {
-    Task<UserDto> GetByAspNetUserIdAsync(string id);   
+    Task<UserDto> GetByAspNetUserIdAsync(string id);
+    Task<IEnumerable<UserDto>> GetUsersWithDetailsAsync();
 }

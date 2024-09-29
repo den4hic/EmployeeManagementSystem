@@ -1,6 +1,7 @@
 ﻿using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace Infrastructure.Context;
 
@@ -37,8 +38,8 @@ public partial class EmployeeManagementSystemDbContext : IdentityContext
             entity.Property(e => e.Position).HasMaxLength(100);
             entity.Property(e => e.Salary).HasColumnType("decimal(10, 2)");
 
-            entity.HasOne(d => d.User).WithMany(p => p.Employees)
-                .HasForeignKey(d => d.UserId)
+            entity.HasOne(d => d.User).WithOne(p => p.Employee)
+                .HasForeignKey<Employee>(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Employee_User");
         });
@@ -51,8 +52,8 @@ public partial class EmployeeManagementSystemDbContext : IdentityContext
 
             entity.Property(e => e.Department).HasMaxLength(100);
 
-            entity.HasOne(d => d.User).WithMany(p => p.Managers)
-                .HasForeignKey(d => d.UserId)
+            entity.HasOne(d => d.User).WithOne(p => p.Manager)
+                .HasForeignKey<Manager>(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Manager_User");
         });
@@ -150,26 +151,24 @@ public partial class EmployeeManagementSystemDbContext : IdentityContext
             entity.Property(e => e.PhoneNumber).HasMaxLength(20);
             entity.Property(e => e.RefreshToken).HasMaxLength(50);
 
-            entity.HasOne<IdentityUser>()
-                  .WithMany()
-                  .HasForeignKey(d => d.AspNetUserId)
-                  .OnDelete(DeleteBehavior.ClientSetNull)
-                  .HasConstraintName("FK_User_AspNetUsers");
+            entity.HasOne(u => u.AspNetUser)
+                .WithOne()
+                .HasForeignKey<User>(u => u.AspNetUserId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         builder.Entity<ProjectManager>(entity =>
         {
-            entity.HasKey(pm => new { pm.ProjectId, pm.ManagerId }); // Composite Key
+            entity.HasKey(pm => new { pm.ProjectId, pm.ManagerId });
 
             entity.ToTable("ProjectManager");
 
-            // Встановлюємо зв'язок між Project і ProjectManager
             entity.HasOne(pm => pm.Project)
                   .WithMany(p => p.ProjectManagers)
                   .HasForeignKey(pm => pm.ProjectId)
                   .OnDelete(DeleteBehavior.ClientSetNull);
 
-            // Встановлюємо зв'язок між Manager і ProjectManager
             entity.HasOne(pm => pm.Manager)
                   .WithMany(m => m.ProjectManagers)
                   .HasForeignKey(pm => pm.ManagerId)

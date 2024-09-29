@@ -8,3 +8,8 @@
     CONSTRAINT [FK_Employee_User] FOREIGN KEY ([UserId]) REFERENCES [dbo].[User] ([Id])
 );
 
+
+GO
+CREATE UNIQUE NONCLUSTERED INDEX [IX_Employee]
+    ON [dbo].[Employee]([UserId] ASC);
+

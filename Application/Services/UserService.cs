@@ -51,4 +51,9 @@ public class UserService : IUserService
 
         return await _userRepository.GetByAspNetUserIdAsync(user.Id);
     }
+
+    public async Task<IEnumerable<UserDto>> GetUsersWithDetailsAsync()
+    {
+        return await _userRepository.GetUsersWithDetailsAsync();
+    }
 }
