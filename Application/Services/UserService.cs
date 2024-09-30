@@ -63,7 +63,7 @@ public class UserService : IUserService
         return await _userRepository.GetUsersWithDetailsAsync();
     }
 
-    public async Task<IEnumerable<UserDto>> GetUsersWithDetailsFilteredAsync(int page, int pageSize, string sortField, string sortDirection, string filter)
+    public async Task<(IEnumerable<UserDto>, int)> GetUsersWithDetailsFilteredAsync(int page, int pageSize, string sortField, string sortDirection, string filter)
     {
         var users = await _userRepository.GetUsersWithDetailsAsync();
 
@@ -74,13 +74,15 @@ public class UserService : IUserService
 
         users = ApplySorting(users, sortField, sortDirection);
 
+        var totalItems = users.Count();
+
         var items = users
-            .Skip((page - 1) * pageSize)
+            .Skip(page * pageSize)
             .Take(pageSize)
             .Select(u => u)
             .ToList();
 
-        return items;
+        return (items, totalItems);
     }
 
     private IEnumerable<UserDto> ApplySorting(IEnumerable<UserDto> query, string sortField, string sortDirection)
@@ -91,6 +93,12 @@ public class UserService : IUserService
                 return sortDirection.ToLower() == "asc" ? query.OrderBy(u => u.FirstName) : query.OrderByDescending(u => u.FirstName);
             case "lastname":
                 return sortDirection.ToLower() == "asc" ? query.OrderBy(u => u.LastName) : query.OrderByDescending(u => u.LastName);
+            case "email":
+                return sortDirection.ToLower() == "asc" ? query.OrderBy(u => u.Email) : query.OrderByDescending(u => u.Email);
+            case "phonenumber":
+                return sortDirection.ToLower() == "asc" ? query.OrderBy(u => u.PhoneNumber) : query.OrderByDescending(u => u.PhoneNumber);
+            case "id":
+                return sortDirection.ToLower() == "asc" ? query.OrderBy(u => u.Id) : query.OrderByDescending(u => u.Id);
             default:
                 return sortDirection.ToLower() == "asc" ? query.OrderBy(u => u.Id) : query.OrderByDescending(u => u.Id);
         }

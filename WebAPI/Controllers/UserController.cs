@@ -96,8 +96,8 @@ public class UserController : ControllerBase
         [FromQuery] string sortDirection = "asc",
         [FromQuery] string filter = "")
     {
-        var users = await _userService.GetUsersWithDetailsFilteredAsync(page, pageSize, sortField, sortDirection, filter);
-        return Ok(users);
+        var (users, totalItems) = await _userService.GetUsersWithDetailsFilteredAsync(page, pageSize, sortField, sortDirection, filter);
+        return Ok(new { items = users, totalItems = totalItems});
     }
 
 

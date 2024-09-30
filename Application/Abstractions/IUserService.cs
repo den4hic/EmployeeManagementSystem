@@ -11,6 +11,6 @@ namespace Application.Abstractions
         Task DeleteUserAsync(int id);
         Task<UserDto> GetUserByUsernameAsync(string username);
         Task<IEnumerable<UserDto>> GetUsersWithDetailsAsync();
-        Task<IEnumerable<UserDto>> GetUsersWithDetailsFilteredAsync(int page, int pageSize, string sortField, string sortDirection, string filter);
+        Task<(IEnumerable<UserDto>, int)> GetUsersWithDetailsFilteredAsync(int page, int pageSize, string sortField, string sortDirection, string filter);
     }
 }

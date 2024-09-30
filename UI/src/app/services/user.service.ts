@@ -86,7 +86,7 @@ export class UserService {
     return this.http.delete(`${this.apiUrl}/${userId}`);
   }
 
-  getUsersWithDetails(page: number, pageSize: number, sortField: string, sortDirection: string, filter: string): Observable<UserDto[]> {
+  getUsersWithDetails(page: number, pageSize: number, sortField: string, sortDirection: string, filter: string): Observable<{items: UserDto[], totalItems: number}> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('pageSize', pageSize.toString())
@@ -94,9 +94,9 @@ export class UserService {
       .set('sortDirection', sortDirection)
       .set('filter', filter);
 
-    return this.http.get<UserDto[]>(`${this.apiUrl}/details/filtered`, { params }).pipe(
+    return this.http.get<{items: UserDto[], totalItems: number}>(`${this.apiUrl}/details/filtered`, { params }).pipe(
       tap(users => {
-        users.forEach(user => {
+        users.items.forEach(user => {
           if (user.manager) {
             user.role = 'Manager';
           } else if (user.employee) {

@@ -61,8 +61,9 @@ export class UserTableComponent implements OnInit, AfterViewInit {
       this.filterValue
     ).subscribe(
       (response) => {
-        this.users = response;
+        this.users = response.items;
         this.dataSource.data = this.users;
+        this.totalItems = response.totalItems;
       },
       (error) => {
         console.error('Error loading users', error);
