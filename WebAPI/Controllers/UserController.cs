@@ -87,4 +87,18 @@ public class UserController : ControllerBase
         var users = await _userService.GetUsersWithDetailsAsync();
         return Ok(users);
     }
+
+    [HttpGet("details/filtered")]
+    public async Task<ActionResult<IEnumerable<UserDto>>> GetUsersWithDetailsFiltered(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string sortField = "id",
+        [FromQuery] string sortDirection = "asc",
+        [FromQuery] string filter = "")
+    {
+        var users = await _userService.GetUsersWithDetailsFilteredAsync(page, pageSize, sortField, sortDirection, filter);
+        return Ok(users);
+    }
+
+
 }
