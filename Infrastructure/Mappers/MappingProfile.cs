@@ -15,7 +15,9 @@ public class MappingProfile : Profile
 
         CreateMap<Manager, ManagerDto>().ReverseMap();
 
-        CreateMap<Project, ProjectDto>().ReverseMap();
+        CreateMap<Project, ProjectDto>()
+            .ForMember(dest => dest.Managers, opt => opt.MapFrom(src => src.ProjectManagers.Select(pm => pm.Manager)))
+            .ForMember(dest => dest.Employees, opt => opt.MapFrom(src => src.ProjectEmployees.Select(pe => pe.Employee)));
 
         CreateMap<Project, ProjectCreateDto>().ReverseMap();
 

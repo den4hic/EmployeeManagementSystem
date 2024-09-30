@@ -50,7 +50,7 @@ public class ProjectController : ControllerBase
     }
 
     [HttpPut]
-    public async Task<ActionResult> UpdateProject(ProjectDto projectDto)
+    public async Task<ActionResult> UpdateProject([FromBody] ProjectCreateDto projectDto)
     {
         if (!ModelState.IsValid)
         {

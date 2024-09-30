@@ -26,12 +26,12 @@ public class ProjectService : IProjectService
 
     public async Task<IEnumerable<ProjectDto>> GetAllProjectsAsync()
     {
-        return await _projectRepository.GetAllAsync();
+        return await _projectRepository.GetProjectsWithDetailsAsync();
     }
 
-    public async System.Threading.Tasks.Task UpdateProjectAsync(ProjectDto projectDto)
+    public async System.Threading.Tasks.Task UpdateProjectAsync(ProjectCreateDto projectDto)
     {
-        await _projectRepository.UpdateAsync(projectDto);
+        await _projectRepository.UpdateCustomAsync(projectDto);
     }
 
     public async System.Threading.Tasks.Task DeleteProjectAsync(int id)
