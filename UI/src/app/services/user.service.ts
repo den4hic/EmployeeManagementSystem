@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from "@angular/common/http";
+import {HttpClient, HttpParams} from "@angular/common/http";
 import { AuthService } from "./auth.service";
 import { JwtService } from "./jwt.service";
 import { Observable, of, throwError } from "rxjs";
@@ -68,8 +68,33 @@ export class UserService {
     return this.http.get<UserDto[]>(`${this.apiUrl}`);
   }
 
-  getUsersWithDetails() {
-    return this.http.get<UserDto[]>(`${this.apiUrl}/details`).pipe(
+  // getUsersWithDetails() {
+  //   return this.http.get<UserDto[]>(`${this.apiUrl}/details`).pipe(
+  //     tap(users => {
+  //       users.forEach(user => {
+  //         if (user.manager) {
+  //           user.role = 'Manager';
+  //         } else if (user.employee) {
+  //           user.role = 'Employee';
+  //         }
+  //       });
+  //     })
+  //   );
+  // }
+
+  deleteUser(userId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${userId}`);
+  }
+
+  getUsersWithDetails(page: number, pageSize: number, sortField: string, sortDirection: string, filter: string): Observable<UserDto[]> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('pageSize', pageSize.toString())
+      .set('sortField', sortField)
+      .set('sortDirection', sortDirection)
+      .set('filter', filter);
+
+    return this.http.get<UserDto[]>(`${this.apiUrl}/details/filtered`, { params }).pipe(
       tap(users => {
         users.forEach(user => {
           if (user.manager) {
@@ -81,8 +106,6 @@ export class UserService {
       })
     );
   }
-
-  deleteUser(userId: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${userId}`);
-  }
 }
+
+

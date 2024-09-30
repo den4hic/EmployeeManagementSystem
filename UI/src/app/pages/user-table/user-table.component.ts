@@ -1,56 +1,98 @@
-import {Component, inject, OnInit, ViewChild} from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import {UserDto} from "../../services/dtos/user.dto";
-import {UserService} from "../../services/user.service";
-import {MatSnackBar} from "@angular/material/snack-bar";
-import {MatDialog} from "@angular/material/dialog";
-import {ConfirmDialogComponent} from "../../shared/confirm-dialog/confirm-dialog.component";
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { MatSort, Sort } from '@angular/material/sort';
+import { UserDto } from "../../services/dtos/user.dto";
+import { UserService } from "../../services/user.service";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatDialog } from "@angular/material/dialog";
+import { ConfirmDialogComponent } from "../../shared/confirm-dialog/confirm-dialog.component";
+import { merge, Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-user-table',
   templateUrl: './user-table.component.html',
   styleUrls: ['./user-table.component.scss']
 })
-export class UserTableComponent implements OnInit {
+export class UserTableComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['id', 'firstName', 'lastName', 'email', 'phoneNumber', 'hireDate', 'role', 'actions'];
   dataSource = new MatTableDataSource<UserDto>();
-  private userService = inject(UserService);
-  private dialog = inject(MatDialog);
-  private snackBar = inject(MatSnackBar);
+
+  totalItems = 0;
+  pageSize = 10;
+  pageSizeOptions: number[] = [5, 10, 20];
+  currentPage = 0;
+
+  filterValue = '';
+  sortActive = 'id';
+  sortDirection = 'asc';
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
   users: UserDto[] = [];
+  constructor(
+    private userService: UserService,
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
+  ) {}
 
   ngOnInit() {
-    const res = this.userService.getUsersWithDetails();
-
-    console.log(res);
-    res.subscribe((users) => {
-      this.users = users;
-      this.dataSource.data = this.users;
-      console.log(this.users);
-    });
+    this.loadUsersPage();
   }
 
   ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
+
+    merge(this.sort.sortChange, this.paginator.page)
+      .pipe(
+        tap(() => this.loadUsersPage())
+      )
+      .subscribe();
+  }
+
+  loadUsersPage() {
+    this.userService.getUsersWithDetails(
+      this.currentPage,
+      this.pageSize,
+      this.sortActive,
+      this.sortDirection,
+      this.filterValue
+    ).subscribe(
+      (response) => {
+        this.users = response;
+        this.dataSource.data = this.users;
+      },
+      (error) => {
+        console.error('Error loading users', error);
+        this.showSnackBar('Помилка завантаження користувачів');
+      }
+    );
   }
 
   applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+    this.filterValue = (event.target as HTMLInputElement).value;
+    this.paginator.pageIndex = 0;
+    this.loadUsersPage();
+  }
+
+  onPageChange(event: PageEvent) {
+    this.currentPage = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.loadUsersPage();
+  }
+
+  onSortChange(sort: Sort) {
+    this.sortActive = sort.active;
+    this.sortDirection = sort.direction;
+    this.loadUsersPage();
   }
 
   confirmDelete(userId: number) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '300px'
     });
-
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.deleteUser(userId);
@@ -58,11 +100,10 @@ export class UserTableComponent implements OnInit {
     });
   }
 
-
   deleteUser(userId: number) {
     this.userService.deleteUser(userId).subscribe({
       next: () => {
-        this.dataSource.data = this.dataSource.data.filter(user => user.id !== userId);
+        this.loadUsersPage(); // Перезавантажуємо поточну сторінку
         this.showSnackBar('Користувача успішно видалено');
       },
       error: (error) => {
@@ -79,5 +120,4 @@ export class UserTableComponent implements OnInit {
       verticalPosition: 'bottom',
     });
   }
-
 }
