@@ -4,6 +4,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {RouterLink, RouterModule, RouterOutlet} from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import {HttpClientModule, provideHttpClient, withInterceptors} from '@angular/common/http';
+import {FormsModule} from "@angular/forms";
 
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -35,6 +36,9 @@ import {MatSort} from "@angular/material/sort";
 import {MatPaginator} from "@angular/material/paginator";
 import { ConfirmDialogComponent } from './shared/confirm-dialog/confirm-dialog.component';
 import {MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle} from "@angular/material/dialog";
+import { AssignRoleDialogComponent } from './shared/role-dialog/role-dialog.component';
+import {MatOption, MatSelect} from "@angular/material/select";
+import {MatCheckbox} from "@angular/material/checkbox";
 
 @NgModule({
   declarations: [
@@ -46,7 +50,8 @@ import {MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle} from
     ToolbarComponent,
     ProfileComponent,
     UserTableComponent,
-    ConfirmDialogComponent
+    ConfirmDialogComponent,
+    AssignRoleDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -80,7 +85,11 @@ import {MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle} from
     MatDialogContent,
     MatDialogActions,
     MatDialogClose,
-    MatDialogTitle
+    MatDialogTitle,
+    MatSelect,
+    MatOption,
+    MatCheckbox,
+    FormsModule
   ],
   providers: [
     provideHttpClient(withInterceptors([tokenInterceptor]))

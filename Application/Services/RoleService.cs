@@ -104,4 +104,57 @@ public class RoleService : IRoleService
             await _employeeRepository.CreateAsync(employeeDto);
         }
     }
+
+    public async Task AssignRoleAsync(int userId, string role, EmployeeManagerRoleDto roleData)
+    {
+        var user = await _userRepository.GetByIdAsync(userId);
+        if (user == null)
+            throw new Exception("User not found");
+
+        var userIdentity = await _userManager.FindByIdAsync(user.AspNetUserId);
+        if (userIdentity == null)
+            throw new Exception("User not found");
+
+        if (!await _roleManager.RoleExistsAsync(role))
+            throw new Exception("Role does not exist");
+
+        // Отримати поточні ролі користувача
+        var currentRoles = await _userManager.GetRolesAsync(userIdentity);
+
+        if (currentRoles.Any())
+        {
+            await _userManager.RemoveFromRolesAsync(userIdentity, currentRoles);
+
+            if (currentRoles.Contains("Manager"))
+            {
+                var manager = await _managerRepository.GetByUserIdAsync(user.Id);
+                if (manager != null)
+                    await _managerRepository.DeleteAsync(manager.Id);
+            }
+
+            if (currentRoles.Contains("Employee"))
+            {
+                var employee = await _employeeRepository.GetByUserIdAsync(user.Id);
+                if (employee != null)
+                    await _employeeRepository.DeleteAsync(employee.Id);
+            }
+        }
+
+        await _userManager.AddToRoleAsync(userIdentity, role);
+
+        if (role == "Manager")
+        {
+            var managerDto = _mapper.Map<ManagerDto>(roleData);
+            managerDto.UserId = user.Id;
+            await _managerRepository.CreateAsync(managerDto);
+        }
+        
+        else if (role == "Employee")
+        {
+            var employeeDto = _mapper.Map<EmployeeDto>(roleData);
+            employeeDto.UserId = user.Id;
+            await _employeeRepository.CreateAsync(employeeDto);
+        }
+    }
+
 }

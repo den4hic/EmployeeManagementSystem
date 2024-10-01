@@ -11,4 +11,5 @@ public interface IRoleService
     Task<IdentityRole> GetRoleByIdAsync(string id);
     Task<bool> DeleteRoleAsync(string roleName);
     Task AssignRoleAsync(string username, string role, EmployeeManagerRoleDto roleData);
+    Task AssignRoleAsync(int userId, string role, EmployeeManagerRoleDto roleData);
 }

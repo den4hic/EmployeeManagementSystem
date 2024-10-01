@@ -70,9 +70,9 @@ public class RoleController : ControllerBase
 
     [HttpPost("assign-role")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> AssignRole(string username, string role, [FromBody] EmployeeManagerRoleDto roleData)
+    public async Task<IActionResult> AssignRole(int userId, string role, [FromBody] EmployeeManagerRoleDto roleData)
     {
-        await _roleService.AssignRoleAsync(username, role, roleData);
+        await _roleService.AssignRoleAsync(userId, role, roleData);
         return Ok(new { Message = "Role assigned and entity created successfully" });
     }
 }

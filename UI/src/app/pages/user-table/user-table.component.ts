@@ -7,8 +7,10 @@ import { UserService } from "../../services/user.service";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { MatDialog } from "@angular/material/dialog";
 import { ConfirmDialogComponent } from "../../shared/confirm-dialog/confirm-dialog.component";
-import { merge, Observable } from 'rxjs';
+import { AssignRoleDialogComponent } from "../../shared/role-dialog/role-dialog.component";
+import { merge } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import {RoleService} from "../../services/role.service";
 
 @Component({
   selector: 'app-user-table',
@@ -16,14 +18,13 @@ import { tap } from 'rxjs/operators';
   styleUrls: ['./user-table.component.scss']
 })
 export class UserTableComponent implements OnInit, AfterViewInit {
-  displayedColumns: string[] = ['id', 'firstName', 'lastName', 'email', 'phoneNumber', 'hireDate', 'role', 'actions'];
+  displayedColumns: string[] = ['select', 'id', 'firstName', 'lastName', 'email', 'phoneNumber', 'hireDate', 'role', 'actions'];
   dataSource = new MatTableDataSource<UserDto>();
-
+  selectedUserIds: number[] = []; // Масив для зберігання ID вибраних користувачів
   totalItems = 0;
   pageSize = 10;
   pageSizeOptions: number[] = [5, 10, 20];
   currentPage = 0;
-
   filterValue = '';
   sortActive = 'id';
   sortDirection = 'asc';
@@ -31,9 +32,9 @@ export class UserTableComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  users: UserDto[] = [];
   constructor(
     private userService: UserService,
+    private roleService: RoleService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar
   ) {}
@@ -44,32 +45,20 @@ export class UserTableComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
-
     merge(this.sort.sortChange, this.paginator.page)
-      .pipe(
-        tap(() => this.loadUsersPage())
-      )
+      .pipe(tap(() => this.loadUsersPage()))
       .subscribe();
   }
 
   loadUsersPage() {
-    this.userService.getUsersWithDetails(
-      this.currentPage,
-      this.pageSize,
-      this.sortActive,
-      this.sortDirection,
-      this.filterValue
-    ).subscribe(
-      (response) => {
-        this.users = response.items;
-        this.dataSource.data = this.users;
+    this.userService.getUsersWithDetails(this.currentPage, this.pageSize, this.sortActive, this.sortDirection, this.filterValue)
+      .subscribe((response) => {
+        this.dataSource.data = response.items;
         this.totalItems = response.totalItems;
-      },
-      (error) => {
+      }, (error) => {
         console.error('Error loading users', error);
-        this.showSnackBar('Помилка завантаження користувачів');
-      }
-    );
+        this.showSnackBar('Error loading users');
+      });
   }
 
   applyFilter(event: Event) {
@@ -104,21 +93,48 @@ export class UserTableComponent implements OnInit, AfterViewInit {
   deleteUser(userId: number) {
     this.userService.deleteUser(userId).subscribe({
       next: () => {
-        this.loadUsersPage(); // Перезавантажуємо поточну сторінку
-        this.showSnackBar('Користувача успішно видалено');
+        this.loadUsersPage();
+        this.showSnackBar('User deleted successfully');
       },
       error: (error) => {
         console.error('Error deleting user', error);
-        this.showSnackBar('Помилка видалення користувача');
+        this.showSnackBar('Error deleting user');
+      }
+    });
+  }
+
+  onRowSelect(userId: number, isChecked: boolean) {
+    if (isChecked) {
+      this.selectedUserIds.push(userId);
+    } else {
+      this.selectedUserIds = this.selectedUserIds.filter(id => id !== userId);
+    }
+  }
+
+  selectAllRows() {
+    this.selectedUserIds = this.dataSource.data.map(user => user.id);
+  }
+
+  deselectAllRows() {
+    this.selectedUserIds = [];
+  }
+
+  openAssignRoleDialog() {
+    const dialogRef = this.dialog.open(AssignRoleDialogComponent, {
+      width: '300px',
+      data: { userIds: this.selectedUserIds }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.snackBar.open('Role assigned successfully', 'Close', { duration: 3000 });
+        this.loadUsersPage();
       }
     });
   }
 
   private showSnackBar(message: string) {
-    this.snackBar.open(message, 'Закрити', {
-      duration: 3000,
-      horizontalPosition: 'center',
-      verticalPosition: 'bottom',
-    });
+    this.snackBar.open(message, 'Close', { duration: 3000 });
   }
 }
+
