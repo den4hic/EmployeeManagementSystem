@@ -1,22 +1,37 @@
-<div class="container mt-4">
-  <h1>Welcome to this management system</h1>
-  <div [ngSwitch]="userRole">
-    <div *ngSwitchCase="'Admin'">
-      <h1>You are admin</h1>
-    </div>
-    <div *ngSwitchCase="'Manager'">
-      <h1>You are manager</h1>
-    </div>
-    <div *ngSwitchCase="'User'">
-      <h1>You are user</h1>
-    </div>
-    <div *ngSwitchCase="'Employee'">
-      <h1>You are employee</h1>
-    </div>
-    <div *ngSwitchDefault>
-      <h1>Unknown role</h1>
-    </div>
-  </div>
+<div class="container mat-elevation-z4">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <h1>Welcome to the Management System</h1>
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div [ngSwitch]="userRole">
+        <mat-icon [ngSwitch]="userRole">
+          <ng-container *ngSwitchCase="'Admin'">admin_panel_settings</ng-container>
+          <ng-container *ngSwitchCase="'Manager'">supervisor_account</ng-container>
+          <ng-container *ngSwitchCase="'User'">person</ng-container>
+          <ng-container *ngSwitchCase="'Employee'">badge</ng-container>
+          <ng-container *ngSwitchDefault>help</ng-container>
+        </mat-icon>
+        <h2>
+          <ng-container [ngSwitch]="userRole">
+            <ng-container *ngSwitchCase="'Admin'">You are an Administrator</ng-container>
+            <ng-container *ngSwitchCase="'Manager'">You are a Manager</ng-container>
+            <ng-container *ngSwitchCase="'User'">You are a User</ng-container>
+            <ng-container *ngSwitchCase="'Employee'">You are an Employee</ng-container>
+            <ng-container *ngSwitchDefault>Unknown role</ng-container>
+          </ng-container>
+        </h2>
+      </div>
+    </mat-card-content>
+    <mat-card-actions *ngIf="userRole === 'Admin'">
+      <button mat-raised-button (click)="navigateToUserTable()">
+        <mat-icon>people</mat-icon>
+        Manage Users
+      </button>
+    </mat-card-actions>
+  </mat-card>
 </div>
 
 <app-user-statistics></app-user-statistics>

@@ -20,4 +20,8 @@ export class HomeComponent implements OnInit {
   ngOnInit() {
     this.userRole = this.jwtService.getUserRole();
   }
+
+  navigateToUserTable() {
+    this.router.navigate(['/users']);
+  }
 }
