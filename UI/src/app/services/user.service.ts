@@ -5,6 +5,7 @@ import { JwtService } from "./jwt.service";
 import { Observable, of, throwError } from "rxjs";
 import { UserDto } from "./dtos/user.dto";
 import { tap, catchError } from "rxjs/operators";
+import {UserStatistics} from "./dtos/user-statistic.dto";
 
 @Injectable({
   providedIn: 'root'
@@ -106,6 +107,11 @@ export class UserService {
       })
     );
   }
+
+  getUserStatistics(): Observable<UserStatistics> {
+    return this.http.get<UserStatistics>(`${this.apiUrl}/statistics`);
+  }
+
 }
 
 

@@ -12,5 +12,6 @@ namespace Application.Abstractions
         Task<UserDto> GetUserByUsernameAsync(string username);
         Task<IEnumerable<UserDto>> GetUsersWithDetailsAsync();
         Task<(IEnumerable<UserDto>, int)> GetUsersWithDetailsFilteredAsync(int page, int pageSize, string sortField, string sortDirection, string filter);
+        Task<(int, int)> GetUsersStatisticsAsync();
     }
 }

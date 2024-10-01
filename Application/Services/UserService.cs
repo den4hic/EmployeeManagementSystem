@@ -103,4 +103,13 @@ public class UserService : IUserService
                 return sortDirection.ToLower() == "asc" ? query.OrderBy(u => u.Id) : query.OrderByDescending(u => u.Id);
         }
     }
+
+    public async Task<(int, int)> GetUsersStatisticsAsync()
+    {
+        var users = await _userRepository.GetAllAsync();
+
+        var totalAdmins = await _userManager.GetUsersInRoleAsync("Admin");
+
+        return (users.Count(), totalAdmins.Count());
+    }
 }

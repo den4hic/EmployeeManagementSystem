@@ -89,7 +89,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("details/filtered")]
-    public async Task<ActionResult<IEnumerable<UserDto>>> GetUsersWithDetailsFiltered(
+    public async Task<ActionResult<(IEnumerable<UserDto>, int)>> GetUsersWithDetailsFiltered(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10,
         [FromQuery] string sortField = "id",
@@ -98,6 +98,13 @@ public class UserController : ControllerBase
     {
         var (users, totalItems) = await _userService.GetUsersWithDetailsFilteredAsync(page, pageSize, sortField, sortDirection, filter);
         return Ok(new { items = users, totalItems = totalItems});
+    }
+
+    [HttpGet("statistics")]
+    public async Task<ActionResult<(int, int)>> GetUsersStatistics()
+    {
+        var (totalUsers, totalAdmins) = await _userService.GetUsersStatisticsAsync();
+        return Ok(new { totalUsers = totalUsers, activeAdmins = totalAdmins });
     }
 
 

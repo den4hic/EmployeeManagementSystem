@@ -1,0 +1,14 @@
+.statistics-container {
+  margin-bottom: 20px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+mat-icon {
+  margin-right: 10px;
+}
+

@@ -39,6 +39,7 @@ import {MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle} from
 import { AssignRoleDialogComponent } from './shared/role-dialog/role-dialog.component';
 import {MatOption, MatSelect} from "@angular/material/select";
 import {MatCheckbox} from "@angular/material/checkbox";
+import { UserStatisticsComponent } from './components/user-statistics/user-statistics.component';
 
 @NgModule({
   declarations: [
@@ -51,7 +52,8 @@ import {MatCheckbox} from "@angular/material/checkbox";
     ProfileComponent,
     UserTableComponent,
     ConfirmDialogComponent,
-    AssignRoleDialogComponent
+    AssignRoleDialogComponent,
+    UserStatisticsComponent
   ],
   imports: [
     BrowserModule,
