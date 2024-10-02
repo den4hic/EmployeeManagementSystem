@@ -102,10 +102,10 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("statistics")]
-    public async Task<ActionResult<(int, int)>> GetUsersStatistics()
+    public async Task<ActionResult<(int, int, int)>> GetUsersStatistics()
     {
-        var (totalUsers, totalAdmins) = await _userService.GetUsersStatisticsAsync();
-        return Ok(new { totalUsers = totalUsers, activeAdmins = totalAdmins });
+        var (totalUsers, totalAdmins, blockedUsers) = await _userService.GetUsersStatisticsAsync();
+        return Ok(new { totalUsers = totalUsers, activeAdmins = totalAdmins, blockedUsers = blockedUsers });
     }
 
     [HttpPut("block/{id}")]

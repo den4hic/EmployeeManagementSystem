@@ -10,7 +10,8 @@ import {UserStatistics} from "../../services/dtos/user-statistic.dto";
 export class UserStatisticsComponent implements OnInit {
   statistics: UserStatistics = {
     totalUsers: 0,
-    activeAdmins: 0
+    activeAdmins: 0,
+    blockedUsers: 0
   };
 
   constructor(private userService: UserService) {}

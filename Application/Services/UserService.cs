@@ -82,12 +82,14 @@ public class UserService : IUserService
         return sortField;
     }
 
-    public async Task<(int, int)> GetUsersStatisticsAsync()
+    public async Task<(int, int, int)> GetUsersStatisticsAsync()
     {
         var users = await _userRepository.GetAllAsync();
 
         var totalAdmins = await _userManager.GetUsersInRoleAsync("Admin");
 
-        return (users.Count(), totalAdmins.Count());
+        var blockedUsers = users.Count(u => u.IsBlocked);
+
+        return (users.Count(), totalAdmins.Count(), blockedUsers);
     }
 }

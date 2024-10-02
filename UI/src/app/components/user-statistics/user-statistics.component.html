@@ -7,20 +7,9 @@
     </mat-card-header>
     <mat-card-content>
       <div class="stat-grid">
-        <div class="stat-item">
-          <mat-icon>group</mat-icon>
-          <div class="stat-info">
-            <span class="stat-label">Total Users</span>
-            <span class="stat-value">{{ statistics.totalUsers }}</span>
-          </div>
-        </div>
-        <div class="stat-item">
-          <mat-icon>admin_panel_settings</mat-icon>
-          <div class="stat-info">
-            <span class="stat-label">Active Admins</span>
-            <span class="stat-value">{{ statistics.activeAdmins }}</span>
-          </div>
-        </div>
+        <app-stat-item icon="group" label="Total Users" [value]="statistics.totalUsers"></app-stat-item>
+        <app-stat-item icon="admin_panel_settings" label="Active Admins" [value]="statistics.activeAdmins"></app-stat-item>
+        <app-stat-item icon="block" label="Blocked Users" [value]="statistics.blockedUsers"></app-stat-item>
       </div>
     </mat-card-content>
   </mat-card>

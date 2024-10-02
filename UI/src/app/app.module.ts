@@ -42,6 +42,7 @@ import {MatCheckbox} from "@angular/material/checkbox";
 import { UserStatisticsComponent } from './components/user-statistics/user-statistics.component';
 import {MatSlideToggle} from "@angular/material/slide-toggle";
 import { BlockedComponent } from './pages/blocked/blocked.component';
+import { StatItemComponent } from './shared/stat-item/stat-item.component';
 
 @NgModule({
   declarations: [
@@ -56,7 +57,8 @@ import { BlockedComponent } from './pages/blocked/blocked.component';
     ConfirmDialogComponent,
     AssignRoleDialogComponent,
     UserStatisticsComponent,
-    BlockedComponent
+    BlockedComponent,
+    StatItemComponent
   ],
   imports: [
     BrowserModule,
