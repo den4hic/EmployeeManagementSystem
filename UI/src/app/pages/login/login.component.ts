@@ -14,6 +14,7 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 export class LoginComponent {
   loginForm: FormGroup;
   router = inject(Router);
+  hidePassword = true;
   private snackBar = inject(MatSnackBar);
 
   constructor(private authService: AuthService, private jwtService: JwtService, private fb: FormBuilder) {

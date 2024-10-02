@@ -95,6 +95,8 @@ public class AccountService : IAccountService
             throw new SecurityTokenException("Invalid token");
         }
 
+        var userDto = await _userRepository.GetByAspNetUserIdAsync(user.Id);
+
         var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
 
         if (role is null)
@@ -102,7 +104,7 @@ public class AccountService : IAccountService
             throw new SecurityTokenException("User has no role");
         }
 
-        var claims = CreateClaims(user, role);
+        var claims = CreateClaims(user, role, userDto.IsBlocked);
         var accessToken = CreateJwtToken(claims);
         var refreshToken = await UpdateUserRefreshTokenAsync(user, populateExp);
 
@@ -164,13 +166,14 @@ public class AccountService : IAccountService
         await _userRepository.CreateAsync(userDto);
     }
 
-    private IEnumerable<Claim> CreateClaims(IdentityUser user, string role)
+    private IEnumerable<Claim> CreateClaims(IdentityUser user, string role, bool isBlocked)
     {
         return new List<Claim>
         {
             new Claim("userData", user.UserName),
             new Claim("username", user.UserName),
-            new Claim("role", role)
+            new Claim("role", role),
+            new Claim("isBlocked", isBlocked.ToString())
         };
     }
 
