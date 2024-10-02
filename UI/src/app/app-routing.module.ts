@@ -8,6 +8,8 @@ import {authGuard} from "./guards/auth.guard";
 import {ProfileComponent} from "./pages/profile/profile.component";
 import {UserTableComponent} from "./pages/user-table/user-table.component";
 import {roleGuard} from "./guards/role.guard";
+import {BlockedComponent} from "./pages/blocked/blocked.component";
+import {blockGuard} from "./guards/block.guard";
 
 const routes: Routes = [
   {
@@ -39,6 +41,11 @@ const routes: Routes = [
     data: {
       roles: ['Admin']
     }
+  },
+  {
+    path: 'blocked',
+    component: BlockedComponent,
+    canActivate: [blockGuard]
   }
 ];
 

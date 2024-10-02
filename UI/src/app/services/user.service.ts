@@ -12,7 +12,6 @@ import {UserStatistics} from "./dtos/user-statistic.dto";
 })
 export class UserService {
   private apiUrl = 'https://localhost:7110/api/user';
-  private authService = inject(AuthService);
   private jwtService = inject(JwtService);
   private http = inject(HttpClient);
 

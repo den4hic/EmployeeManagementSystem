@@ -12,6 +12,12 @@ export const authGuard: CanActivateFn = (route, state) => {
     router.navigate(['/landing']);
     return false;
   }
+  console.log(jwtService.getUserIsBlocked() === false);
+  if (jwtService.getUserIsBlocked()) {
+    console.log(1);
+    router.navigate(['/blocked']);
+    return false;
+  }
 
   return true;
 };

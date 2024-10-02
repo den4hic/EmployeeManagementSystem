@@ -5,6 +5,7 @@ import { tap } from 'rxjs/operators';
 import {RegisterDto} from "./dtos/register.dto";
 import {LoginDto} from "./dtos/login.dto";
 import {TokenDto} from "./dtos/token.dto";
+import {UserService} from "./user.service";
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,7 @@ import {TokenDto} from "./dtos/token.dto";
 export class AuthService {
   private apiUrl = 'https://localhost:7110/api/account';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private userService: UserService) {}
 
   register(model: RegisterDto): Observable<string> {
     return this.http.post<string>(`${this.apiUrl}/register`, model);
@@ -30,6 +31,7 @@ export class AuthService {
   logout(): Observable<string> {
     return this.http.post<string>(`${this.apiUrl}/logout`, {}).pipe(
       tap(() => {
+        this.userService.clearUserInfo();
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
       })

@@ -23,6 +23,16 @@ export class JwtService {
     return null;
   }
 
+  public getUserIsBlocked(): boolean {
+    const token = this.getToken();
+    if (token) {
+      const decodedToken: any = jwtDecode(token);
+      console.log(decodedToken.isBlocked);
+      return decodedToken.isBlocked !== 'False';
+    }
+    return false;
+  }
+
   public getUsername(): string | null {
     const token = this.getToken();
     if (token) {
