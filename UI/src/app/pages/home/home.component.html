@@ -34,4 +34,6 @@
   </mat-card>
 </div>
 
-<app-user-statistics></app-user-statistics>
+<ng-container *ngIf="userRole === 'Admin'">
+  <app-user-statistics></app-user-statistics>
+</ng-container>

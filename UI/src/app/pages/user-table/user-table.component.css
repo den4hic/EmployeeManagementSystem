@@ -1,10 +1,17 @@
 .user-table-container {
   margin: 20px;
+  height: 85vh;
+}
+
+.filter-container {
+  display: flex;
+  gap: 10px;
+  height: 12vh;
+  font-size: 20px;
 }
 
 mat-form-field {
-  width: 100%;
-  margin-bottom: 10px;
+  flex: 1;
 }
 
 table {
@@ -12,5 +19,17 @@ table {
 }
 
 .mat-elevation-z8 {
-  box-shadow: 0 8px 16px -4px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.2);
+}
+
+.table-container {
+  flex: 1;
+  max-height: calc(83vh - 190px);
+  overflow-y: auto;
+  border: 1px solid #ccc;
+}
+
+.assign-role-container {
+  padding-bottom: 10px;
+  height: 5vh;
 }
