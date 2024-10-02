@@ -76,14 +76,35 @@ public class UserService : IUserService
 
         var totalItems = users.Count();
 
-        var items = users
+        var paginatedUsers = users
             .Skip(page * pageSize)
             .Take(pageSize)
-            .Select(u => u)
             .ToList();
 
-        return (items, totalItems);
+        var userDtos = new List<UserDto>();
+
+        foreach (var user in paginatedUsers)
+        {
+            var roles = await _userManager.GetRolesAsync(await _userManager.FindByIdAsync(user.AspNetUserId));
+
+            var userDto = new UserDto
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                Manager = user.Manager,
+                Employee = user.Employee,
+                PhoneNumber = user.PhoneNumber,
+                Role = roles.FirstOrDefault()
+            };
+
+            userDtos.Add(userDto);
+        }
+
+        return (userDtos, totalItems);
     }
+
 
     private IEnumerable<UserDto> ApplySorting(IEnumerable<UserDto> query, string sortField, string sortDirection)
     {

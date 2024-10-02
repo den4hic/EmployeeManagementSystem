@@ -95,17 +95,7 @@ export class UserService {
       .set('sortDirection', sortDirection)
       .set('filter', filter);
 
-    return this.http.get<{items: UserDto[], totalItems: number}>(`${this.apiUrl}/details/filtered`, { params }).pipe(
-      tap(users => {
-        users.items.forEach(user => {
-          if (user.manager) {
-            user.role = 'Manager';
-          } else if (user.employee) {
-            user.role = 'Employee';
-          }
-        });
-      })
-    );
+    return this.http.get<{items: UserDto[], totalItems: number}>(`${this.apiUrl}/details/filtered`, { params });
   }
 
   getUserStatistics(): Observable<UserStatistics> {
