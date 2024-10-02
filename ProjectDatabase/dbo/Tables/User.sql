@@ -7,6 +7,7 @@
     [PhoneNumber]            NVARCHAR (20)  NULL,
     [RefreshToken]           NVARCHAR (50)  NULL,
     [RefreshTokenExpiryTime] DATETIME       NULL,
+    [IsBlocked]              BIT            CONSTRAINT [DF_User_IsBlocked] DEFAULT ((0)) NOT NULL,
     PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_User_AspNetUsers] FOREIGN KEY ([AspNetUserId]) REFERENCES [dbo].[AspNetUsers] ([Id]) ON DELETE CASCADE
 );

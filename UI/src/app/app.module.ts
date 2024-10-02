@@ -40,6 +40,7 @@ import { AssignRoleDialogComponent } from './shared/role-dialog/role-dialog.comp
 import {MatOption, MatSelect} from "@angular/material/select";
 import {MatCheckbox} from "@angular/material/checkbox";
 import { UserStatisticsComponent } from './components/user-statistics/user-statistics.component';
+import {MatSlideToggle} from "@angular/material/slide-toggle";
 
 @NgModule({
   declarations: [
@@ -91,7 +92,8 @@ import { UserStatisticsComponent } from './components/user-statistics/user-stati
     MatSelect,
     MatOption,
     MatCheckbox,
-    FormsModule
+    FormsModule,
+    MatSlideToggle
   ],
   providers: [
     provideHttpClient(withInterceptors([tokenInterceptor]))

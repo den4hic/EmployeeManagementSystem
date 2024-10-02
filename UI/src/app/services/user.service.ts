@@ -103,6 +103,9 @@ export class UserService {
     return this.http.get<UserStatistics>(`${this.apiUrl}/statistics`);
   }
 
+  blockUser(userId: number, isBlocked: boolean) {
+    return this.http.put(`${this.apiUrl}/block/${userId}`, isBlocked);
+  }
 }
 
 

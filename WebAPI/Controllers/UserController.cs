@@ -108,5 +108,21 @@ public class UserController : ControllerBase
         return Ok(new { totalUsers = totalUsers, activeAdmins = totalAdmins });
     }
 
+    [HttpPut("block/{id}")]
+    public async Task<ActionResult> BlockUser(int id, [FromBody] bool newIsBlocked)
+    {
+        var user = await _userService.GetUserByIdAsync(id);
+
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        user.IsBlocked = newIsBlocked;
+        await _userService.UpdateUserAsync(user);
+        return NoContent();
+    }
+
+
 
 }

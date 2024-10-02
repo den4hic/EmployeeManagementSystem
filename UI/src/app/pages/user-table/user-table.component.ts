@@ -11,6 +11,7 @@ import { AssignRoleDialogComponent } from "../../shared/role-dialog/role-dialog.
 import { merge } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import {RoleService} from "../../services/role.service";
+import {MatSlideToggleChange} from "@angular/material/slide-toggle";
 
 @Component({
   selector: 'app-user-table',
@@ -18,9 +19,9 @@ import {RoleService} from "../../services/role.service";
   styleUrls: ['./user-table.component.scss']
 })
 export class UserTableComponent implements OnInit, AfterViewInit {
-  displayedColumns: string[] = ['select', 'id', 'firstName', 'lastName', 'email', 'phoneNumber', 'hireDate', 'role', 'actions'];
+  displayedColumns: string[] = ['select', 'id', 'firstName', 'lastName', 'email', 'phoneNumber', 'hireDate', 'role', 'isBlocked', 'actions'];
   dataSource = new MatTableDataSource<UserDto>();
-  selectedUserIds: number[] = []; // Масив для зберігання ID вибраних користувачів
+  selectedUserIds: number[] = [];
   totalItems = 0;
   pageSize = 10;
   pageSizeOptions: number[] = [5, 10, 20];
@@ -164,6 +165,24 @@ export class UserTableComponent implements OnInit, AfterViewInit {
 
   private showSnackBar(message: string) {
     this.snackBar.open(message, 'Close', { duration: 3000 });
+  }
+
+  onToggleChange(userId: number, $event: MatSlideToggleChange) {
+    const isBlocked : boolean = $event.checked;
+
+    this.userService.blockUser(userId, isBlocked).subscribe({
+      next: () => {
+        if (isBlocked) {
+          this.showSnackBar('User blocked successfully');
+        } else {
+          this.showSnackBar('User unblocked successfully');
+        }
+      },
+      error: (error) => {
+        console.error('Error blocking user', error);
+        this.showSnackBar('Error blocking user');
+      }
+    });
   }
 }
 

@@ -18,6 +18,7 @@ public partial class User : IEntity<int>
     public string? PhoneNumber { get; set; }
 
     public string? RefreshToken { get; set; }
+    public bool IsBlocked { get; set; }
 
     public DateTime? RefreshTokenExpiryTime { get; set; }
 

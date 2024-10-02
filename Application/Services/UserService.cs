@@ -1,9 +1,6 @@
 ﻿using Application.Abstractions;
 using Application.DTOs;
-using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Application.Services;
 
@@ -92,7 +89,7 @@ public class UserService : IUserService
             .Skip(page * pageSize)
             .Take(pageSize)
             .ToList();
-        
+
         return (paginatedUsers, totalItems);
     }
 

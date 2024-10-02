@@ -8,6 +8,7 @@ export interface UserDto {
   email: string;
   phoneNumber: string;
   username: string;
+  isBlocked: boolean;
   manager: ManagerDto | null;
   employee: EmployeeDto | null;
   role: string;
