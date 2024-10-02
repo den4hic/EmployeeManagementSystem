@@ -62,12 +62,9 @@ public class UserService : IUserService
 
     public async Task<(IEnumerable<UserDto>, int)> GetUsersWithDetailsFilteredAsync(int page, int pageSize, string sortField, string sortDirection, string filter, string role)
     {
-        var users = await _userRepository.GetUsersWithDetailsAsync();
+        sortField = ToCapital(sortField);
 
-        if (!string.IsNullOrEmpty(filter))
-        {
-            users = users.Where(u => u.FirstName.Contains(filter) || u.LastName.Contains(filter) || u.Email.Contains(filter));
-        }
+        var (users, totalItems) = await _userRepository.GetUsersWithDetailsFilteredAsync(page, pageSize, sortField, sortDirection, filter, role);
 
         foreach (var user in users)
         {
@@ -76,41 +73,13 @@ public class UserService : IUserService
             user.Role = roles.FirstOrDefault();
         }
 
-        if (!string.IsNullOrEmpty(role))
-        {
-            users = users.Where(u => u.Role == role);
-        }
-
-        users = ApplySorting(users, sortField, sortDirection);
-
-        var totalItems = users.Count();
-
-        var paginatedUsers = users
-            .Skip(page * pageSize)
-            .Take(pageSize)
-            .ToList();
-
-        return (paginatedUsers, totalItems);
+        return (users, totalItems);
     }
 
-
-    private IEnumerable<UserDto> ApplySorting(IEnumerable<UserDto> query, string sortField, string sortDirection)
+    private static string ToCapital(string sortField)
     {
-        switch (sortField.ToLower())
-        {
-            case "firstname":
-                return sortDirection.ToLower() == "asc" ? query.OrderBy(u => u.FirstName) : query.OrderByDescending(u => u.FirstName);
-            case "lastname":
-                return sortDirection.ToLower() == "asc" ? query.OrderBy(u => u.LastName) : query.OrderByDescending(u => u.LastName);
-            case "email":
-                return sortDirection.ToLower() == "asc" ? query.OrderBy(u => u.Email) : query.OrderByDescending(u => u.Email);
-            case "phonenumber":
-                return sortDirection.ToLower() == "asc" ? query.OrderBy(u => u.PhoneNumber) : query.OrderByDescending(u => u.PhoneNumber);
-            case "id":
-                return sortDirection.ToLower() == "asc" ? query.OrderBy(u => u.Id) : query.OrderByDescending(u => u.Id);
-            default:
-                return sortDirection.ToLower() == "asc" ? query.OrderBy(u => u.Id) : query.OrderByDescending(u => u.Id);
-        }
+        sortField = sortField.ToUpper()[0] + sortField.ToLower().Substring(1);
+        return sortField;
     }
 
     public async Task<(int, int)> GetUsersStatisticsAsync()
