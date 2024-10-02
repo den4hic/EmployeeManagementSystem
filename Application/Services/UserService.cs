@@ -63,13 +63,25 @@ public class UserService : IUserService
         return await _userRepository.GetUsersWithDetailsAsync();
     }
 
-    public async Task<(IEnumerable<UserDto>, int)> GetUsersWithDetailsFilteredAsync(int page, int pageSize, string sortField, string sortDirection, string filter)
+    public async Task<(IEnumerable<UserDto>, int)> GetUsersWithDetailsFilteredAsync(int page, int pageSize, string sortField, string sortDirection, string filter, string role)
     {
         var users = await _userRepository.GetUsersWithDetailsAsync();
 
         if (!string.IsNullOrEmpty(filter))
         {
             users = users.Where(u => u.FirstName.Contains(filter) || u.LastName.Contains(filter) || u.Email.Contains(filter));
+        }
+
+        foreach (var user in users)
+        {
+            var roles = await _userManager.GetRolesAsync(await _userManager.FindByIdAsync(user.AspNetUserId));
+
+            user.Role = roles.FirstOrDefault();
+        }
+
+        if (!string.IsNullOrEmpty(role))
+        {
+            users = users.Where(u => u.Role == role);
         }
 
         users = ApplySorting(users, sortField, sortDirection);
@@ -80,29 +92,8 @@ public class UserService : IUserService
             .Skip(page * pageSize)
             .Take(pageSize)
             .ToList();
-
-        var userDtos = new List<UserDto>();
-
-        foreach (var user in paginatedUsers)
-        {
-            var roles = await _userManager.GetRolesAsync(await _userManager.FindByIdAsync(user.AspNetUserId));
-
-            var userDto = new UserDto
-            {
-                Id = user.Id,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-                Manager = user.Manager,
-                Employee = user.Employee,
-                PhoneNumber = user.PhoneNumber,
-                Role = roles.FirstOrDefault()
-            };
-
-            userDtos.Add(userDto);
-        }
-
-        return (userDtos, totalItems);
+        
+        return (paginatedUsers, totalItems);
     }
 
 

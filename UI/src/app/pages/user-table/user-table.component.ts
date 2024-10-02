@@ -28,6 +28,8 @@ export class UserTableComponent implements OnInit, AfterViewInit {
   filterValue = '';
   sortActive = 'id';
   sortDirection = 'asc';
+  roles: string[] = [];
+  selectedRole = '';
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -40,6 +42,7 @@ export class UserTableComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit() {
+    this.loadRoles();
     this.loadUsersPage();
   }
 
@@ -50,15 +53,36 @@ export class UserTableComponent implements OnInit, AfterViewInit {
       .subscribe();
   }
 
+  loadRoles() {
+    this.roleService.getRoles().subscribe(
+      (roles) => {
+        this.roles = roles.map((role) => role.name);
+      },
+      (error) => {
+        console.error('Error loading roles', error);
+        this.showSnackBar('Error loading roles');
+      }
+    );
+  }
+
   loadUsersPage() {
-    this.userService.getUsersWithDetails(this.currentPage, this.pageSize, this.sortActive, this.sortDirection, this.filterValue)
-      .subscribe((response) => {
+    this.userService.getUsersWithDetails(
+      this.currentPage,
+      this.pageSize,
+      this.sortActive,
+      this.sortDirection,
+      this.filterValue,
+      this.selectedRole
+    ).subscribe(
+      (response) => {
         this.dataSource.data = response.items;
         this.totalItems = response.totalItems;
-      }, (error) => {
+      },
+      (error) => {
         console.error('Error loading users', error);
         this.showSnackBar('Error loading users');
-      });
+      }
+    );
   }
 
   applyFilter(event: Event) {
@@ -70,6 +94,11 @@ export class UserTableComponent implements OnInit, AfterViewInit {
   onPageChange(event: PageEvent) {
     this.currentPage = event.pageIndex;
     this.pageSize = event.pageSize;
+    this.loadUsersPage();
+  }
+
+  onRoleFilterChange() {
+    this.paginator.pageIndex = 0;
     this.loadUsersPage();
   }
 

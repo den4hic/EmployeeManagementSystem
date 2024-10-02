@@ -4,6 +4,16 @@
     <input matInput (keyup)="applyFilter($event)" placeholder="Filter users">
   </mat-form-field>
 
+  <mat-form-field>
+    <mat-label>Filter by Role</mat-label>
+    <mat-select [(ngModel)]="selectedRole" (selectionChange)="onRoleFilterChange()">
+      <mat-option value="">All Roles</mat-option>
+      <mat-option *ngFor="let role of roles" [value]="role">
+        {{role}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
   <div>
     <button mat-raised-button color="primary" (click)="openAssignRoleDialog()">Assign role</button>
   </div>

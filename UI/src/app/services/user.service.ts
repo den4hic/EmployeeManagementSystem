@@ -87,13 +87,14 @@ export class UserService {
     return this.http.delete(`${this.apiUrl}/${userId}`);
   }
 
-  getUsersWithDetails(page: number, pageSize: number, sortField: string, sortDirection: string, filter: string): Observable<{items: UserDto[], totalItems: number}> {
+  getUsersWithDetails(page: number, pageSize: number, sortField: string, sortDirection: string, filter: string, selectedRole: string): Observable<{items: UserDto[], totalItems: number}> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('pageSize', pageSize.toString())
       .set('sortField', sortField)
       .set('sortDirection', sortDirection)
-      .set('filter', filter);
+      .set('filter', filter)
+      .set('role', selectedRole);
 
     return this.http.get<{items: UserDto[], totalItems: number}>(`${this.apiUrl}/details/filtered`, { params });
   }

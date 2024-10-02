@@ -94,9 +94,10 @@ public class UserController : ControllerBase
         [FromQuery] int pageSize = 10,
         [FromQuery] string sortField = "id",
         [FromQuery] string sortDirection = "asc",
-        [FromQuery] string filter = "")
+        [FromQuery] string filter = "",
+        [FromQuery] string role = "")
     {
-        var (users, totalItems) = await _userService.GetUsersWithDetailsFilteredAsync(page, pageSize, sortField, sortDirection, filter);
+        var (users, totalItems) = await _userService.GetUsersWithDetailsFilteredAsync(page, pageSize, sortField, sortDirection, filter, role);
         return Ok(new { items = users, totalItems = totalItems});
     }
 
