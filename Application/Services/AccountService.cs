@@ -17,14 +17,16 @@ public class AccountService : IAccountService
     private readonly UserManager<IdentityUser> _userManager;
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly IUserRepository _userRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IConfiguration _config;
 
-    public AccountService(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IUserRepository userRepository, IMapper mapper, IConfiguration config)
+    public AccountService(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IUserRepository userRepository, IUnitOfWork unitOfWork, IMapper mapper, IConfiguration config)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _userRepository = userRepository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
         _config = config;
     }
@@ -157,22 +159,40 @@ public class AccountService : IAccountService
 
     private async Task<Result<bool>> CreateAdminUserAsync(string username, string email, string password)
     {
-        var newAdmin = new IdentityUser { UserName = username, Email = email };
-        var result = await _userManager.CreateAsync(newAdmin, password);
+        await _unitOfWork.BeginTransactionAsync();
 
-        if (result.Succeeded)
+        try
         {
+            var newAdmin = new IdentityUser { UserName = username, Email = email };
+            var result = await _userManager.CreateAsync(newAdmin, password);
+
+            if (!result.Succeeded)
+            {
+                await _unitOfWork.RollbackAsync();
+                return Result<bool>.Failure($"Failed to create admin: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            }
+                
             var addRole = await _userManager.AddToRoleAsync(newAdmin, "Admin");
 
-            if (addRole.Succeeded)
+            if (!addRole.Succeeded)
             {
-                await CreateAdminInRepositoryAsync(newAdmin, username, email);
-                return Result<bool>.Success(true);
+                await _unitOfWork.RollbackAsync();
+                return Result<bool>.Failure("Failed to add role to admin");
+            
             }
 
-            return Result<bool>.Failure("Failed to add role to admin");
+            await CreateAdminInRepositoryAsync(newAdmin, username, email);
+
+            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.CommitAsync();
+
+            return Result<bool>.Success(true);
+        } 
+        catch (Exception ex)
+        {
+            await _unitOfWork.RollbackAsync();
+            return Result<bool>.Failure($"Transaction failed: {ex.Message}");
         }
-        return Result<bool>.Failure($"Failed to create admin: {string.Join(", ", result.Errors.Select(e => e.Description))}");
     }
 
     private async Task CreateAdminInRepositoryAsync(IdentityUser admin, string username, string email)
