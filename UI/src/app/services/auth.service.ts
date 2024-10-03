@@ -38,7 +38,12 @@ export class AuthService {
     );
   }
 
-  refreshToken(tokenDto: TokenDto): Observable<TokenDto> {
+  refreshToken(): Observable<TokenDto> {
+    console.log('Refreshing token...');
+    const tokenDto: TokenDto = {
+      accessToken: localStorage.getItem('accessToken') || '',
+      refreshToken: localStorage.getItem('refreshToken') || ''
+    };
     return this.http.post<TokenDto>(`${this.apiUrl}/refresh-token`, tokenDto).pipe(
       tap(response => {
         localStorage.setItem('accessToken', response.accessToken);

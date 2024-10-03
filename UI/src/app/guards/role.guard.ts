@@ -14,8 +14,18 @@ export const roleGuard: CanActivateFn = (route, state) => {
   const role = jwtService.getUserRole();
 
   if (jwtService.isTokenExpired()) {
-    router.navigate(['/landing']);
-    return false;
+    authService.refreshToken().subscribe(
+      response => {
+        console.log('Token refreshed:', response);
+        return true;
+      },
+      error => {
+        console.error('Token refresh failed:', error);
+        authService.logout();
+        router.navigate(['/login']);
+        return false;
+      }
+    );
   }
 
   if (role != null && roles.includes(role)) {

@@ -9,12 +9,21 @@ export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
 
   if (jwtService.isTokenExpired()) {
-    router.navigate(['/landing']);
-    return false;
+    authService.refreshToken().subscribe(
+      response => {
+        console.log('Token refreshed:', response);
+        return true;
+      },
+      error => {
+        console.error('Token refresh failed:', error);
+        authService.logout();
+        router.navigate(['/login']);
+        return false;
+      }
+    );
   }
-  console.log(jwtService.getUserIsBlocked() === false);
+
   if (jwtService.getUserIsBlocked()) {
-    console.log(1);
     router.navigate(['/blocked']);
     return false;
   }
