@@ -125,7 +125,7 @@ public class AccountService : IAccountService
         try
         {
             var principal = GetPrincipalFromExpiredToken(tokenDto.AccessToken);
-            var user = await _userManager.FindByNameAsync(principal.Identity.Name);
+            var user = await _userManager.FindByNameAsync(principal.Claims.ToList()[1].Value);
 
             if (user is null)
             {
