@@ -18,7 +18,8 @@ public class JwtTokenService : IJwtTokenService
 
     public string CreateJwtToken(IEnumerable<Claim> claims)
     {
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+        var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET");
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
         var securityToken = new JwtSecurityToken(
@@ -34,12 +35,13 @@ public class JwtTokenService : IJwtTokenService
 
     public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
     {
+        var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET");
         var tokenValidationParameters = new TokenValidationParameters
         {
             ValidateAudience = true,
             ValidateIssuer = true,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"])),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
             ValidateLifetime = false,
             ValidIssuer = _config["Jwt:Issuer"],
             ValidAudience = _config["Jwt:Audience"],
