@@ -1,12 +1,13 @@
-﻿using Application.DTOs;
+﻿using Application.Common;
+using Application.DTOs;
 
 namespace Application.Abstractions;
 
 public interface IEmployeeService
 {
-    Task<EmployeeDto> CreateEmployeeAsync(EmployeeDto employeeDto);
-    Task<EmployeeDto> GetEmployeeByIdAsync(int id);
-    Task<IEnumerable<EmployeeDto>> GetAllEmployeesAsync();
-    Task UpdateEmployeeAsync(EmployeeDto employeeDto);
-    Task DeleteEmployeeAsync(int id);
+    Task<Result<EmployeeDto>> CreateEmployeeAsync(EmployeeDto employeeDto);
+    Task<Result<EmployeeDto>> GetEmployeeByIdAsync(int id);
+    Task<Result<IEnumerable<EmployeeDto>>> GetAllEmployeesAsync();
+    Task<Result<bool>> UpdateEmployeeAsync(EmployeeDto employeeDto);
+    Task<Result<bool>> DeleteEmployeeAsync(int id);
 }

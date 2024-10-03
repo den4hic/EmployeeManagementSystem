@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions;
+using Application.Common;
 using Application.DTOs;
 
 namespace Application.Services;
@@ -12,28 +13,63 @@ public class EmployeeService : IEmployeeService
         _employeeRepository = employeeRepository;
     }
 
-    public async Task<EmployeeDto> CreateEmployeeAsync(EmployeeDto employeeDto)
+    public async Task<Result<EmployeeDto>> CreateEmployeeAsync(EmployeeDto employeeDto)
     {
-        return await _employeeRepository.CreateAsync(employeeDto);
+        try
+        {
+            var employee = await _employeeRepository.CreateAsync(employeeDto);
+            return Result<EmployeeDto>.Success(employee);
+        }
+        catch (Exception ex)
+        {
+            return Result<EmployeeDto>.Failure(ex.Message);
+        }
     }
 
-    public async Task<EmployeeDto> GetEmployeeByIdAsync(int id)
+    public async Task<Result<EmployeeDto>> GetEmployeeByIdAsync(int id)
     {
-        return await _employeeRepository.GetByIdAsync(id);
+        var employee = await _employeeRepository.GetByIdAsync(id);
+        return employee != null
+            ? Result<EmployeeDto>.Success(employee)
+            : Result<EmployeeDto>.Failure($"Employee with id {id} not found");
     }
 
-    public async Task<IEnumerable<EmployeeDto>> GetAllEmployeesAsync()
+    public async Task<Result<IEnumerable<EmployeeDto>>> GetAllEmployeesAsync()
     {
-        return await _employeeRepository.GetAllAsync();
+        try
+        {
+            var employees = await _employeeRepository.GetAllAsync();
+            return Result<IEnumerable<EmployeeDto>>.Success(employees);
+        }
+        catch (Exception ex)
+        {
+            return Result<IEnumerable<EmployeeDto>>.Failure(ex.Message);
+        }
     }
 
-    public async Task UpdateEmployeeAsync(EmployeeDto employeeDto)
+    public async Task<Result<bool>> UpdateEmployeeAsync(EmployeeDto employeeDto)
     {
-        await _employeeRepository.UpdateAsync(employeeDto);
+        try
+        {
+            await _employeeRepository.UpdateAsync(employeeDto);
+            return Result<bool>.Success(true);
+        }
+        catch (Exception ex)
+        {
+            return Result<bool>.Failure(ex.Message);
+        }
     }
 
-    public async Task DeleteEmployeeAsync(int id)
+    public async Task<Result<bool>> DeleteEmployeeAsync(int id)
     {
-        await _employeeRepository.DeleteAsync(id);
+        try
+        {
+            await _employeeRepository.DeleteAsync(id);
+            return Result<bool>.Success(true);
+        }
+        catch (Exception ex)
+        {
+            return Result<bool>.Failure(ex.Message);
+        }
     }
 }

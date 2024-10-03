@@ -1,40 +1,75 @@
 ﻿using Application.Abstractions;
+using Application.Common;
 using Application.DTOs;
 
-namespace Application.Services
+namespace Application.Services;
+
+public class StatusService : IStatusService
 {
-    public class StatusService : IStatusService
+    private readonly IStatusRepository _statusRepository;
+
+    public StatusService(IStatusRepository statusRepository)
     {
-        private readonly IStatusRepository _statusRepository;
+        _statusRepository = statusRepository;
+    }
 
-        public StatusService(IStatusRepository statusRepository)
+    public async Task<Result<StatusDto>> CreateStatusAsync(StatusDto statusDto)
+    {
+        try
         {
-            _statusRepository = statusRepository;
+            var status = await _statusRepository.CreateAsync(statusDto);
+            return Result<StatusDto>.Success(status);
         }
-
-        public async Task<StatusDto> CreateStatusAsync(StatusDto statusDto)
+        catch (Exception ex)
         {
-            return await _statusRepository.CreateAsync(statusDto);
+            return Result<StatusDto>.Failure($"Failed to create user: {ex.Message}");
         }
+    }
 
-        public async Task<StatusDto> GetStatusByIdAsync(int id)
+    public async Task<Result<StatusDto>> GetStatusByIdAsync(int id)
+    {
+        var status = await _statusRepository.GetByIdAsync(id);
+        return status != null
+            ? Result<StatusDto>.Success(status)
+            : Result<StatusDto>.Failure($"Status with id {id} not found");
+    }
+
+    public async Task<Result<IEnumerable<StatusDto>>> GetAllStatusesAsync()
+    {
+        try
         {
-            return await _statusRepository.GetByIdAsync(id);
+            var statuses = await _statusRepository.GetAllAsync();
+            return Result<IEnumerable<StatusDto>>.Success(statuses);
         }
-
-        public async Task<IEnumerable<StatusDto>> GetAllStatusesAsync()
+        catch (Exception ex)
         {
-            return await _statusRepository.GetAllAsync();
+            return Result<IEnumerable<StatusDto>>.Failure($"Failed to retrieve statuses: {ex.Message}");
         }
+    }
 
-        public async Task UpdateStatusAsync(StatusDto statusDto)
+    public async Task<Result<bool>> UpdateStatusAsync(StatusDto statusDto)
+    {
+        try
         {
             await _statusRepository.UpdateAsync(statusDto);
+            return Result<bool>.Success(true);
         }
+        catch (Exception ex)
+        {
+            return Result<bool>.Failure($"Failed to update status: {ex.Message}");
+        }
+    }
 
-        public async Task DeleteStatusAsync(int id)
+    public async Task<Result<bool>> DeleteStatusAsync(int id)
+    {
+        try
         {
             await _statusRepository.DeleteAsync(id);
+            return Result<bool>.Success(true);
+        }
+        catch (Exception ex)
+        {
+            return Result<bool>.Failure($"Failed to delete status: {ex.Message}");
         }
     }
 }

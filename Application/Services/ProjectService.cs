@@ -1,6 +1,6 @@
 ﻿using Application.Abstractions;
+using Application.Common;
 using Application.DTOs;
-using Domain.Entities;
 
 namespace Application.Services;
 
@@ -13,29 +13,63 @@ public class ProjectService : IProjectService
         _projectRepository = projectRepository;
     }
 
-    public async Task<ProjectDto> CreateProjectAsync(ProjectCreateDto projectDto)
+    public async Task<Result<ProjectDto>> CreateProjectAsync(ProjectCreateDto projectDto)
     {
-
-        return await _projectRepository.CreateCustomAsync(projectDto);
+        try
+        {
+            var project = await _projectRepository.CreateCustomAsync(projectDto);
+            return Result<ProjectDto>.Success(project);
+        }
+        catch (Exception ex)
+        {
+            return Result<ProjectDto>.Failure(ex.Message);
+        }
     }
 
-    public async Task<ProjectDto> GetProjectByIdAsync(int id)
+    public async Task<Result<ProjectDto>> GetProjectByIdAsync(int id)
     {
-        return await _projectRepository.GetByIdAsync(id);
+        var project = await _projectRepository.GetByIdAsync(id);
+        return project != null
+            ? Result<ProjectDto>.Success(project)
+            : Result<ProjectDto>.Failure($"Project with id {id} not found");
     }
 
-    public async Task<IEnumerable<ProjectDto>> GetAllProjectsAsync()
+    public async Task<Result<IEnumerable<ProjectDto>>> GetAllProjectsAsync()
     {
-        return await _projectRepository.GetProjectsWithDetailsAsync();
+        try
+        {
+            var projects = await _projectRepository.GetAllAsync();
+            return Result<IEnumerable<ProjectDto>>.Success(projects);
+        }
+        catch (Exception ex)
+        {
+            return Result<IEnumerable<ProjectDto>>.Failure(ex.Message);
+        }
     }
 
-    public async System.Threading.Tasks.Task UpdateProjectAsync(ProjectCreateDto projectDto)
+    public async Task<Result<bool>> UpdateProjectAsync(ProjectCreateDto projectDto)
     {
-        await _projectRepository.UpdateCustomAsync(projectDto);
+        try
+        {
+            await _projectRepository.UpdateCustomAsync(projectDto);
+            return Result<bool>.Success(true);
+        }
+        catch (Exception ex)
+        {
+            return Result<bool>.Failure(ex.Message);
+        }
     }
 
-    public async System.Threading.Tasks.Task DeleteProjectAsync(int id)
+    public async Task<Result<bool>> DeleteProjectAsync(int id)
     {
-        await _projectRepository.DeleteAsync(id);
+        try
+        {
+            await _projectRepository.DeleteAsync(id);
+            return Result<bool>.Success(true);
+        }
+        catch (Exception ex)
+        {
+            return Result<bool>.Failure(ex.Message);
+        }
     }
 }

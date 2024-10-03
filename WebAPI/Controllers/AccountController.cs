@@ -25,13 +25,11 @@ public class AccountController : ControllerBase
         }
 
         var result = await _accountService.RegisterAsync(model);
-
-        if (result)
+        if (result.IsSuccess)
         {
             return Ok(new { message = "User created successfully" });
         }
-
-        return BadRequest(new { Errors = new List<string> { "User creation failed" } });
+        return BadRequest(new { Errors = new List<string> { result.Error } });
     }
 
     [HttpPost("login")]
@@ -42,42 +40,49 @@ public class AccountController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var result = await _accountService.LoginAsync(model);
-
-        if (result)
+        var loginResult = await _accountService.LoginAsync(model);
+        if (loginResult.IsSuccess)
         {
-            var token = await _accountService.GenereateJwtTokenAsync(model, true);
-            return Ok(token);
+            var tokenResult = await _accountService.GenereateJwtTokenAsync(model, true);
+            if (tokenResult.IsSuccess)
+            {
+                return Ok(tokenResult.Value);
+            }
+            return BadRequest(new { Error = tokenResult.Error });
         }
-
-
-        return Unauthorized("Invalid credentials");
+        return Unauthorized(loginResult.Error);
     }
 
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
     {
-        await _accountService.LogoutAsync();
-        return Ok(new { message = "Logged out successfully" });
+        var result = await _accountService.LogoutAsync();
+        if (result.IsSuccess)
+        {
+            return Ok(new { message = "Logged out successfully" });
+        }
+        return BadRequest(new { Error = result.Error });
     }
 
     [HttpPost("default-admin")]
     public async Task<ActionResult> CreateDefaultAdmin()
     {
         var result = await _accountService.CreateDefaultAdminAsync();
-
-        if (result)
+        if (result.IsSuccess)
         {
             return NoContent();
         }
-
-        return BadRequest(new { message = "Problems with default admin creation" });
+        return BadRequest(new { message = result.Error });
     }
 
     [HttpPost("refresh-token")]
     public async Task<IActionResult> RefreshToken(TokenDto tokenDto)
     {
-        var token = await _accountService.RefreshToken(tokenDto);
-        return Ok(token);
+        var result = await _accountService.RefreshToken(tokenDto);
+        if (result.IsSuccess)
+        {
+            return Ok(result.Value);
+        }
+        return BadRequest(new { Error = result.Error });
     }
 }

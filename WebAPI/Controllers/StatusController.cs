@@ -25,28 +25,40 @@ public class StatusController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var createdStatus = await _statusService.CreateStatusAsync(statusDto);
-        return CreatedAtAction(nameof(GetStatus), new { id = createdStatus.Id }, createdStatus);
+        var result = await _statusService.CreateStatusAsync(statusDto);
+
+        if (result.IsSuccess)
+        {
+            return CreatedAtAction(nameof(GetStatus), new { id = result.Value.Id }, result.Value);
+        }
+
+        return BadRequest(result.Error);
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<StatusDto>> GetStatus(int id)
     {
-        var status = await _statusService.GetStatusByIdAsync(id);
+        var result = await _statusService.GetStatusByIdAsync(id);
 
-        if (status == null)
+        if (result.IsSuccess)
         {
-            return NotFound();
+            return Ok(result.Value);
         }
 
-        return Ok(status);
+        return NotFound(result.Error);
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<StatusDto>>> GetAllStatuses()
     {
-        var statuses = await _statusService.GetAllStatusesAsync();
-        return Ok(statuses);
+        var result = await _statusService.GetAllStatusesAsync();
+
+        if (result.IsSuccess)
+        {
+            return Ok(result.Value);
+        }
+
+        return BadRequest(result.Error);
     }
 
     [HttpPut]
@@ -57,14 +69,26 @@ public class StatusController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        await _statusService.UpdateStatusAsync(statusDto);
-        return NoContent();
+        var result = await _statusService.UpdateStatusAsync(statusDto);
+
+        if (result.IsSuccess)
+        {
+            return NoContent();
+        }
+
+        return BadRequest(result.Error);
     }
 
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteStatus(int id)
     {
-        await _statusService.DeleteStatusAsync(id);
-        return NoContent();
+        var result = await _statusService.DeleteStatusAsync(id);
+
+        if (result.IsSuccess)
+        {
+            return NoContent();
+        }
+
+        return NotFound(result.Error);
     }
 }

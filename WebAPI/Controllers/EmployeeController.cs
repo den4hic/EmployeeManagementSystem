@@ -24,26 +24,40 @@ public class EmployeeController : ControllerBase
         {
             return BadRequest(ModelState);
         }
-        var createdEmployee = await _employeeService.CreateEmployeeAsync(employeeDto);
-        return CreatedAtAction(nameof(GetEmployee), new { id = createdEmployee.Id }, createdEmployee);
+        var result = await _employeeService.CreateEmployeeAsync(employeeDto);
+
+        if (result.IsSuccess)
+        {
+            return CreatedAtAction(nameof(GetEmployee), new { id = result.Value.Id }, result.Value);
+        }
+
+        return BadRequest(result.Error);
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<EmployeeDto>> GetEmployee(int id)
     {
         var employee = await _employeeService.GetEmployeeByIdAsync(id);
-        if (employee == null)
+
+        if (employee.IsSuccess)
         {
-            return NotFound();
+            return Ok(employee.Value);
         }
-        return Ok(employee);
+
+        return NotFound(employee.Error);
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<EmployeeDto>>> GetAllEmployees()
     {
         var employees = await _employeeService.GetAllEmployeesAsync();
-        return Ok(employees);
+
+        if (employees.IsSuccess)
+        {
+            return Ok(employees.Value);
+        }
+
+        return BadRequest(employees.Error);
     }
 
     [HttpPut]
@@ -53,14 +67,27 @@ public class EmployeeController : ControllerBase
         {
             return BadRequest(ModelState);
         }
-        await _employeeService.UpdateEmployeeAsync(employeeDto);
-        return NoContent();
+
+        var result = await _employeeService.UpdateEmployeeAsync(employeeDto);
+
+        if (result.IsSuccess)
+        {
+            return NoContent();
+        }
+
+        return BadRequest(result.Error);
     }
 
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteEmployee(int id)
     {
-        await _employeeService.DeleteEmployeeAsync(id);
-        return NoContent();
+        var result = await _employeeService.DeleteEmployeeAsync(id);
+
+        if (result.IsSuccess)
+        {
+            return NoContent();
+        }
+
+        return NotFound(result.Error);
     }
 }

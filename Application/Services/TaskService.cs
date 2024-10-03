@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions;
+using Application.Common;
 using Application.DTOs;
 
 namespace Application.Services;
@@ -12,28 +13,63 @@ public class TaskService : ITaskService
         _taskRepository = taskRepository;
     }
 
-    public async Task<TaskDto> CreateTaskAsync(TaskDto taskDto)
+    public async Task<Result<TaskDto>> CreateTaskAsync(TaskDto taskDto)
     {
-        return await _taskRepository.CreateAsync(taskDto);
+        try
+        {
+            var task = await _taskRepository.CreateAsync(taskDto);
+            return Result<TaskDto>.Success(task);
+        }
+        catch (Exception ex)
+        {
+            return Result<TaskDto>.Failure($"Failed to create task: {ex.Message}");
+        }
     }
 
-    public async Task<TaskDto> GetTaskByIdAsync(int id)
+    public async Task<Result<TaskDto>> GetTaskByIdAsync(int id)
     {
-        return await _taskRepository.GetByIdAsync(id);
+        var task = await _taskRepository.GetByIdAsync(id);
+        return task != null
+            ? Result<TaskDto>.Success(task)
+            : Result<TaskDto>.Failure($"Task with id {id} not found");
     }
 
-    public async Task<IEnumerable<TaskDto>> GetAllTasksAsync()
+    public async Task<Result<IEnumerable<TaskDto>>> GetAllTasksAsync()
     {
-        return await _taskRepository.GetAllAsync();
+        try
+        {
+            var tasks = await _taskRepository.GetAllAsync();
+            return Result<IEnumerable<TaskDto>>.Success(tasks);
+        }
+        catch (Exception ex)
+        {
+            return Result<IEnumerable<TaskDto>>.Failure($"Failed to retrieve tasks: {ex.Message}");
+        }
     }
 
-    public async Task UpdateTaskAsync(TaskDto taskDto)
+    public async Task<Result<bool>> UpdateTaskAsync(TaskDto taskDto)
     {
-        await _taskRepository.UpdateAsync(taskDto);
+        try
+        {
+            await _taskRepository.UpdateAsync(taskDto);
+            return Result<bool>.Success(true);
+        }
+        catch (Exception ex)
+        {
+            return Result<bool>.Failure($"Failed to update task: {ex.Message}");
+        }
     }
 
-    public async Task DeleteTaskAsync(int id)
+    public async Task<Result<bool>> DeleteTaskAsync(int id)
     {
-        await _taskRepository.DeleteAsync(id);
+        try
+        {
+            await _taskRepository.DeleteAsync(id);
+            return Result<bool>.Success(true);
+        }
+        catch (Exception ex)
+        {
+            return Result<bool>.Failure($"Failed to delete task: {ex.Message}");
+        }
     }
 }

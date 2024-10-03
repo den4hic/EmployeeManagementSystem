@@ -25,8 +25,14 @@ public class ProjectController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var createdProject = await _projectService.CreateProjectAsync(projectDto);
-        return CreatedAtAction(nameof(GetProject), new { id = createdProject.Id }, createdProject);
+        var result = await _projectService.CreateProjectAsync(projectDto);
+
+        if (result.IsSuccess)
+        {
+            return CreatedAtAction(nameof(GetProject), new { id = result.Value.Id }, result.Value);
+        }
+
+        return BadRequest(result.Error);
     }
 
     [HttpGet("{id}")]
@@ -34,19 +40,25 @@ public class ProjectController : ControllerBase
     {
         var project = await _projectService.GetProjectByIdAsync(id);
 
-        if (project == null)
+        if (project.IsSuccess)
         {
-            return NotFound();
+            return Ok(project.Value);
         }
 
-        return Ok(project);
+        return NotFound(project.Error);
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ProjectDto>>> GetAllProjects()
     {
         var projects = await _projectService.GetAllProjectsAsync();
-        return Ok(projects);
+
+        if (projects.IsSuccess)
+        {
+            return Ok(projects.Value);
+        }
+
+        return BadRequest(projects.Error);
     }
 
     [HttpPut]
@@ -57,14 +69,26 @@ public class ProjectController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        await _projectService.UpdateProjectAsync(projectDto);
-        return NoContent();
+        var result = await _projectService.UpdateProjectAsync(projectDto);
+
+        if (result.IsSuccess)
+        {
+            return NoContent();
+        }
+
+        return BadRequest(result.Error);
     }
 
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteProject(int id)
     {
-        await _projectService.DeleteProjectAsync(id);
-        return NoContent();
+        var result = await _projectService.DeleteProjectAsync(id);
+
+        if (result.IsSuccess)
+        {
+            return NoContent();
+        }
+
+        return NotFound(result.Error);
     }
 }

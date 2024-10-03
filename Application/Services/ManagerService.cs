@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions;
+using Application.Common;
 using Application.DTOs;
 
 namespace Application.Services
@@ -12,29 +13,64 @@ namespace Application.Services
             _managerRepository = managerRepository;
         }
 
-        public async Task<ManagerDto> CreateManagerAsync(ManagerDto managerDto)
+        public async Task<Result<ManagerDto>> CreateManagerAsync(ManagerDto managerDto)
         {
-            return await _managerRepository.CreateAsync(managerDto);
+            try
+            {
+                var manager = await _managerRepository.CreateAsync(managerDto);
+                return Result<ManagerDto>.Success(manager);
+            }
+            catch (Exception ex)
+            {
+                return Result<ManagerDto>.Failure(ex.Message);
+            }
         }
 
-        public async Task<ManagerDto> GetManagerByIdAsync(int id)
+        public async Task<Result<ManagerDto>> GetManagerByIdAsync(int id)
         {
-            return await _managerRepository.GetByIdAsync(id);
+            var manager = await _managerRepository.GetByIdAsync(id);
+            return manager != null
+                ? Result<ManagerDto>.Success(manager)
+                : Result<ManagerDto>.Failure($"Manager with id {id} not found");
         }
 
-        public async Task<IEnumerable<ManagerDto>> GetAllManagersAsync()
+        public async Task<Result<IEnumerable<ManagerDto>>> GetAllManagersAsync()
         {
-            return await _managerRepository.GetAllAsync();
+            try
+            {
+                var managers = await _managerRepository.GetAllAsync();
+                return Result<IEnumerable<ManagerDto>>.Success(managers);
+            }
+            catch (Exception ex)
+            {
+                return Result<IEnumerable<ManagerDto>>.Failure(ex.Message);
+            }
         }
 
-        public async Task UpdateManagerAsync(ManagerDto managerDto)
+        public async Task<Result<bool>> UpdateManagerAsync(ManagerDto managerDto)
         {
-            await _managerRepository.UpdateAsync(managerDto);
+            try
+            {
+                await _managerRepository.UpdateAsync(managerDto);
+                return Result<bool>.Success(true);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure(ex.Message);
+            }
         }
 
-        public async Task DeleteManagerAsync(int id)
+        public async Task<Result<bool>> DeleteManagerAsync(int id)
         {
-            await _managerRepository.DeleteAsync(id);
+            try
+            {
+                await _managerRepository.DeleteAsync(id);
+                return Result<bool>.Success(true);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure(ex.Message);
+            }
         }
     }
 

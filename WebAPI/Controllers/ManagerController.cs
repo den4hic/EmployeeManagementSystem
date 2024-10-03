@@ -25,9 +25,14 @@ public class ManagerController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var createdManager = await _managerService.CreateManagerAsync(managerDto);
+        var result = await _managerService.CreateManagerAsync(managerDto);
 
-        return CreatedAtAction(nameof(GetManager), new { id = createdManager.Id }, createdManager);
+        if (result.IsSuccess)
+        {
+            return CreatedAtAction(nameof(GetManager), new { id = result.Value.Id }, result.Value);
+        }
+
+        return BadRequest(result.Error);
     }
 
     [HttpGet("{id}")]
@@ -35,12 +40,12 @@ public class ManagerController : ControllerBase
     {
         var manager = await _managerService.GetManagerByIdAsync(id);
 
-        if (manager == null)
+        if (manager.IsSuccess)
         {
-            return NotFound();
+            return Ok(manager.Value);
         }
 
-        return Ok(manager);
+        return NotFound(manager.Error);
     }
 
     [HttpGet]
@@ -48,7 +53,12 @@ public class ManagerController : ControllerBase
     {
         var managers = await _managerService.GetAllManagersAsync();
 
-        return Ok(managers);
+        if (managers.IsSuccess)
+        {
+            return Ok(managers.Value);
+        }
+
+        return BadRequest(managers.Error);
     }
 
     [HttpPut]
@@ -59,23 +69,26 @@ public class ManagerController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        await _managerService.UpdateManagerAsync(managerDto);
+        var result = await _managerService.UpdateManagerAsync(managerDto);
 
-        return NoContent();
+        if (result.IsSuccess)
+        {
+            return NoContent();
+        }
+
+        return BadRequest(result.Error);
     }
 
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteManager(int id)
     {
-        var manager = await _managerService.GetManagerByIdAsync(id);
+        var result = await _managerService.DeleteManagerAsync(id);
 
-        if (manager == null)
+        if (result.IsSuccess)
         {
-            return NotFound();
+            return NoContent();
         }
 
-        await _managerService.DeleteManagerAsync(id);
-
-        return NoContent();
+        return NotFound(result.Error);
     }
 }

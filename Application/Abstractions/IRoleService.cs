@@ -1,15 +1,15 @@
-﻿using Application.DTOs;
+﻿using Application.Common;
+using Application.DTOs;
 using Microsoft.AspNetCore.Identity;
 
 namespace Application.Abstractions;
 
 public interface IRoleService
 {
-    Task<bool> CreateDefaultRolesAsync();
-    Task<bool> CreateRoleAsync(string roleName);
-    Task<IEnumerable<IdentityRole>> GetRolesAsync();
-    Task<IdentityRole> GetRoleByIdAsync(string id);
-    Task<bool> DeleteRoleAsync(string roleName);
-    Task AssignRoleAsync(string username, string role, EmployeeManagerRoleDto roleData);
-    Task AssignRoleAsync(int userId, string role, EmployeeManagerRoleDto roleData);
+    Task<Result<bool>> CreateDefaultRolesAsync();
+    Task<Result<bool>> CreateRoleAsync(string roleName);
+    Task<Result<IEnumerable<IdentityRole>>> GetRolesAsync();
+    Task<Result<IdentityRole>> GetRoleByIdAsync(string id);
+    Task<Result<bool>> DeleteRoleAsync(string roleName);
+    Task<Result<bool>> AssignRoleAsync(int userId, string role, EmployeeManagerRoleDto roleData);
 }

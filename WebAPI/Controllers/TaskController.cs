@@ -25,28 +25,39 @@ public class TaskController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var createdTask = await _taskService.CreateTaskAsync(taskDto);
-        return CreatedAtAction(nameof(GetTask), new { id = createdTask.Id }, createdTask);
+        var result = await _taskService.CreateTaskAsync(taskDto);
+        if (result.IsSuccess)
+        {
+            return CreatedAtAction(nameof(GetTask), new { id = result.Value.Id }, result.Value);
+        }
+
+        return BadRequest(result.Error);
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<TaskDto>> GetTask(int id)
     {
-        var task = await _taskService.GetTaskByIdAsync(id);
+        var result = await _taskService.GetTaskByIdAsync(id);
 
-        if (task == null)
+        if (result.IsSuccess)
         {
-            return NotFound();
+            return Ok(result.Value);
         }
 
-        return Ok(task);
+        return NotFound(result.Error);
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<TaskDto>>> GetAllTasks()
     {
-        var tasks = await _taskService.GetAllTasksAsync();
-        return Ok(tasks);
+        var result = await _taskService.GetAllTasksAsync();
+
+        if (result.IsSuccess)
+        {
+            return Ok(result.Value);
+        }
+
+        return BadRequest(result.Error);
     }
 
     [HttpPut]
@@ -57,19 +68,26 @@ public class TaskController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        await _taskService.UpdateTaskAsync(taskDto);
-        return NoContent();
+        var result = await _taskService.UpdateTaskAsync(taskDto);
+
+        if (result.IsSuccess)
+        {
+            return NoContent();
+        }
+
+        return BadRequest(result.Error);
     }
 
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteTask(int id)
     {
-        var task = await _taskService.GetTaskByIdAsync(id);
-        if (task == null)
+        var result = await _taskService.DeleteTaskAsync(id);
+
+        if (result.IsSuccess)
         {
-            return NotFound();
+            return NoContent();
         }
-        await _taskService.DeleteTaskAsync(id);
-        return NoContent();
+
+        return NotFound(result.Error);
     }
 }

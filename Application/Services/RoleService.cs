@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions;
+using Application.Common;
 using Application.DTOs;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
@@ -31,130 +32,136 @@ public class RoleService : IRoleService
         _managerRepository = managerRepository;
     }
 
-    public async Task<bool> CreateDefaultRolesAsync()
+    public async Task<Result<bool>> CreateDefaultRolesAsync()
     {
-        string[] roleNames = { "User", "Admin", "Employee", "Manager" };
-
-        foreach (var roleName in roleNames)
+        try
         {
-            if (!await _roleManager.RoleExistsAsync(roleName))
-            {
-                await _roleManager.CreateAsync(new IdentityRole(roleName));
-            }
-        }
+            string[] roleNames = { "User", "Admin", "Employee", "Manager" };
 
-        return true;
+            foreach (var roleName in roleNames)
+            {
+                if (!await _roleManager.RoleExistsAsync(roleName))
+                {
+                    await _roleManager.CreateAsync(new IdentityRole(roleName));
+                }
+            }
+
+            return Result<bool>.Success(true);
+        }
+        catch (Exception ex)
+        {
+            return Result<bool>.Failure($"Failed to create default roles: {ex.Message}");
+        }
     }
 
-    public async Task<bool> CreateRoleAsync(string roleName)
+    public async Task<Result<bool>> CreateRoleAsync(string roleName)
     {
         if (await _roleManager.RoleExistsAsync(roleName))
         {
-            return false;
+            return Result<bool>.Failure($"Role '{roleName}' already exists");
         }
 
-        await _roleManager.CreateAsync(new IdentityRole(roleName));
-        return true;
+        var result = await _roleManager.CreateAsync(new IdentityRole(roleName));
+        return result.Succeeded
+            ? Result<bool>.Success(true)
+            : Result<bool>.Failure($"Failed to create role: {string.Join(", ", result.Errors.Select(e => e.Description))}");
     }
 
-    public async Task<IEnumerable<IdentityRole>> GetRolesAsync()
+    public async Task<Result<IEnumerable<IdentityRole>>> GetRolesAsync()
     {
-        return await _roleManager.Roles.ToListAsync();
+        try
+        {
+            var roles = await _roleManager.Roles.ToListAsync();
+            return Result<IEnumerable<IdentityRole>>.Success(roles);
+        }
+        catch (Exception ex)
+        {
+            return Result<IEnumerable<IdentityRole>>.Failure($"Failed to retrieve roles: {ex.Message}");
+        }
     }
 
-    public async Task<IdentityRole> GetRoleByIdAsync(string id)
+    public async Task<Result<IdentityRole>> GetRoleByIdAsync(string id)
     {
-        return await _roleManager.FindByIdAsync(id);
+        var role = await _roleManager.FindByIdAsync(id);
+        return role != null
+            ? Result<IdentityRole>.Success(role)
+            : Result<IdentityRole>.Failure($"Role with id '{id}' not found");
     }
 
-    public async Task<bool> DeleteRoleAsync(string roleName)
+    public async Task<Result<bool>> DeleteRoleAsync(string roleName)
     {
         var role = await _roleManager.FindByNameAsync(roleName);
-        if (role != null)
+        if (role == null)
         {
-            await _roleManager.DeleteAsync(role);
-            return true;
+            return Result<bool>.Failure($"Role '{roleName}' not found");
         }
-        return false;
+
+        var result = await _roleManager.DeleteAsync(role);
+        return result.Succeeded
+            ? Result<bool>.Success(true)
+            : Result<bool>.Failure($"Failed to delete role: {string.Join(", ", result.Errors.Select(e => e.Description))}");
     }
 
-    public async Task AssignRoleAsync(string username, string role, EmployeeManagerRoleDto roleData)
+    public async Task<Result<bool>> AssignRoleAsync(int userId, string role, EmployeeManagerRoleDto roleData)
     {
-        var userIdentity = await _userManager.FindByNameAsync(username);
-        if (userIdentity == null)
-            throw new Exception("User not found");
-
-        if (!await _roleManager.RoleExistsAsync(role))
-            throw new Exception("Role does not exist");
-
-        await _userManager.AddToRoleAsync(userIdentity, role);
-
-        var user = await _userRepository.GetByAspNetUserIdAsync(userIdentity.Id);
-
-        if (role == "Manager")
+        try
         {
-            var managerDto = _mapper.Map<ManagerDto>(roleData);
-            managerDto.UserId = user.Id;
-            await _managerRepository.CreateAsync(managerDto);
-        }
-        else if (role == "Employee")
-        {
-            var employeeDto = _mapper.Map<EmployeeDto>(roleData);
-            employeeDto.UserId = user.Id;
-            await _employeeRepository.CreateAsync(employeeDto);
-        }
-    }
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+                return Result<bool>.Failure($"User with id '{userId}' not found");
 
-    public async Task AssignRoleAsync(int userId, string role, EmployeeManagerRoleDto roleData)
-    {
-        var user = await _userRepository.GetByIdAsync(userId);
-        if (user == null)
-            throw new Exception("User not found");
+            var userIdentity = await _userManager.FindByIdAsync(user.AspNetUserId);
+            if (userIdentity == null)
+                return Result<bool>.Failure($"Identity user with id '{user.AspNetUserId}' not found");
 
-        var userIdentity = await _userManager.FindByIdAsync(user.AspNetUserId);
-        if (userIdentity == null)
-            throw new Exception("User not found");
+            if (!await _roleManager.RoleExistsAsync(role))
+                return Result<bool>.Failure($"Role '{role}' does not exist");
 
-        if (!await _roleManager.RoleExistsAsync(role))
-            throw new Exception("Role does not exist");
+            var currentRoles = await _userManager.GetRolesAsync(userIdentity);
 
-        // Отримати поточні ролі користувача
-        var currentRoles = await _userManager.GetRolesAsync(userIdentity);
-
-        if (currentRoles.Any())
-        {
-            await _userManager.RemoveFromRolesAsync(userIdentity, currentRoles);
-
-            if (currentRoles.Contains("Manager"))
+            if (currentRoles.Any())
             {
-                var manager = await _managerRepository.GetByUserIdAsync(user.Id);
-                if (manager != null)
-                    await _managerRepository.DeleteAsync(manager.Id);
+                var removeResult = await _userManager.RemoveFromRolesAsync(userIdentity, currentRoles);
+                if (!removeResult.Succeeded)
+                    return Result<bool>.Failure($"Failed to remove existing roles: {string.Join(", ", removeResult.Errors.Select(e => e.Description))}");
+
+                if (currentRoles.Contains("Manager"))
+                {
+                    var manager = await _managerRepository.GetByUserIdAsync(user.Id);
+                    if (manager != null)
+                        await _managerRepository.DeleteAsync(manager.Id);
+                }
+
+                if (currentRoles.Contains("Employee"))
+                {
+                    var employee = await _employeeRepository.GetByUserIdAsync(user.Id);
+                    if (employee != null)
+                        await _employeeRepository.DeleteAsync(employee.Id);
+                }
             }
 
-            if (currentRoles.Contains("Employee"))
+            var addRoleResult = await _userManager.AddToRoleAsync(userIdentity, role);
+            if (!addRoleResult.Succeeded)
+                return Result<bool>.Failure($"Failed to add role: {string.Join(", ", addRoleResult.Errors.Select(e => e.Description))}");
+
+            if (role == "Manager")
             {
-                var employee = await _employeeRepository.GetByUserIdAsync(user.Id);
-                if (employee != null)
-                    await _employeeRepository.DeleteAsync(employee.Id);
+                var managerDto = _mapper.Map<ManagerDto>(roleData);
+                managerDto.UserId = user.Id;
+                await _managerRepository.CreateAsync(managerDto);
             }
-        }
+            else if (role == "Employee")
+            {
+                var employeeDto = _mapper.Map<EmployeeDto>(roleData);
+                employeeDto.UserId = user.Id;
+                await _employeeRepository.CreateAsync(employeeDto);
+            }
 
-        await _userManager.AddToRoleAsync(userIdentity, role);
-
-        if (role == "Manager")
-        {
-            var managerDto = _mapper.Map<ManagerDto>(roleData);
-            managerDto.UserId = user.Id;
-            await _managerRepository.CreateAsync(managerDto);
+            return Result<bool>.Success(true);
         }
-        
-        else if (role == "Employee")
+        catch (Exception ex)
         {
-            var employeeDto = _mapper.Map<EmployeeDto>(roleData);
-            employeeDto.UserId = user.Id;
-            await _employeeRepository.CreateAsync(employeeDto);
+            return Result<bool>.Failure($"Failed to assign role: {ex.Message}");
         }
     }
-
 }

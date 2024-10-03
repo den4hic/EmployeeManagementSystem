@@ -25,28 +25,37 @@ public class UserController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var createdUser = await _userService.CreateUserAsync(userDto);
-        return CreatedAtAction(nameof(GetUser), new { id = createdUser.Id }, createdUser);
+        var result = await _userService.CreateUserAsync(userDto);
+        if (result.IsSuccess)
+        {
+            return CreatedAtAction(nameof(GetUser), new { id = result.Value.Id }, result.Value);
+        }
+
+        return BadRequest(result.Error);
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<UserDto>> GetUser(int id)
     {
-        var user = await _userService.GetUserByIdAsync(id);
-
-        if (user == null)
+        var result = await _userService.GetUserByIdAsync(id);
+        if (result.IsSuccess)
         {
-            return NotFound();
+            return Ok(result.Value);
         }
 
-        return Ok(user);
+        return NotFound(result.Error);
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
     {
-        var users = await _userService.GetAllUsersAsync();
-        return Ok(users);
+        var result = await _userService.GetAllUsersAsync();
+        if (result.IsSuccess)
+        {
+            return Ok(result.Value);
+        }
+
+        return BadRequest(result.Error);
     }
 
     [HttpPut]
@@ -57,35 +66,49 @@ public class UserController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        await _userService.UpdateUserAsync(userDto);
-        return NoContent();
+        var result = await _userService.UpdateUserAsync(userDto);
+        if (result.IsSuccess)
+        {
+            return NoContent();
+        }
+
+        return BadRequest(result.Error);
     }
 
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteUser(int id)
     {
-        await _userService.DeleteUserAsync(id);
-        return NoContent();
+        var result = await _userService.DeleteUserAsync(id);
+        if (result.IsSuccess)
+        {
+            return NoContent();
+        }
+
+        return NotFound(result.Error);
     }
 
     [HttpGet("current/{username}")]
     public async Task<ActionResult<UserDto>> GetCurrentUser(string username)
     {
-        var user = await _userService.GetUserByUsernameAsync(username);
-
-        if (user == null)
+        var result = await _userService.GetUserByUsernameAsync(username);
+        if (result.IsSuccess)
         {
-            return NotFound();
+            return Ok(result.Value);
         }
 
-        return Ok(user);
+        return NotFound(result.Error);
     }
 
     [HttpGet("details")]
     public async Task<ActionResult<IEnumerable<UserDto>>> GetUsersWithDetails()
     {
-        var users = await _userService.GetUsersWithDetailsAsync();
-        return Ok(users);
+        var result = await _userService.GetUsersWithDetailsAsync();
+        if (result.IsSuccess)
+        {
+            return Ok(result.Value);
+        }
+
+        return BadRequest(result.Error);
     }
 
     [HttpGet("details/filtered")]
@@ -97,32 +120,45 @@ public class UserController : ControllerBase
         [FromQuery] string filter = "",
         [FromQuery] string role = "")
     {
-        var (users, totalItems) = await _userService.GetUsersWithDetailsFilteredAsync(page, pageSize, sortField, sortDirection, filter, role);
-        return Ok(new { items = users, totalItems = totalItems});
+        var result = await _userService.GetUsersWithDetailsFilteredAsync(page, pageSize, sortField, sortDirection, filter, role);
+        if (result.IsSuccess)
+        {
+            return Ok(new { items = result.Value.Item1, totalItems = result.Value.Item2 });
+        }
+
+        return BadRequest(result.Error);
     }
 
     [HttpGet("statistics")]
     public async Task<ActionResult<(int, int, int)>> GetUsersStatistics()
     {
-        var (totalUsers, totalAdmins, blockedUsers) = await _userService.GetUsersStatisticsAsync();
-        return Ok(new { totalUsers = totalUsers, activeAdmins = totalAdmins, blockedUsers = blockedUsers });
+        var result = await _userService.GetUsersStatisticsAsync();
+        if (result.IsSuccess)
+        {
+            var (totalUsers, totalAdmins, blockedUsers) = result.Value;
+            return Ok(new { totalUsers, activeAdmins = totalAdmins, blockedUsers });
+        }
+
+        return BadRequest(result.Error);
     }
 
     [HttpPut("block/{id}")]
     public async Task<ActionResult> BlockUser(int id, [FromBody] bool newIsBlocked)
     {
-        var user = await _userService.GetUserByIdAsync(id);
-
-        if (user == null)
+        var userResult = await _userService.GetUserByIdAsync(id);
+        if (!userResult.IsSuccess)
         {
-            return NotFound();
+            return NotFound(userResult.Error);
         }
 
+        var user = userResult.Value;
         user.IsBlocked = newIsBlocked;
-        await _userService.UpdateUserAsync(user);
-        return NoContent();
+        var updateResult = await _userService.UpdateUserAsync(user);
+        if (updateResult.IsSuccess)
+        {
+            return NoContent();
+        }
+
+        return BadRequest(updateResult.Error);
     }
-
-
-
 }

@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions;
+using Application.Common;
 using Application.DTOs;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
@@ -28,11 +29,11 @@ public class AccountService : IAccountService
         _config = config;
     }
 
-    public async Task<bool> RegisterAsync(RegisterDto model)
+    public async Task<Result<bool>> RegisterAsync(RegisterDto model)
     {
         if (await _userManager.FindByEmailAsync(model.Email) != null || await _userManager.FindByNameAsync(model.Username) != null)
         {
-            return false;
+            return Result<bool>.Failure("User with this email or username already exists");
         }
 
         var user = new IdentityUser { UserName = model.Username, Email = model.Email, PhoneNumber = model.PhoneNumber };
@@ -43,36 +44,37 @@ public class AccountService : IAccountService
             await _userManager.AddToRoleAsync(user, "User");
             await CreateUserInRepositoryAsync(user, model);
             await _signInManager.SignInAsync(user, isPersistent: false);
-            return true;
+            return Result<bool>.Success(true);
         }
 
-        return false;
+        return Result<bool>.Failure(string.Join(", ", result.Errors.Select(e => e.Description)));
     }
 
-    public async Task<bool> LoginAsync(LoginDto model)
+    public async Task<Result<bool>> LoginAsync(LoginDto model)
     {
         var user = await _userManager.FindByNameAsync(model.Username);
         if (user == null)
         {
-            return false;
+            return Result<bool>.Failure("Invalid username or password");
         }
 
         var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
         if (!result.Succeeded)
         {
-            return false;
+            return Result<bool>.Failure("Invalid username or password");
         }
 
         await _signInManager.SignInAsync(user, isPersistent: false);
-        return true;
+        return Result<bool>.Success(true);
     }
 
-    public async Task LogoutAsync()
+    public async Task<Result<bool>> LogoutAsync()
     {
         await _signInManager.SignOutAsync();
+        return Result<bool>.Success(true);
     }
 
-    public async Task<bool> CreateDefaultAdminAsync()
+    public async Task<Result<bool>> CreateDefaultAdminAsync()
     {
         const string adminUsername = "admin";
         const string adminEmail = "admin@example.com";
@@ -83,53 +85,68 @@ public class AccountService : IAccountService
         {
             return await CreateAdminUserAsync(adminUsername, adminEmail, adminPassword);
         }
-        return true;
+        return Result<bool>.Success(true);
     }
 
-    public async Task<TokenDto> GenereateJwtTokenAsync(LoginDto model, bool populateExp)
+    public async Task<Result<TokenDto>> GenereateJwtTokenAsync(LoginDto model, bool populateExp)
     {
-        var user = await _userManager.FindByNameAsync(model.Username);
-
-        if (user is null)
+        try
         {
-            throw new SecurityTokenException("Invalid token");
+            var user = await _userManager.FindByNameAsync(model.Username);
+
+            if (user is null)
+            {
+                return Result<TokenDto>.Failure("Invalid user");
+            }
+
+            var userDto = await _userRepository.GetByAspNetUserIdAsync(user.Id);
+
+            var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+
+            if (role is null)
+            {
+                return Result<TokenDto>.Failure("User has no role");
+            }
+
+            var claims = CreateClaims(user, role, userDto.IsBlocked);
+            var accessToken = CreateJwtToken(claims);
+            var refreshToken = await UpdateUserRefreshTokenAsync(user, populateExp);
+
+            return Result<TokenDto>.Success(new TokenDto { AccessToken = accessToken, RefreshToken = refreshToken });
         }
-
-        var userDto = await _userRepository.GetByAspNetUserIdAsync(user.Id);
-
-        var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
-
-        if (role is null)
+        catch (Exception ex)
         {
-            throw new SecurityTokenException("User has no role");
+            return Result<TokenDto>.Failure($"Token generation failed: {ex.Message}");
         }
-
-        var claims = CreateClaims(user, role, userDto.IsBlocked);
-        var accessToken = CreateJwtToken(claims);
-        var refreshToken = await UpdateUserRefreshTokenAsync(user, populateExp);
-
-        return new TokenDto { AccessToken = accessToken, RefreshToken = refreshToken };
     }
 
-    public async Task<TokenDto> RefreshToken(TokenDto tokenDto)
+    public async Task<Result<TokenDto>> RefreshToken(TokenDto tokenDto)
     {
-        var principal = GetPrincipalFromExpiredToken(tokenDto.AccessToken);
-        var user = await _userManager.FindByNameAsync(principal.Identity.Name);
-
-        if (user is null)
+        try
         {
-            throw new SecurityTokenException("Invalid token");
+            var principal = GetPrincipalFromExpiredToken(tokenDto.AccessToken);
+            var user = await _userManager.FindByNameAsync(principal.Identity.Name);
+
+            if (user is null)
+            {
+                return Result<TokenDto>.Failure("Invalid token");
+            }
+
+            var userDto = await _userRepository.GetByAspNetUserIdAsync(user.Id);
+
+            if (userDto.RefreshToken != tokenDto.RefreshToken || userDto.RefreshTokenExpiryTime <= DateTime.Now)
+            {
+                return Result<TokenDto>.Failure("Invalid token");
+            }
+
+            return await GenereateJwtTokenAsync(new LoginDto { Username = user.UserName, Password = "" }, false);
         }
-
-        var userDto = await _userRepository.GetByAspNetUserIdAsync(user.Id);
-
-        if (userDto.RefreshToken != tokenDto.RefreshToken || userDto.RefreshTokenExpiryTime <= DateTime.Now)
+        catch (Exception ex)
         {
-            throw new SecurityTokenException("Invalid token");
+            return Result<TokenDto>.Failure($"Token refresh failed: {ex.Message}");
         }
-
-        return await GenereateJwtTokenAsync(new LoginDto { Username = user.UserName, Password = "" }, false);
     }
+
 
     private async Task CreateUserInRepositoryAsync(IdentityUser user, RegisterDto model)
     {
@@ -138,18 +155,24 @@ public class AccountService : IAccountService
         await _userRepository.CreateAsync(userDto);
     }
 
-    private async Task<bool> CreateAdminUserAsync(string username, string email, string password)
+    private async Task<Result<bool>> CreateAdminUserAsync(string username, string email, string password)
     {
         var newAdmin = new IdentityUser { UserName = username, Email = email };
         var result = await _userManager.CreateAsync(newAdmin, password);
 
         if (result.Succeeded)
         {
-            await _userManager.AddToRoleAsync(newAdmin, "Admin");
-            await CreateAdminInRepositoryAsync(newAdmin, username, email);
-            return true;
+            var addRole = await _userManager.AddToRoleAsync(newAdmin, "Admin");
+
+            if (addRole.Succeeded)
+            {
+                await CreateAdminInRepositoryAsync(newAdmin, username, email);
+                return Result<bool>.Success(true);
+            }
+
+            return Result<bool>.Failure("Failed to add role to admin");
         }
-        return false;
+        return Result<bool>.Failure($"Failed to create admin: {string.Join(", ", result.Errors.Select(e => e.Description))}");
     }
 
     private async Task CreateAdminInRepositoryAsync(IdentityUser admin, string username, string email)

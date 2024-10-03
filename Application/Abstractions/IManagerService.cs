@@ -1,13 +1,14 @@
-﻿using Application.DTOs;
+﻿using Application.Common;
+using Application.DTOs;
 
 namespace Application.Abstractions
 {
     public interface IManagerService
     {
-        Task<ManagerDto> CreateManagerAsync(ManagerDto managerDto);
-        Task<ManagerDto> GetManagerByIdAsync(int id);
-        Task<IEnumerable<ManagerDto>> GetAllManagersAsync();
-        Task UpdateManagerAsync(ManagerDto managerDto);
-        Task DeleteManagerAsync(int id);
+        Task<Result<ManagerDto>> CreateManagerAsync(ManagerDto managerDto);
+        Task<Result<ManagerDto>> GetManagerByIdAsync(int id);
+        Task<Result<IEnumerable<ManagerDto>>> GetAllManagersAsync();
+        Task<Result<bool>> UpdateManagerAsync(ManagerDto managerDto);
+        Task<Result<bool>> DeleteManagerAsync(int id);
     }
 }
