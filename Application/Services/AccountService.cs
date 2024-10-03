@@ -2,6 +2,7 @@
 using Application.Common;
 using Application.DTOs;
 using AutoMapper;
+using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -97,10 +98,39 @@ public class AccountService : IAccountService
         return Result<bool>.Success(true);
     }
 
-    public async Task<Result<bool>> LogoutAsync()
+    public async Task<Result<bool>> LogoutAsync(string username)
     {
-        await _signInManager.SignOutAsync();
-        return Result<bool>.Success(true);
+        if (string.IsNullOrEmpty(username))
+        {
+            return Result<bool>.Failure("Invalid username");
+        }
+
+        var user = await _userManager.FindByNameAsync(username);
+
+        if (user == null)
+        {
+            return Result<bool>.Failure("Invalid user");
+        }
+
+        var userDto = await _userRepository.GetByAspNetUserIdAsync(user.Id);
+
+        if (userDto is null)
+        {
+            return Result<bool>.Failure("User not found");
+        }
+
+        userDto.RefreshToken = null;
+        userDto.RefreshTokenExpiryTime = null;
+
+        try
+        {
+            await _userRepository.UpdateAsync(userDto);
+            return Result<bool>.Success(true);
+        }
+        catch (Exception ex)
+        {
+            return Result<bool>.Failure(ex.Message);
+        }
     }
 
     public async Task<Result<TokenDto>> GenerateJwtTokenAsync(LoginDto model, bool populateExp)

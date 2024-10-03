@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions;
 using Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace WebAPI.Controllers;
 
@@ -56,7 +57,9 @@ public class AccountController : ControllerBase
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
     {
-        var result = await _accountService.LogoutAsync();
+        var username = User.FindFirstValue("username");
+
+        var result = await _accountService.LogoutAsync(username);
         if (result.IsSuccess)
         {
             return Ok(new { message = "Logged out successfully" });

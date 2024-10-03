@@ -68,20 +68,6 @@ export class UserService {
     return this.http.get<UserDto[]>(`${this.apiUrl}`);
   }
 
-  // getUsersWithDetails() {
-  //   return this.http.get<UserDto[]>(`${this.apiUrl}/details`).pipe(
-  //     tap(users => {
-  //       users.forEach(user => {
-  //         if (user.manager) {
-  //           user.role = 'Manager';
-  //         } else if (user.employee) {
-  //           user.role = 'Employee';
-  //         }
-  //       });
-  //     })
-  //   );
-  // }
-
   deleteUser(userId: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${userId}`);
   }
