@@ -33,23 +33,51 @@ public class AccountService : IAccountService
 
     public async Task<Result<bool>> RegisterAsync(RegisterDto model)
     {
-        if (await _userManager.FindByEmailAsync(model.Email) != null || await _userManager.FindByNameAsync(model.Username) != null)
-        {
-            return Result<bool>.Failure("User with this email or username already exists");
-        }
+        await _unitOfWork.BeginTransactionAsync();
 
-        var user = new IdentityUser { UserName = model.Username, Email = model.Email, PhoneNumber = model.PhoneNumber };
-        var result = await _userManager.CreateAsync(user, model.Password);
-
-        if (result.Succeeded)
+        try
         {
-            await _userManager.AddToRoleAsync(user, "User");
-            await CreateUserInRepositoryAsync(user, model);
-            await _signInManager.SignInAsync(user, isPersistent: false);
+            if (await _userManager.FindByEmailAsync(model.Email) != null || await _userManager.FindByNameAsync(model.Username) != null)
+            {
+                return Result<bool>.Failure("User with this email or username already exists");
+            }
+
+            var user = new IdentityUser { UserName = model.Username, Email = model.Email, PhoneNumber = model.PhoneNumber };
+            var result = await _userManager.CreateAsync(user, model.Password);
+
+            if (!result.Succeeded)
+            {
+                await _unitOfWork.RollbackAsync();
+                return Result<bool>.Failure(string.Join(", ", result.Errors.Select(e => e.Description)));
+            }
+
+            var roleResult = await _userManager.AddToRoleAsync(user, "User");
+            if (!roleResult.Succeeded)
+            {
+                await _unitOfWork.RollbackAsync();
+                return Result<bool>.Failure(string.Join(", ", roleResult.Errors.Select(e => e.Description)));
+            }
+
+            var userDto = _mapper.Map<UserDto>(model);
+            userDto.AspNetUserId = user.Id;
+            var userDtoResult = await CreateUserAsync(userDto);
+
+            if (!userDtoResult.IsSuccess)
+            {
+                await _unitOfWork.RollbackAsync();
+                return Result<bool>.Failure(userDtoResult.Error);
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.CommitAsync();
+
             return Result<bool>.Success(true);
         }
-
-        return Result<bool>.Failure(string.Join(", ", result.Errors.Select(e => e.Description)));
+        catch (Exception ex)
+        {
+            await _unitOfWork.RollbackAsync();
+            return Result<bool>.Failure($"Transaction failed: {ex.Message}");
+        }
     }
 
     public async Task<Result<bool>> LoginAsync(LoginDto model)
@@ -66,7 +94,6 @@ public class AccountService : IAccountService
             return Result<bool>.Failure("Invalid username or password");
         }
 
-        await _signInManager.SignInAsync(user, isPersistent: false);
         return Result<bool>.Success(true);
     }
 
@@ -149,14 +176,6 @@ public class AccountService : IAccountService
         }
     }
 
-
-    private async Task CreateUserInRepositoryAsync(IdentityUser user, RegisterDto model)
-    {
-        var userDto = _mapper.Map<UserDto>(model);
-        userDto.AspNetUserId = user.Id;
-        await _userRepository.CreateAsync(userDto);
-    }
-
     private async Task<Result<bool>> CreateAdminUserAsync(string username, string email, string password)
     {
         await _unitOfWork.BeginTransactionAsync();
@@ -181,7 +200,13 @@ public class AccountService : IAccountService
             
             }
 
-            await CreateAdminInRepositoryAsync(newAdmin, username, email);
+            var addAdmin = await CreateAdminInRepositoryAsync(newAdmin, username, email);
+
+            if (!addAdmin.IsSuccess)
+            {
+                await _unitOfWork.RollbackAsync();
+                return Result<bool>.Failure(addAdmin.Error);
+            }
 
             await _unitOfWork.SaveChangesAsync();
             await _unitOfWork.CommitAsync();
@@ -195,7 +220,7 @@ public class AccountService : IAccountService
         }
     }
 
-    private async Task CreateAdminInRepositoryAsync(IdentityUser admin, string username, string email)
+    private async Task<Result<bool>> CreateAdminInRepositoryAsync(IdentityUser admin, string username, string email)
     {
         var userDto = new UserDto
         {
@@ -206,7 +231,20 @@ public class AccountService : IAccountService
             AspNetUserId = admin.Id
         };
 
-        await _userRepository.CreateAsync(userDto);
+        return await CreateUserAsync(userDto);
+    }
+
+    private async Task<Result<bool>> CreateUserAsync(UserDto userDto)
+    {
+        try
+        {
+            var user = await _userRepository.CreateAsync(userDto);
+            return Result<bool>.Success(true);
+        }
+        catch (Exception ex)
+        {
+            return Result<bool>.Failure($"Failed to create user: {ex.Message}");
+        }
     }
 
     private IEnumerable<Claim> CreateClaims(IdentityUser user, string role, bool isBlocked)
