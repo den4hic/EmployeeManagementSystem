@@ -3,14 +3,8 @@ using Application.Common;
 using Application.DTOs;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using System.Text;
-
-namespace Application.Services;
 
 public class AccountService : IAccountService
 {
@@ -19,16 +13,22 @@ public class AccountService : IAccountService
     private readonly IUserRepository _userRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
-    private readonly IConfiguration _config;
+    private readonly IJwtTokenService _jwtTokenService;
 
-    public AccountService(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IUserRepository userRepository, IUnitOfWork unitOfWork, IMapper mapper, IConfiguration config)
+    public AccountService(
+        UserManager<IdentityUser> userManager,
+        SignInManager<IdentityUser> signInManager,
+        IUserRepository userRepository,
+        IUnitOfWork unitOfWork,
+        IMapper mapper,
+        IJwtTokenService jwtTokenService)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _userRepository = userRepository;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
-        _config = config;
+        _jwtTokenService = jwtTokenService;
     }
 
     public async Task<Result<bool>> RegisterAsync(RegisterDto model)
@@ -103,21 +103,7 @@ public class AccountService : IAccountService
         return Result<bool>.Success(true);
     }
 
-    public async Task<Result<bool>> CreateDefaultAdminAsync()
-    {
-        const string adminUsername = "admin";
-        const string adminEmail = "admin@example.com";
-        const string adminPassword = "Admin@123";
-
-        var adminUser = await _userManager.FindByEmailAsync(adminEmail);
-        if (adminUser == null)
-        {
-            return await CreateAdminUserAsync(adminUsername, adminEmail, adminPassword);
-        }
-        return Result<bool>.Success(true);
-    }
-
-    public async Task<Result<TokenDto>> GenereateJwtTokenAsync(LoginDto model, bool populateExp)
+    public async Task<Result<TokenDto>> GenerateJwtTokenAsync(LoginDto model, bool populateExp)
     {
         try
         {
@@ -129,7 +115,6 @@ public class AccountService : IAccountService
             }
 
             var userDto = await _userRepository.GetByAspNetUserIdAsync(user.Id);
-
             var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
 
             if (role is null)
@@ -138,7 +123,7 @@ public class AccountService : IAccountService
             }
 
             var claims = CreateClaims(user, role, userDto.IsBlocked);
-            var accessToken = CreateJwtToken(claims);
+            var accessToken = _jwtTokenService.CreateJwtToken(claims);
             var refreshToken = await UpdateUserRefreshTokenAsync(user, populateExp);
 
             return Result<TokenDto>.Success(new TokenDto { AccessToken = accessToken, RefreshToken = refreshToken });
@@ -153,8 +138,8 @@ public class AccountService : IAccountService
     {
         try
         {
-            var principal = GetPrincipalFromExpiredToken(tokenDto.AccessToken);
-            var user = await _userManager.FindByNameAsync(principal.Claims.ToList()[1].Value);
+            var principal = _jwtTokenService.GetPrincipalFromExpiredToken(tokenDto.AccessToken);
+            var user = await _userManager.FindByNameAsync(principal.Claims.FirstOrDefault(c => c.Type == "username")?.Value);
 
             if (user is null)
             {
@@ -168,12 +153,26 @@ public class AccountService : IAccountService
                 return Result<TokenDto>.Failure("Invalid token");
             }
 
-            return await GenereateJwtTokenAsync(new LoginDto { Username = user.UserName, Password = "" }, false);
+            return await GenerateJwtTokenAsync(new LoginDto { Username = user.UserName, Password = "" }, false);
         }
         catch (Exception ex)
         {
             return Result<TokenDto>.Failure($"Token refresh failed: {ex.Message}");
         }
+    }
+
+    public async Task<Result<bool>> CreateDefaultAdminAsync()
+    {
+        const string adminUsername = "admin";
+        const string adminEmail = "admin@example.com";
+        const string adminPassword = "Admin@123";
+
+        var adminUser = await _userManager.FindByEmailAsync(adminEmail);
+        if (adminUser == null)
+        {
+            return await CreateAdminUserAsync(adminUsername, adminEmail, adminPassword);
+        }
+        return Result<bool>.Success(true);
     }
 
     private async Task<Result<bool>> CreateAdminUserAsync(string username, string email, string password)
@@ -190,18 +189,15 @@ public class AccountService : IAccountService
                 await _unitOfWork.RollbackAsync();
                 return Result<bool>.Failure($"Failed to create admin: {string.Join(", ", result.Errors.Select(e => e.Description))}");
             }
-                
-            var addRole = await _userManager.AddToRoleAsync(newAdmin, "Admin");
 
+            var addRole = await _userManager.AddToRoleAsync(newAdmin, "Admin");
             if (!addRole.Succeeded)
             {
                 await _unitOfWork.RollbackAsync();
                 return Result<bool>.Failure("Failed to add role to admin");
-            
             }
 
             var addAdmin = await CreateAdminInRepositoryAsync(newAdmin, username, email);
-
             if (!addAdmin.IsSuccess)
             {
                 await _unitOfWork.RollbackAsync();
@@ -212,7 +208,7 @@ public class AccountService : IAccountService
             await _unitOfWork.CommitAsync();
 
             return Result<bool>.Success(true);
-        } 
+        }
         catch (Exception ex)
         {
             await _unitOfWork.RollbackAsync();
@@ -238,7 +234,7 @@ public class AccountService : IAccountService
     {
         try
         {
-            var user = await _userRepository.CreateAsync(userDto);
+            await _userRepository.CreateAsync(userDto);
             return Result<bool>.Success(true);
         }
         catch (Exception ex)
@@ -256,22 +252,6 @@ public class AccountService : IAccountService
             new Claim("role", role),
             new Claim("isBlocked", isBlocked.ToString())
         };
-    }
-
-    private string CreateJwtToken(IEnumerable<Claim> claims)
-    {
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("Jwt:Key").Value));
-        var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-        var securityToken = new JwtSecurityToken(
-            claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(Convert.ToInt32(_config.GetSection("Jwt:ExpireInMinutes").Value)),
-            issuer: _config.GetSection("Jwt:Issuer").Value,
-            audience: _config.GetSection("Jwt:Audience").Value,
-            signingCredentials: signingCredentials
-        );
-
-        return new JwtSecurityTokenHandler().WriteToken(securityToken);
     }
 
     private async Task<string> UpdateUserRefreshTokenAsync(IdentityUser user, bool populateExp)
@@ -299,30 +279,5 @@ public class AccountService : IAccountService
             rng.GetBytes(randomNumber);
             return Convert.ToBase64String(randomNumber);
         }
-    }
-
-    private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
-    {
-        var tokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateAudience = true,
-            ValidateIssuer = true,
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("Jwt:Key").Value)),
-            ValidateLifetime = true,
-            ValidIssuer = _config.GetSection("Jwt:Issuer").Value,
-            ValidAudience = _config.GetSection("Jwt:Audience").Value,
-        };
-
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
-        var jwtSecurityToken = securityToken as JwtSecurityToken;
-
-        if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-        {
-            throw new SecurityTokenException("Invalid token");
-        }
-
-        return principal;
     }
 }

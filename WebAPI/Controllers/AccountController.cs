@@ -43,7 +43,7 @@ public class AccountController : ControllerBase
         var loginResult = await _accountService.LoginAsync(model);
         if (loginResult.IsSuccess)
         {
-            var tokenResult = await _accountService.GenereateJwtTokenAsync(model, true);
+            var tokenResult = await _accountService.GenerateJwtTokenAsync(model, true);
             if (tokenResult.IsSuccess)
             {
                 return Ok(tokenResult.Value);
