@@ -38,7 +38,7 @@ public class ProjectService : IProjectService
     {
         try
         {
-            var projects = await _projectRepository.GetAllAsync();
+            var projects = await _projectRepository.GetProjectsWithDetailsAsync();
             return Result<IEnumerable<ProjectDto>>.Success(projects);
         }
         catch (Exception ex)

@@ -1,5 +1,6 @@
 export enum ApiPaths {
   User = 'user',
   Role = 'role',
-  Account = 'account'
+  Account = 'account',
+  Project = 'project',
 }
