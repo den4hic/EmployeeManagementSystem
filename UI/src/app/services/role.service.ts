@@ -3,23 +3,24 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { EmployeeManagerRoleDto } from './dtos/employee-manager-role.dto';
 import {RoleDto} from "./dtos/role.dto";
+import {ApiPaths} from "./enums/api-paths";
 
 @Injectable({
   providedIn: 'root'
 })
 export class RoleService {
-  private apiUrl = `https://localhost:7110/api/role`;
+  private apiPath: string = ApiPaths.Role;
 
   constructor(private http: HttpClient) {}
 
   assignRole(userId: number, role: string, roleData: EmployeeManagerRoleDto): Observable<any> {
     roleData.hireDate = new Date();
-    const url = `${this.apiUrl}/assign-role?userId=${userId}&role=${role}`;
+    const url = `${this.apiPath}/assign-role?userId=${userId}&role=${role}`;
     return this.http.post(url, roleData);
   }
 
   getRoles(): Observable<RoleDto[]> {
-    const url = `${this.apiUrl}`;
+    const url = `${this.apiPath}`;
     return this.http.get<RoleDto[]>(url);
   }
 }

@@ -44,6 +44,7 @@ import {MatSlideToggle} from "@angular/material/slide-toggle";
 import { BlockedComponent } from './pages/blocked/blocked.component';
 import { StatItemComponent } from './shared/stat-item/stat-item.component';
 import { ProjectTableComponent } from './pages/project-table/project-table.component';
+import {apiUrlInterceptor} from "./interceptor/api-url.interceptor";
 
 @NgModule({
   declarations: [
@@ -102,7 +103,7 @@ import { ProjectTableComponent } from './pages/project-table/project-table.compo
     MatSlideToggle
   ],
   providers: [
-    provideHttpClient(withInterceptors([tokenInterceptor]))
+    provideHttpClient(withInterceptors([apiUrlInterceptor, tokenInterceptor]))
   ],
   bootstrap: [AppComponent]
 })

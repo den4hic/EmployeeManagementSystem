@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
-import { AuthService } from "./auth.service";
+import { ApiPaths} from "./enums/api-paths";
 import { JwtService } from "./jwt.service";
 import { Observable, of, throwError } from "rxjs";
 import { UserDto } from "./dtos/user.dto";
@@ -11,7 +11,7 @@ import {UserStatistics} from "./dtos/user-statistic.dto";
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = 'https://localhost:7110/api/user';
+  private apiPath : string = ApiPaths.User;
   private jwtService = inject(JwtService);
   private http = inject(HttpClient);
 
@@ -31,7 +31,7 @@ export class UserService {
       return throwError(() => new Error('User is not authenticated'));
     }
 
-    return this.http.get<UserDto>(`${this.apiUrl}/current/${username}`).pipe(
+    return this.http.get<UserDto>(`${this.apiPath}/current/${username}`).pipe(
       tap(user => {
         user.username = username;
         const role = this.jwtService.getUserRole();
@@ -65,11 +65,11 @@ export class UserService {
   }
 
   getUsers(): Observable<UserDto[]> {
-    return this.http.get<UserDto[]>(`${this.apiUrl}`);
+    return this.http.get<UserDto[]>(`${this.apiPath}`);
   }
 
   deleteUser(userId: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${userId}`);
+    return this.http.delete(`${this.apiPath}/${userId}`);
   }
 
   getUsersWithDetails(page: number, pageSize: number, sortField: string, sortDirection: string, filter: string, selectedRole: string): Observable<{items: UserDto[], totalItems: number}> {
@@ -81,19 +81,19 @@ export class UserService {
       .set('filter', filter)
       .set('role', selectedRole);
 
-    return this.http.get<{items: UserDto[], totalItems: number}>(`${this.apiUrl}/details/filtered`, { params });
+    return this.http.get<{items: UserDto[], totalItems: number}>(`${this.apiPath}/details/filtered`, { params });
   }
 
   getUserStatistics(): Observable<UserStatistics> {
-    return this.http.get<UserStatistics>(`${this.apiUrl}/statistics`);
+    return this.http.get<UserStatistics>(`${this.apiPath}/statistics`);
   }
 
   blockUser(userId: number, isBlocked: boolean) {
-    return this.http.put(`${this.apiUrl}/block/${userId}`, isBlocked);
+    return this.http.put(`${this.apiPath}/block/${userId}`, isBlocked);
   }
 
   updateUserInfo(updatedUser: UserDto) {
-    return this.http.put<void>(`${this.apiUrl}`, updatedUser);
+    return this.http.put<void>(`${this.apiPath}`, updatedUser);
   }
 }
 

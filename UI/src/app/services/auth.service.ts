@@ -6,21 +6,22 @@ import {RegisterDto} from "./dtos/register.dto";
 import {LoginDto} from "./dtos/login.dto";
 import {TokenDto} from "./dtos/token.dto";
 import {UserService} from "./user.service";
+import {ApiPaths} from "./enums/api-paths";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'https://localhost:7110/api/account';
+  private apiPath = ApiPaths.Account;
 
   constructor(private http: HttpClient, private userService: UserService) {}
 
   register(model: RegisterDto): Observable<string> {
-    return this.http.post<string>(`${this.apiUrl}/register`, model);
+    return this.http.post<string>(`${this.apiPath}/register`, model);
   }
 
   login(model: LoginDto): Observable<TokenDto> {
-    return this.http.post<TokenDto>(`${this.apiUrl}/login`, model).pipe(
+    return this.http.post<TokenDto>(`${this.apiPath}/login`, model).pipe(
       tap(response => {
         localStorage.setItem('accessToken', response.accessToken);
         localStorage.setItem('refreshToken', response.refreshToken);
@@ -29,7 +30,7 @@ export class AuthService {
   }
 
   logout(): Observable<string> {
-    return this.http.post<string>(`${this.apiUrl}/logout`, {}).pipe(
+    return this.http.post<string>(`${this.apiPath}/logout`, {}).pipe(
       tap(() => {
         this.userService.clearUserInfo();
         localStorage.removeItem('accessToken');
@@ -44,7 +45,7 @@ export class AuthService {
       accessToken: localStorage.getItem('accessToken') || '',
       refreshToken: localStorage.getItem('refreshToken') || ''
     };
-    return this.http.post<TokenDto>(`${this.apiUrl}/refresh-token`, tokenDto).pipe(
+    return this.http.post<TokenDto>(`${this.apiPath}/refresh-token`, tokenDto).pipe(
       tap(response => {
         localStorage.setItem('accessToken', response.accessToken);
         localStorage.setItem('refreshToken', response.refreshToken);
