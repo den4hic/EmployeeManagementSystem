@@ -46,6 +46,15 @@ import { StatItemComponent } from './shared/stat-item/stat-item.component';
 import { ProjectTableComponent } from './pages/project-table/project-table.component';
 import {apiUrlInterceptor} from "./interceptor/api-url.interceptor";
 import { CreateProjectDialogComponent } from './shared/create-project-dialog/create-project-dialog.component';
+import {
+  MatDatepicker,
+  MatDatepickerInput,
+  MatDatepickerToggle,
+  MatDateRangeInput,
+  MatDateRangePicker
+} from "@angular/material/datepicker";
+import {MatStep, MatStepLabel, MatStepper, MatStepperNext, MatStepperPrevious} from "@angular/material/stepper";
+import {MatChip, MatChipInput, MatChipListbox, MatChipRemove} from "@angular/material/chips";
 
 @NgModule({
   declarations: [
@@ -102,7 +111,21 @@ import { CreateProjectDialogComponent } from './shared/create-project-dialog/cre
     MatOption,
     MatCheckbox,
     FormsModule,
-    MatSlideToggle
+    MatSlideToggle,
+    MatDateRangeInput,
+    MatDatepickerToggle,
+    MatDateRangePicker,
+    MatDatepicker,
+    MatDatepickerInput,
+    MatStepper,
+    MatStep,
+    MatStepLabel,
+    MatChipInput,
+    MatChip,
+    MatChipRemove,
+    MatStepperPrevious,
+    MatChipListbox,
+    MatStepperNext
   ],
   providers: [
     provideHttpClient(withInterceptors([apiUrlInterceptor, tokenInterceptor]))

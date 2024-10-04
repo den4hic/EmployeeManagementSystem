@@ -1,27 +1,96 @@
-<h1 mat-dialog-title>Create project</h1>
-<div mat-dialog-content>
-  <form [formGroup]="createProjectForm" (ngSubmit)="onSubmit()">
-    <mat-form-field appearance="fill">
-      <mat-label>Project name</mat-label>
-      <input matInput formControlName="name">
-      <mat-error *ngIf="createProjectForm.controls['name'].hasError('required')">
-        Project name is required
-      </mat-error>
-    </mat-form-field>
+<h2 mat-dialog-title class="dialog-title">Create New Project</h2>
+<mat-dialog-content class="dialog-content">
+  <mat-stepper #stepper>
+    <mat-step [stepControl]="valueForm" errorMessage="Form is not valid">
+      <form [formGroup]="valueForm" class="project-form">
+        <ng-template matStepLabel>Text Description</ng-template>
+        <div class="form-fields">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Project Name</mat-label>
+            <input matInput formControlName="name" placeholder="Enter project name">
+            <mat-error *ngIf="valueForm.controls['name'].hasError('required')">
+              Project name is required
+            </mat-error>
+            <mat-error *ngIf="valueForm.controls['name'].hasError('maxLength')">
+              Project name should be less than 100 characters
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Description</mat-label>
+            <textarea matInput formControlName="description" placeholder="Enter project description" rows="3"></textarea>
+          </mat-form-field>
+          <div class="date-row">
+            <mat-form-field appearance="outline" class="date-field">
+              <mat-label>Start Date</mat-label>
+              <input matInput formControlName="startDate" [matDatepicker]="startDatePicker" placeholder="MM/DD/YYYY">
+              <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #startDatePicker></mat-datepicker>
+              <mat-error *ngIf="valueForm.controls['startDate'].hasError('required')">
+                Start date is required
+              </mat-error>
+              <mat-error *ngIf="valueForm.controls['startDate'].hasError('startDateInvalid')">
+                Start date cannot be in the past
+              </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="date-field">
+              <mat-label>End Date</mat-label>
+              <input matInput formControlName="endDate" [matDatepicker]="endDatePicker" placeholder="MM/DD/YYYY">
+              <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #endDatePicker></mat-datepicker>
+              <mat-error *ngIf="valueForm.controls['startDate'].hasError('endDateInvalid')">
+                Start date cannot be in the past
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button mat-raised-button color="primary" matStepperNext>Next</button>
+        </div>
+      </form>
+    </mat-step>
+    <mat-step [stepControl]="assignForm" errorMessage="Form is not valid">
+      <form [formGroup]="assignForm">
+        <ng-template matStepLabel>Assign People</ng-template>
+        <div class="form-fields">
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Project Employees</mat-label>
+            <mat-select formControlName="employeeIds" placeholder="Select project manager" multiple>
+              <mat-option *ngFor="let employee of employees" [value]="employee.id">{{ employee.id }}</mat-option>
+            </mat-select>
 
-    <mat-form-field appearance="fill">
-      <mat-label>Description</mat-label>
-      <input matInput formControlName="description">
-      <mat-error *ngIf="createProjectForm.controls['description'].hasError('required')">
-        Description is required
-      </mat-error>
-    </mat-form-field>
-    <div mat-dialog-actions>
-      <button mat-button (click)="onCancel()">Cansel</button>
-      <button mat-raised-button type="submit" color="primary" [disabled]="!createProjectForm.valid">
-        Create
-      </button>
-    </div>
-  </form>
-</div>
+            <mat-error *ngIf="assignForm.controls['employeeIds'].hasError('required')">
+              Please select at least one employee
+            </mat-error>
+          </mat-form-field>
 
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Project Status</mat-label>
+            <mat-select formControlName="statusId" placeholder="Select project manager">
+              <mat-option *ngFor="let status of statuses" [value]="status.id">{{ status.name }}</mat-option>
+            </mat-select>
+
+            <mat-error *ngIf="assignForm.controls['statusId'].hasError('required')">
+              Please select status for project
+            </mat-error>
+          </mat-form-field>
+
+        </div>
+
+        <div class="form-actions">
+          <button mat-raised-button color="primary" matStepperNext>Next</button>
+        </div>
+      </form>
+    </mat-step>
+
+    <mat-step>
+      <ng-template matStepLabel>Done</ng-template>
+      <p>You are now done.</p>
+      <div class="done-actions">
+        <button mat-raised-button color="primary" matStepperPrevious>Back</button>
+        <button mat-raised-button color="primary" (click)="stepper.reset()">Reset</button>
+        <button mat-raised-button color="primary" (click)="onSubmit()">Create</button>
+      </div>
+    </mat-step>
+
+  </mat-stepper>
+</mat-dialog-content>

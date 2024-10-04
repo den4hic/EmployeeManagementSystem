@@ -35,14 +35,18 @@ export class ProjectTableComponent {
 
   openCreateProjectDialog() {
     const dialogRef = this.dialog.open(CreateProjectDialogComponent, {
-      width: '300px',
+      width: '90vw',
       data: { managerId: 1 }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.snackBar.open('Project created successfully', 'Close', { duration: 3000 });
-        this.loadProjects();
+        this.projectService.createProject(result).subscribe(
+          () => {
+            this.snackBar.open('Project created successfully', 'Close', { duration: 3000 });
+            this.loadProjects();
+          }
+        );
       }
     });
   }

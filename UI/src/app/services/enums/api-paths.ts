@@ -3,4 +3,8 @@ export enum ApiPaths {
   Role = 'role',
   Account = 'account',
   Project = 'project',
+  Task = 'task',
+  Employee = 'employee',
+  Manager = 'manager',
+  Status = 'status',
 }

@@ -1,0 +1,65 @@
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog-title {
+  font-size: 16px;
+  color: #333;
+  margin: 0;
+  padding: 12px 16px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.project-form {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 8px;
+  overflow-y: auto;
+}
+
+.form-fields {
+  padding-right: 8px;
+}
+
+.dialog-content {
+  flex: 1;
+  overflow-y: auto;
+  height: 100%;
+}
+
+.form-fields::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 4px;
+}
+
+.date-row {
+  display: flex;
+  gap: 4px;
+}
+
+.date-field {
+  flex: 1;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 8px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.done-actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px;
+  border-top: 1px solid #e0e0e0;
+}
+
