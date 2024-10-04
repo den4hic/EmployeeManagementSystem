@@ -1,0 +1,27 @@
+<h1 mat-dialog-title>Create project</h1>
+<div mat-dialog-content>
+  <form [formGroup]="createProjectForm" (ngSubmit)="onSubmit()">
+    <mat-form-field appearance="fill">
+      <mat-label>Project name</mat-label>
+      <input matInput formControlName="name">
+      <mat-error *ngIf="createProjectForm.controls['name'].hasError('required')">
+        Project name is required
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Description</mat-label>
+      <input matInput formControlName="description">
+      <mat-error *ngIf="createProjectForm.controls['description'].hasError('required')">
+        Description is required
+      </mat-error>
+    </mat-form-field>
+    <div mat-dialog-actions>
+      <button mat-button (click)="onCancel()">Cansel</button>
+      <button mat-raised-button type="submit" color="primary" [disabled]="!createProjectForm.valid">
+        Create
+      </button>
+    </div>
+  </form>
+</div>
+

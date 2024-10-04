@@ -45,6 +45,7 @@ import { BlockedComponent } from './pages/blocked/blocked.component';
 import { StatItemComponent } from './shared/stat-item/stat-item.component';
 import { ProjectTableComponent } from './pages/project-table/project-table.component';
 import {apiUrlInterceptor} from "./interceptor/api-url.interceptor";
+import { CreateProjectDialogComponent } from './shared/create-project-dialog/create-project-dialog.component';
 
 @NgModule({
   declarations: [
@@ -61,7 +62,8 @@ import {apiUrlInterceptor} from "./interceptor/api-url.interceptor";
     UserStatisticsComponent,
     BlockedComponent,
     StatItemComponent,
-    ProjectTableComponent
+    ProjectTableComponent,
+    CreateProjectDialogComponent
   ],
   imports: [
     BrowserModule,
