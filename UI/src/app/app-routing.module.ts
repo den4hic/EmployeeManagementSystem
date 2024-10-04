@@ -10,6 +10,7 @@ import {UserTableComponent} from "./pages/user-table/user-table.component";
 import {roleGuard} from "./guards/role.guard";
 import {BlockedComponent} from "./pages/blocked/blocked.component";
 import {blockGuard} from "./guards/block.guard";
+import {ProjectTableComponent} from "./pages/project-table/project-table.component";
 
 const routes: Routes = [
   {
@@ -46,6 +47,14 @@ const routes: Routes = [
     path: 'blocked',
     component: BlockedComponent,
     canActivate: [blockGuard]
+  },
+  {
+    path: 'projects',
+    component: ProjectTableComponent,
+    canActivate: [roleGuard],
+    data: {
+      roles: ['Admin', 'Manager', 'Employee']
+    }
   }
 ];
 

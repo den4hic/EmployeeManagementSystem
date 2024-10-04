@@ -43,6 +43,7 @@ import { UserStatisticsComponent } from './components/user-statistics/user-stati
 import {MatSlideToggle} from "@angular/material/slide-toggle";
 import { BlockedComponent } from './pages/blocked/blocked.component';
 import { StatItemComponent } from './shared/stat-item/stat-item.component';
+import { ProjectTableComponent } from './pages/project-table/project-table.component';
 
 @NgModule({
   declarations: [
@@ -58,7 +59,8 @@ import { StatItemComponent } from './shared/stat-item/stat-item.component';
     AssignRoleDialogComponent,
     UserStatisticsComponent,
     BlockedComponent,
-    StatItemComponent
+    StatItemComponent,
+    ProjectTableComponent
   ],
   imports: [
     BrowserModule,

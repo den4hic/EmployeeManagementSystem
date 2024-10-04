@@ -25,6 +25,12 @@
         </h2>
       </div>
     </mat-card-content>
+    <mat-card-actions *ngIf="userRole !== 'User'">
+      <button mat-raised-button (click)="navigateToProjectTable()">
+        <mat-icon>work</mat-icon>
+        All Projects
+      </button>
+    </mat-card-actions>
     <mat-card-actions *ngIf="userRole === 'Admin'">
       <button mat-raised-button (click)="navigateToUserTable()">
         <mat-icon>people</mat-icon>

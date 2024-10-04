@@ -11,17 +11,35 @@
         <p>Phone Number: {{userModel?.phoneNumber || '-'}}</p>
       </ng-container>
       <form *ngIf="editMode" [formGroup]="userForm">
-        <mat-form-field>
+        <mat-form-field appearance="fill">
           <mat-label>First Name</mat-label>
           <input matInput formControlName="firstName">
+          <mat-error *ngIf="userForm.controls['firstName'].hasError('required')">
+            First name is required
+          </mat-error>
+          <mat-error *ngIf="userForm.controls['firstName'].hasError('maxlength')">
+            Too much characters
+          </mat-error>
         </mat-form-field>
-        <mat-form-field>
+        <mat-form-field appearance="fill">
           <mat-label>Last Name</mat-label>
           <input matInput formControlName="lastName">
+          <mat-error *ngIf="userForm.controls['lastName'].hasError('required')">
+            Last name is required
+          </mat-error>
+          <mat-error *ngIf="userForm.controls['lastName'].hasError('maxlength')">
+            Too much characters
+          </mat-error>
         </mat-form-field>
-        <mat-form-field>
+        <mat-form-field appearance="fill">
           <mat-label>Email</mat-label>
           <input matInput formControlName="email">
+          <mat-error *ngIf="userForm.controls['email'].hasError('required')">
+            Email is required
+          </mat-error>
+          <mat-error *ngIf="userForm.controls['email'].hasError('email')">
+            Invalid email address
+          </mat-error>
         </mat-form-field>
         <mat-form-field appearance="fill">
           <mat-label>Phone Number</mat-label>

@@ -24,4 +24,8 @@ export class HomeComponent implements OnInit {
   navigateToUserTable() {
     this.router.navigate(['/users']);
   }
+
+  navigateToProjectTable() {
+    this.router.navigate(['/projects']);
+  }
 }
