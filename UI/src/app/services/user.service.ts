@@ -21,8 +21,8 @@ export class UserService {
     this.loadUserFromStorage();
   }
 
-  getUserInfo(): Observable<UserDto> {
-    if (this.currentUser) {
+  getUserInfo(isUpdate: boolean = false): Observable<UserDto> {
+    if (this.currentUser && !isUpdate) {
       return of(this.currentUser);
     }
 
@@ -90,6 +90,10 @@ export class UserService {
 
   blockUser(userId: number, isBlocked: boolean) {
     return this.http.put(`${this.apiUrl}/block/${userId}`, isBlocked);
+  }
+
+  updateUserInfo(updatedUser: UserDto) {
+    return this.http.put<void>(`${this.apiUrl}`, updatedUser);
   }
 }
 

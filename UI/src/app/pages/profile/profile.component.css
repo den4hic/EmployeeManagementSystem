@@ -7,3 +7,13 @@ mat-card {
   width: 400px;
   margin-top: 20px;
 }
+
+mat-form-field {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+mat-card-actions {
+  display: flex;
+  justify-content: flex-end;
+}

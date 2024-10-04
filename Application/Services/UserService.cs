@@ -54,6 +54,7 @@ public class UserService : IUserService
     {
         try
         {
+            userDto.AspNetUser = null;
             await _userRepository.UpdateAsync(userDto);
             return Result<bool>.Success(true);
         }
