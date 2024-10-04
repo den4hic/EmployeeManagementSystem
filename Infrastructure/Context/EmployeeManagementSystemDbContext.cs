@@ -1,7 +1,5 @@
 ﻿using Domain.Entities;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection.Emit;
 
 namespace Infrastructure.Context;
 
@@ -70,40 +68,6 @@ public partial class EmployeeManagementSystemDbContext : IdentityContext
                 .HasForeignKey(d => d.StatusId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Project_Status");
-
-            //entity.HasMany(d => d.Employees).WithMany(p => p.Projects)
-            //    .UsingEntity<Dictionary<string, object>>(
-            //        "ProjectEmployee",
-            //        r => r.HasOne<Employee>().WithMany()
-            //            .HasForeignKey("EmployeeId")
-            //            .OnDelete(DeleteBehavior.ClientSetNull)
-            //            .HasConstraintName("FK_ProjectEmployee_Employee"),
-            //        l => l.HasOne<Project>().WithMany()
-            //            .HasForeignKey("ProjectId")
-            //            .OnDelete(DeleteBehavior.ClientSetNull)
-            //            .HasConstraintName("FK_ProjectEmployee_Project"),
-            //        j =>
-            //        {
-            //            j.HasKey("ProjectId", "EmployeeId").HasName("PK__ProjectE__71B7BA018DEBC603");
-            //            j.ToTable("ProjectEmployee");
-            //        });
-
-            //entity.HasMany(d => d.Managers).WithMany(p => p.Projects)
-            //    .UsingEntity<Dictionary<string, object>>(
-            //        "ProjectManager",
-            //        r => r.HasOne<Manager>().WithMany()
-            //            .HasForeignKey("ManagerId")
-            //            .OnDelete(DeleteBehavior.ClientSetNull)
-            //            .HasConstraintName("FK_ProjectManager_Manager"),
-            //        l => l.HasOne<Project>().WithMany()
-            //            .HasForeignKey("ProjectId")
-            //            .OnDelete(DeleteBehavior.ClientSetNull)
-            //            .HasConstraintName("FK_ProjectManager_Project"),
-            //        j =>
-            //        {
-            //            j.HasKey("ProjectId", "ManagerId").HasName("PK__ProjectM__75A0945E642EB1EF");
-            //            j.ToTable("ProjectManager");
-            //        });
         });
 
         builder.Entity<Status>(entity =>

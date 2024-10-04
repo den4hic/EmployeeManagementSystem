@@ -2,10 +2,11 @@
 using Application.Common;
 using Application.DTOs;
 using AutoMapper;
-using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using System.Security.Cryptography;
+
+namespace Application.Services;
 
 public class AccountService : IAccountService
 {
@@ -276,12 +277,12 @@ public class AccountService : IAccountService
     private IEnumerable<Claim> CreateClaims(IdentityUser user, string role, bool isBlocked)
     {
         return new List<Claim>
-        {
-            new Claim("userData", user.UserName),
-            new Claim("username", user.UserName),
-            new Claim("role", role),
-            new Claim("isBlocked", isBlocked.ToString())
-        };
+    {
+        new Claim("userData", user.UserName),
+        new Claim("username", user.UserName),
+        new Claim("role", role),
+        new Claim("isBlocked", isBlocked.ToString())
+    };
     }
 
     private async Task<string> UpdateUserRefreshTokenAsync(IdentityUser user, bool populateExp)

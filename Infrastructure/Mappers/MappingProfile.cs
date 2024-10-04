@@ -11,8 +11,6 @@ public class MappingProfile : Profile
     {
         CreateMap<User, UserDto>().ReverseMap();
 
-        //CreateMap<UserDto, User>().AfterMap((src, dest) => dest.AspNetUser = null);
-
         CreateMap<Employee, EmployeeDto>().ReverseMap();
 
         CreateMap<Manager, ManagerDto>().ReverseMap();
