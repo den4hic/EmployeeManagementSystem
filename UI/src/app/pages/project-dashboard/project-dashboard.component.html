@@ -1,18 +1,18 @@
 <div class="project-dashboard">
   <div class="project-table-container">
+    <mat-form-field appearance="fill">
+      <mat-label>Choose Project</mat-label>
+      <mat-select [(value)]="selectedProject" (selectionChange)="selectProject($event.value)">
+        <mat-option *ngFor="let project of projects" [value]="project">
+          {{project.name}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
     <div class="create-project-container">
       <button mat-raised-button color="primary" (click)="openCreateProjectDialog()">Create project</button>
     </div>
   </div>
-
-  <mat-form-field appearance="fill">
-    <mat-label>Choose Project</mat-label>
-    <mat-select [(value)]="selectedProject" (selectionChange)="selectProject($event.value)">
-      <mat-option *ngFor="let project of projects" [value]="project">
-        {{project.name}}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
 
   <mat-card *ngIf="selectedProject" class="project-info">
     <mat-card-header>
