@@ -55,6 +55,9 @@ import {
 } from "@angular/material/datepicker";
 import {MatStep, MatStepLabel, MatStepper, MatStepperNext, MatStepperPrevious} from "@angular/material/stepper";
 import {MatChip, MatChipInput, MatChipListbox, MatChipRemove} from "@angular/material/chips";
+import { ProjectDashboardComponent } from './pages/project-dashboard/project-dashboard.component';
+import {CdkDrag, CdkDropList} from "@angular/cdk/drag-drop";
+import {MatProgressBar} from "@angular/material/progress-bar";
 
 @NgModule({
   declarations: [
@@ -72,7 +75,8 @@ import {MatChip, MatChipInput, MatChipListbox, MatChipRemove} from "@angular/mat
     BlockedComponent,
     StatItemComponent,
     ProjectTableComponent,
-    CreateProjectDialogComponent
+    CreateProjectDialogComponent,
+    ProjectDashboardComponent
   ],
   imports: [
     BrowserModule,
@@ -125,7 +129,10 @@ import {MatChip, MatChipInput, MatChipListbox, MatChipRemove} from "@angular/mat
     MatChipRemove,
     MatStepperPrevious,
     MatChipListbox,
-    MatStepperNext
+    MatStepperNext,
+    CdkDropList,
+    CdkDrag,
+    MatProgressBar
   ],
   providers: [
     provideHttpClient(withInterceptors([apiUrlInterceptor, tokenInterceptor]))

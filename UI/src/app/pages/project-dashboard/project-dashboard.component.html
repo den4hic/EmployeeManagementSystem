@@ -1,0 +1,50 @@
+<div class="project-dashboard">
+  <mat-form-field appearance="fill">
+    <mat-label>Choose Project</mat-label>
+    <mat-select [(value)]="selectedProject" (selectionChange)="selectProject($event.value)">
+      <mat-option *ngFor="let project of projects" [value]="project">
+        {{project.name}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-card *ngIf="selectedProject" class="project-info">
+    <mat-card-header>
+      <mat-card-title>{{selectedProject.name}}</mat-card-title>
+      <mat-card-subtitle>Project Project: {{getProjectProgress() | number:'1.0-0'}}%</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <p class="project-description">{{selectedProject.description}}</p>
+      <div class="project-dates">
+        <p><strong>Start:</strong> {{selectedProject.startDate | date}}</p>
+        <p><strong>End:</strong> {{selectedProject.endDate | date}}</p>
+      </div>
+      <mat-progress-bar mode="determinate" [value]="getProjectProgress()"></mat-progress-bar>
+      <p class="task-completion">Tasks Completed: {{completedTasks}} з {{totalTasks}}</p>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="kanban-board">
+    <div class="kanban-column" *ngFor="let status of statuses">
+      <h3>{{status.name}}</h3>
+      <div
+        cdkDropList
+        [cdkDropListData]="tasks[status.id]"
+        [id]="status.id.toString()"
+        [cdkDropListConnectedTo]="connectedLists"
+        class="task-list"
+        (cdkDropListDropped)="onTaskDrop($event)"
+      >
+        <mat-card class="task-card" *ngFor="let task of tasks[status.id]" cdkDrag>
+          <mat-card-header>
+            <mat-card-title>{{task.title}}</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p>{{task.description}}</p>
+            <p *ngIf="task.assignedToEmployeeId"><strong>Assigned:</strong> {{task.assignedToEmployeeId}}</p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+</div>

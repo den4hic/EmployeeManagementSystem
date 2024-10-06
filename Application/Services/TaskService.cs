@@ -47,6 +47,19 @@ public class TaskService : ITaskService
         }
     }
 
+    public async Task<Result<IEnumerable<TaskDto>>> GetTasksByProjectId(int projectId)
+    {
+        try
+        {
+            var tasks = await _taskRepository.GetTasksByProjectId(projectId);
+            return Result<IEnumerable<TaskDto>>.Success(tasks);
+        }
+        catch (Exception ex)
+        {
+            return Result<IEnumerable<TaskDto>>.Failure($"Failed to retrieve tasks: {ex.Message}");
+        }
+    }
+
     public async Task<Result<bool>> UpdateTaskAsync(TaskDto taskDto)
     {
         try
@@ -70,6 +83,27 @@ public class TaskService : ITaskService
         catch (Exception ex)
         {
             return Result<bool>.Failure($"Failed to delete task: {ex.Message}");
+        }
+    }
+
+    public async Task<Result<bool>> UpdateTaskStatusAsync(int taskId, int statusId)
+    {
+        try
+        {
+            var task = _taskRepository.GetByIdAsync(taskId).Result;
+            if (task == null)
+            {
+                return Result<bool>.Failure($"Task with id {taskId} not found");
+            }
+
+            task.StatusId = statusId;
+            await _taskRepository.UpdateAsync(task);
+
+            return Result<bool>.Success(true);
+        }
+        catch (Exception ex)
+        {
+            return Result<bool>.Failure($"Failed to update task status: {ex.Message}");
         }
     }
 }

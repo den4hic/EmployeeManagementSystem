@@ -13,6 +13,11 @@ export class StatusService {
 
   constructor(private http: HttpClient) { }
 
+  getStatusById(id: number): Observable<StatusDto> {
+    const url = `${this.apiPath}/${id}`;
+    return this.http.get<StatusDto>(url);
+  }
+
   getStatuses(): Observable<StatusDto[]> {
     const url = `${this.apiPath}`;
     return this.http.get<StatusDto[]>(url);

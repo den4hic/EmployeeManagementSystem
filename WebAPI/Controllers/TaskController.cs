@@ -2,6 +2,7 @@
 using Application.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections;
 
 namespace WebAPI.Controllers;
 
@@ -60,6 +61,19 @@ public class TaskController : ControllerBase
         return BadRequest(result.Error);
     }
 
+    [HttpGet("project/{projectId}")]
+    public async Task<ActionResult<IEnumerable<TaskDto>>> GetTasksByProjectId(int projectId)
+    {
+        var result = await _taskService.GetTasksByProjectId(projectId);
+
+        if (result.IsSuccess)
+        {
+            return Ok(result.Value);
+        }
+
+        return BadRequest(result.Error);
+    }
+
     [HttpPut]
     public async Task<ActionResult> UpdateTask(TaskDto taskDto)
     {
@@ -69,6 +83,19 @@ public class TaskController : ControllerBase
         }
 
         var result = await _taskService.UpdateTaskAsync(taskDto);
+
+        if (result.IsSuccess)
+        {
+            return NoContent();
+        }
+
+        return BadRequest(result.Error);
+    }
+
+    [HttpPut("{taskId}/status")]
+    public async Task<ActionResult> UpdateTaskStatus(int taskId, [FromBody] int statusId)
+    {
+        var result = await _taskService.UpdateTaskStatusAsync(taskId, statusId);
 
         if (result.IsSuccess)
         {
