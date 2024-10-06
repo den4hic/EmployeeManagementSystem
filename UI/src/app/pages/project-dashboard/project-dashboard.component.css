@@ -9,6 +9,11 @@
   justify-content: space-between;
 }
 
+.project-action-container {
+  display: flex;
+  gap: 10px;
+}
+
 mat-form-field {
   width: 100%;
   max-width: 400px;

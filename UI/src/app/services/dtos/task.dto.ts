@@ -1,3 +1,5 @@
+import {EmployeeDto} from "./employee.dto";
+
 export interface TaskDto {
   id: number;
   projectId: number;
@@ -6,4 +8,5 @@ export interface TaskDto {
   title: string;
   description: string;
   dueDate: Date;
+  assignedToEmployee: EmployeeDto;
 }

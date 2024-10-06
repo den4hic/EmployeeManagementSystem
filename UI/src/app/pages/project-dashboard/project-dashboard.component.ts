@@ -12,6 +12,7 @@ import {MatDialog} from "@angular/material/dialog";
 import {CreateProjectDialogComponent} from "../../shared/create-project-dialog/create-project-dialog.component";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {EmployeeService} from "../../services/employee.service";
+import {CreateProjectDto} from "../../services/dtos/create-project.dto";
 
 @Component({
   selector: 'app-project-dashboard',
@@ -47,6 +48,7 @@ export class ProjectDashboardComponent implements OnInit {
     this.projectService.getProjects().subscribe(
       (projects) => {
         this.projects = projects;
+        console.log(projects);
         if (projects.length > 0) {
           this.selectProject(projects[0]);
         }
@@ -67,6 +69,7 @@ export class ProjectDashboardComponent implements OnInit {
     this.employeeService.getEmployees().subscribe(
       (employees) => {
         this.employees = employees;
+        console.log('Employees:', employees);
       }
     );
   }
@@ -79,6 +82,7 @@ export class ProjectDashboardComponent implements OnInit {
   loadTasks(projectId: number) {
     this.taskService.getTasksByProjectId(projectId).subscribe(
       (tasks) => {
+        console.log('Tasks:', tasks);
         this.tasks = {};
         this.totalTasks = tasks.length;
         this.completedTasks = tasks.filter(task => task.statusId === this.getCompletedStatusId()).length;
@@ -164,10 +168,28 @@ export class ProjectDashboardComponent implements OnInit {
     });
   }
 
+  projectDtoToCreateProjectDto(project: ProjectDto): CreateProjectDto {
+    let result: CreateProjectDto;
+
+    result = {
+      id: project.id,
+      name: project.name,
+      description: project.description,
+      startDate: project.startDate,
+      endDate: project.endDate,
+      statusId: project.statusId,
+      managerIds: project.managers.map(manager => manager.id),
+      employeeIds: project.employees.map(employee => employee.id),
+      taskIds: project.tasks.map(task => task.id)
+    };
+
+    return result;
+  }
+
   openCreateProjectDialog() {
     const dialogRef = this.dialog.open(CreateProjectDialogComponent, {
       width: '90vw',
-      data: { managerId: 1, employees: this.employees }
+      data: { selectedProject: null, managerId: 1, employees: this.employees }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -175,6 +197,29 @@ export class ProjectDashboardComponent implements OnInit {
         this.projectService.createProject(result).subscribe(
           () => {
             this.snackBar.open('Project created successfully', 'Close', { duration: 3000 });
+            this.loadProjects();
+          }
+        );
+      }
+    });
+  }
+
+  openEditProjectDialog() {
+    if (!this.selectedProject) {
+      return;
+    }
+    const createProjectDto = this.projectDtoToCreateProjectDto(this.selectedProject);
+    const dialogRef = this.dialog.open(CreateProjectDialogComponent, {
+      width: '90vw',
+      data: { selectedProject: createProjectDto, managerId: 1, employees: this.employees }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        result.id = this.selectedProject?.id;
+        this.projectService.updateProject(result).subscribe(
+          () => {
+            this.snackBar.open('Project update successfully', 'Close', { duration: 3000 });
             this.loadProjects();
           }
         );

@@ -21,4 +21,9 @@ export class ProjectService {
     const url = `${this.apiPath}`;
     return this.http.post<ProjectDto>(url, project);
   }
+
+  updateProject(project: CreateProjectDto) {
+    const url = `${this.apiPath}`;
+    return this.http.put(url, project);
+  }
 }

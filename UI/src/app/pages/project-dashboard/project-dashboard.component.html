@@ -9,8 +9,13 @@
       </mat-select>
     </mat-form-field>
 
-    <div class="create-project-container">
-      <button mat-raised-button color="primary" (click)="openCreateProjectDialog()">Create project</button>
+    <div class="project-action-container">
+      <div>
+        <button mat-raised-button color="accent" (click)="openEditProjectDialog()">Edit project</button>
+      </div>
+      <div>
+        <button mat-raised-button color="primary" (click)="openCreateProjectDialog()">Create project</button>
+      </div>
     </div>
   </div>
 
@@ -50,7 +55,7 @@
           </mat-card-header>
           <mat-card-content>
             <p>{{task.description}}</p>
-            <p *ngIf="task.assignedToEmployeeId"><strong>Assigned:</strong> {{task.assignedToEmployeeId}}</p>
+            <p *ngIf="task.assignedToEmployee"><strong>Assigned:</strong> {{task.assignedToEmployee.user.firstName + ' ' + task.assignedToEmployee.user.lastName}}</p>
           </mat-card-content>
         </mat-card>
       </div>

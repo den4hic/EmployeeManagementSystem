@@ -1,4 +1,5 @@
 import {ProjectDto} from "./project.dto";
+import {UserDto} from "./user.dto";
 
 export interface EmployeeDto {
   id: number;
@@ -7,4 +8,5 @@ export interface EmployeeDto {
   hireDate: Date;
   salary: number;
   projects: ProjectDto[];
+  user: UserDto;
 }

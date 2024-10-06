@@ -8,6 +8,7 @@ import {EmployeeDto} from "../../services/dtos/employee.dto";
 import {StatusService} from "../../services/status.service";
 import {StatusDto} from "../../services/dtos/status.dto";
 import {STEPPER_GLOBAL_OPTIONS} from "@angular/cdk/stepper";
+import {ProjectDto} from "../../services/dtos/project.dto";
 
 @Component({
   selector: 'app-create-project-dialog',
@@ -35,7 +36,7 @@ export class CreateProjectDialogComponent {
     private statusService: StatusService,
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<CreateProjectDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { managerId: number, employees: EmployeeDto[] }
+    @Inject(MAT_DIALOG_DATA) public data: { selectedProject: CreateProjectDto | null, managerId: number, employees: EmployeeDto[] }
   ) {
     this.employees = this.data.employees;
 
@@ -46,15 +47,15 @@ export class CreateProjectDialogComponent {
     );
 
     this.valueForm = this.fb.group({
-      name: ['', [Validators.required, Validators.maxLength(100)]],
-      description: [''],
-      startDate: ['', [Validators.required, this.startDateValidator]],
-      endDate: [''],
+      name: [data.selectedProject?.name || '', [Validators.required, Validators.maxLength(100)]],
+      description: [data.selectedProject?.description || ''],
+      startDate: [data.selectedProject?.startDate || '', [Validators.required, this.startDateValidator]],
+      endDate: [data.selectedProject?.endDate || ''],
     });
 
     this.assignForm = this.fb.group({
-      employeeIds: [[], Validators.required],
-      statusId: [null, Validators.required],
+      employeeIds: [data.selectedProject?.employeeIds || [], Validators.required],
+      statusId: [data.selectedProject?.statusId || 1, Validators.required],
     });
   }
 

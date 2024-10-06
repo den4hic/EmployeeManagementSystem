@@ -55,7 +55,7 @@
           <mat-form-field appearance="fill" class="full-width">
             <mat-label>Project Employees</mat-label>
             <mat-select formControlName="employeeIds" placeholder="Select project manager" multiple>
-              <mat-option *ngFor="let employee of employees" [value]="employee.id">{{ employee.id }}</mat-option>
+              <mat-option *ngFor="let employee of employees" [value]="employee.id">{{ employee.user.firstName + ' ' + employee.user.lastName }}</mat-option>
             </mat-select>
 
             <mat-error *ngIf="assignForm.controls['employeeIds'].hasError('required')">

@@ -20,7 +20,7 @@
       <mat-select formControlName="assignedToEmployeeId">
         <mat-option [value]="null">No Employee</mat-option>
         <mat-option *ngFor="let employee of employees" [value]="employee.id">
-          {{employee.id}}
+          {{employee.user.firstName + ' ' + employee.user.lastName}}
         </mat-option>
       </mat-select>
     </mat-form-field>
