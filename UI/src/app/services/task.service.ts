@@ -21,4 +21,9 @@ export class TaskService {
     const url = `${this.apiPath}/${taskId}/status`;
     return this.http.put<TaskDto>(url, newStatusId);
   }
+
+  createTask(task: TaskDto): Observable<TaskDto> {
+    console.log(task);
+    return this.http.post<TaskDto>(this.apiPath, task);
+  }
 }

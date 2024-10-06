@@ -22,6 +22,9 @@
       <mat-progress-bar mode="determinate" [value]="getProjectProgress()"></mat-progress-bar>
       <p class="task-completion">Tasks Completed: {{completedTasks}} з {{totalTasks}}</p>
     </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button color="primary" (click)="openCreateTaskDialog()">Create new task</button>
+    </mat-card-actions>
   </mat-card>
 
   <div class="kanban-board">

@@ -1,0 +1,32 @@
+<h2 mat-dialog-title>Створити нове завдання</h2>
+<mat-dialog-content>
+  <form [formGroup]="taskForm">
+    <mat-form-field appearance="fill">
+      <mat-label>Title</mat-label>
+      <input matInput formControlName="title" required>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description" rows="3"></textarea>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="date-field">
+      <mat-label>Due Date</mat-label>
+      <input matInput formControlName="dueDate" [matDatepicker]="dueDatePicker" placeholder="MM/DD/YYYY">
+      <mat-datepicker-toggle matSuffix [for]="dueDatePicker"></mat-datepicker-toggle>
+      <mat-datepicker #dueDatePicker></mat-datepicker>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Assign Employee</mat-label>
+      <mat-select formControlName="assignedToEmployeeId">
+        <mat-option [value]="null">No Employee</mat-option>
+        <mat-option *ngFor="let employee of employees" [value]="employee.id">
+          {{employee.id}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cansel</button>
+  <button mat-raised-button color="primary" [disabled]="taskForm.invalid" (click)="onSubmit()">Create</button>
+</mat-dialog-actions>

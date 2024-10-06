@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import { ProjectService } from '../../services/project.service';
 import { TaskService } from '../../services/task.service';
 import { StatusService } from '../../services/status.service';
@@ -6,13 +6,17 @@ import { ProjectDto } from '../../services/dtos/project.dto';
 import { TaskDto } from '../../services/dtos/task.dto';
 import { StatusDto } from '../../services/dtos/status.dto';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import {EmployeeDto} from "../../services/dtos/employee.dto";
+import {CreateTaskDialogComponent} from "../../shared/create-task-dialog/create-task-dialog.component";
+import {MatDialog} from "@angular/material/dialog";
 
 @Component({
   selector: 'app-project-dashboard',
   templateUrl: './project-dashboard.component.html',
-  styleUrls: ['./project-dashboard.component.css']
+  styleUrls: ['./project-dashboard.component.css'],
 })
 export class ProjectDashboardComponent implements OnInit {
+  @Input() employees: EmployeeDto[] = [];
   projects: ProjectDto[] = [];
   selectedProject: ProjectDto | null = null;
   statuses: StatusDto[] = [];
@@ -24,7 +28,8 @@ export class ProjectDashboardComponent implements OnInit {
   constructor(
     private projectService: ProjectService,
     private taskService: TaskService,
-    private statusService: StatusService
+    private statusService: StatusService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -118,5 +123,30 @@ export class ProjectDashboardComponent implements OnInit {
 
   getProjectProgress(): number {
     return this.totalTasks > 0 ? (this.completedTasks / this.totalTasks) * 100 : 0;
+  }
+
+  openCreateTaskDialog(): void {
+    const dialogRef = this.dialog.open(CreateTaskDialogComponent, {
+      width: '400px',
+      data: { projectId: this.selectedProject?.id, employees: this.employees }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.taskService.createTask(result).subscribe(
+          (newTask) => {
+            const initialStatusId = this.statuses[0].id;
+            if (!this.tasks[initialStatusId]) {
+              this.tasks[initialStatusId] = [];
+            }
+            this.tasks[initialStatusId].push(newTask);
+            this.totalTasks++;
+          },
+          (error) => {
+            console.error('Error creating task:', error);
+          }
+        );
+      }
+    });
   }
 }

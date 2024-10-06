@@ -35,13 +35,9 @@ export class CreateProjectDialogComponent {
     private statusService: StatusService,
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<CreateProjectDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { managerId: number }
+    @Inject(MAT_DIALOG_DATA) public data: { managerId: number, employees: EmployeeDto[] }
   ) {
-    employeeService.getEmployees().subscribe(
-      (employees) => {
-        this.employees = employees;
-      }
-    );
+    this.employees = this.data.employees;
 
     statusService.getStatuses().subscribe(
       (statuses) => {

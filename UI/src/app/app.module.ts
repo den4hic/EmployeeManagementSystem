@@ -58,6 +58,7 @@ import {MatChip, MatChipInput, MatChipListbox, MatChipRemove} from "@angular/mat
 import { ProjectDashboardComponent } from './pages/project-dashboard/project-dashboard.component';
 import {CdkDrag, CdkDropList} from "@angular/cdk/drag-drop";
 import {MatProgressBar} from "@angular/material/progress-bar";
+import { CreateTaskDialogComponent } from './shared/create-task-dialog/create-task-dialog.component';
 
 @NgModule({
   declarations: [
@@ -76,7 +77,8 @@ import {MatProgressBar} from "@angular/material/progress-bar";
     StatItemComponent,
     ProjectTableComponent,
     CreateProjectDialogComponent,
-    ProjectDashboardComponent
+    ProjectDashboardComponent,
+    CreateTaskDialogComponent
   ],
   imports: [
     BrowserModule,
