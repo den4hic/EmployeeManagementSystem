@@ -16,6 +16,6 @@ public class UserDto : BaseDto<int>
     public bool IsBlocked { get; set; }
     public string? Role { get; set; }
     public virtual IdentityUser? AspNetUser { get; set; } = null!;
-    public virtual EmployeeDto? Employee { get; set; }
-    public virtual ManagerDto? Manager { get; set; }
+    public virtual EmployeeDto? Employee { get; set; } = null!;
+    public virtual ManagerDto? Manager { get; set; } = null!;
 }

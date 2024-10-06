@@ -67,6 +67,18 @@ public class ProjectRepository : CRUDRepositoryBase<Project, ProjectDto, Employe
             .Include(p => p.Tasks)
             .ToListAsync();
 
+        foreach (var project in projects)
+        {
+            foreach (var task in project.Tasks)
+            {
+                task.Project = null;
+                if (task.AssignedToEmployee != null)
+                {
+                    task.AssignedToEmployee.Tasks = null;
+                }
+            }
+        }
+
         return _mapper.Map<IEnumerable<ProjectDto>>(projects);
     }
 

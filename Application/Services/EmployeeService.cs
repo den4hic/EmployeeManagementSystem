@@ -38,7 +38,7 @@ public class EmployeeService : IEmployeeService
     {
         try
         {
-            var employees = await _employeeRepository.GetAllAsync();
+            var employees = await _employeeRepository.GetAllWithUsersAsync();
             return Result<IEnumerable<EmployeeDto>>.Success(employees);
         }
         catch (Exception ex)
