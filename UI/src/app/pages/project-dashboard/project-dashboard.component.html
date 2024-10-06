@@ -1,4 +1,10 @@
 <div class="project-dashboard">
+  <div class="project-table-container">
+    <div class="create-project-container">
+      <button mat-raised-button color="primary" (click)="openCreateProjectDialog()">Create project</button>
+    </div>
+  </div>
+
   <mat-form-field appearance="fill">
     <mat-label>Choose Project</mat-label>
     <mat-select [(value)]="selectedProject" (selectionChange)="selectProject($event.value)">

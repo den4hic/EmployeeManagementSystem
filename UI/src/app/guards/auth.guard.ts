@@ -24,7 +24,7 @@ export const authGuard: CanActivateFn = (route, state): Observable<boolean> => {
       catchError(error => {
         console.error('Token refresh failed:', error);
         authService.logout();
-        router.navigate(['/login']);
+        router.navigate(['/landing']);
         return of(false);
       })
     );

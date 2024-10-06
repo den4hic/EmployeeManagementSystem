@@ -43,7 +43,6 @@ import { UserStatisticsComponent } from './components/user-statistics/user-stati
 import {MatSlideToggle} from "@angular/material/slide-toggle";
 import { BlockedComponent } from './pages/blocked/blocked.component';
 import { StatItemComponent } from './shared/stat-item/stat-item.component';
-import { ProjectTableComponent } from './pages/project-table/project-table.component';
 import {apiUrlInterceptor} from "./interceptor/api-url.interceptor";
 import { CreateProjectDialogComponent } from './shared/create-project-dialog/create-project-dialog.component';
 import {
@@ -75,7 +74,6 @@ import { CreateTaskDialogComponent } from './shared/create-task-dialog/create-ta
     UserStatisticsComponent,
     BlockedComponent,
     StatItemComponent,
-    ProjectTableComponent,
     CreateProjectDialogComponent,
     ProjectDashboardComponent,
     CreateTaskDialogComponent

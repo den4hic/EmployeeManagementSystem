@@ -9,6 +9,9 @@ import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/dr
 import {EmployeeDto} from "../../services/dtos/employee.dto";
 import {CreateTaskDialogComponent} from "../../shared/create-task-dialog/create-task-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
+import {CreateProjectDialogComponent} from "../../shared/create-project-dialog/create-project-dialog.component";
+import {MatSnackBar} from "@angular/material/snack-bar";
+import {EmployeeService} from "../../services/employee.service";
 
 @Component({
   selector: 'app-project-dashboard',
@@ -16,7 +19,7 @@ import {MatDialog} from "@angular/material/dialog";
   styleUrls: ['./project-dashboard.component.css'],
 })
 export class ProjectDashboardComponent implements OnInit {
-  @Input() employees: EmployeeDto[] = [];
+  employees: EmployeeDto[] = [];
   projects: ProjectDto[] = [];
   selectedProject: ProjectDto | null = null;
   statuses: StatusDto[] = [];
@@ -27,14 +30,17 @@ export class ProjectDashboardComponent implements OnInit {
 
   constructor(
     private projectService: ProjectService,
+    private employeeService: EmployeeService,
     private taskService: TaskService,
     private statusService: StatusService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit() {
     this.loadProjects();
     this.loadStatuses();
+    this.loadEmployees();
   }
 
   loadProjects() {
@@ -53,6 +59,14 @@ export class ProjectDashboardComponent implements OnInit {
       (statuses) => {
         this.statuses = statuses;
         this.connectedLists = this.statuses.map(s => s.id.toString());
+      }
+    );
+  }
+
+  private loadEmployees() {
+    this.employeeService.getEmployees().subscribe(
+      (employees) => {
+        this.employees = employees;
       }
     );
   }
@@ -144,6 +158,24 @@ export class ProjectDashboardComponent implements OnInit {
           },
           (error) => {
             console.error('Error creating task:', error);
+          }
+        );
+      }
+    });
+  }
+
+  openCreateProjectDialog() {
+    const dialogRef = this.dialog.open(CreateProjectDialogComponent, {
+      width: '90vw',
+      data: { managerId: 1, employees: this.employees }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.projectService.createProject(result).subscribe(
+          () => {
+            this.snackBar.open('Project created successfully', 'Close', { duration: 3000 });
+            this.loadProjects();
           }
         );
       }

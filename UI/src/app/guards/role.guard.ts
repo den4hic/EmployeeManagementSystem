@@ -22,7 +22,7 @@ export const roleGuard: CanActivateFn = (route, state) => {
       error => {
         console.error('Token refresh failed:', error);
         authService.logout();
-        router.navigate(['/login']);
+        router.navigate(['/landing']);
         return false;
       }
     );
