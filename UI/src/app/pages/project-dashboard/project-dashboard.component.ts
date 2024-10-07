@@ -265,4 +265,28 @@ export class ProjectDashboardComponent implements OnInit {
       }
     });
   }
+
+  confirmDeleteTask(taskId: number) {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '300px'
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.deleteTask(taskId);
+      }
+    });
+  }
+
+  private deleteTask(taskId: number) {
+    this.taskService.deleteTask(taskId).subscribe({
+      next: () => {
+        this.loadTasks(this.selectedProject?.id || 0);
+        this.snackBar.open('Task deleted successfully', 'Close', {duration: 3000});
+      },
+      error: (error) => {
+        console.error('Error deleting task', error);
+        this.snackBar.open('Error deleting task', 'Close', {duration: 3000});
+      }
+    });
+  }
 }

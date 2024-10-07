@@ -26,4 +26,9 @@ export class TaskService {
     console.log(task);
     return this.http.post<TaskDto>(this.apiPath, task);
   }
+
+  deleteTask(taskId: number) {
+    const url = `${this.apiPath}/${taskId}`;
+    return this.http.delete(url);
+  }
 }

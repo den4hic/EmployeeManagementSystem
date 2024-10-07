@@ -55,8 +55,11 @@
         (cdkDropListDropped)="onTaskDrop($event)"
       >
         <mat-card class="task-card" *ngFor="let task of tasks[status.id]" cdkDrag>
-          <mat-card-header>
+          <mat-card-header class="task-header">
             <mat-card-title>{{task.title}}</mat-card-title>
+            <button mat-icon-button color="warn" (click)="confirmDeleteTask(task.id)">
+              <mat-icon>delete</mat-icon>
+            </button>
           </mat-card-header>
           <mat-card-content>
             <p>{{task.description}}</p>
