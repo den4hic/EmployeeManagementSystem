@@ -31,4 +31,9 @@ export class TaskService {
     const url = `${this.apiPath}/${taskId}`;
     return this.http.delete(url);
   }
+
+  updateTask(task: TaskDto) {
+    const url = `${this.apiPath}`;
+    return this.http.put(url, task);
+  }
 }

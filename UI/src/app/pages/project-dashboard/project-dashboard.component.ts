@@ -161,7 +161,7 @@ export class ProjectDashboardComponent implements OnInit {
   openCreateTaskDialog(): void {
     const dialogRef = this.dialog.open(CreateTaskDialogComponent, {
       width: '400px',
-      data: { projectId: this.selectedProject?.id, employees: this.employees }
+      data: { selectedTask: null, projectId: this.selectedProject?.id, employees: this.employees }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -286,6 +286,27 @@ export class ProjectDashboardComponent implements OnInit {
       error: (error) => {
         console.error('Error deleting task', error);
         this.snackBar.open('Error deleting task', 'Close', {duration: 3000});
+      }
+    });
+  }
+
+  openEditTaskDialog(task: TaskDto) {
+    const dialogRef = this.dialog.open(CreateTaskDialogComponent, {
+      width: '400px',
+      data: { selectedTask: task, projectId: this.selectedProject?.id, employees: this.employees }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        result.id = task.id;
+        this.taskService.updateTask(result).subscribe(
+          () => {
+            this.loadTasks(this.selectedProject?.id || 0);
+          },
+          (error) => {
+            console.error('Error updating task:', error);
+          }
+        );
       }
     });
   }

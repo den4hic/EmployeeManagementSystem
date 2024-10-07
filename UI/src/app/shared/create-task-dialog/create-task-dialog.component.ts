@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { EmployeeDto } from '../../services/dtos/employee.dto';
 import {provideNativeDateAdapter} from "@angular/material/core";
+import {TaskDto} from "../../services/dtos/task.dto";
 
 @Component({
   selector: 'app-create-task-dialog',
@@ -19,15 +20,15 @@ export class CreateTaskDialogComponent {
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<CreateTaskDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { projectId: number, employees: EmployeeDto[] }
+    @Inject(MAT_DIALOG_DATA) public data: { selectedTask: TaskDto | null, projectId: number, employees: EmployeeDto[] }
   ) {
     this.taskForm = this.fb.group({
-      title: ['', Validators.required],
-      description: [''],
+      title: [data.selectedTask?.title || '', Validators.required],
+      description: [data.selectedTask?.description || ''],
       projectId: [this.data.projectId, Validators.required],
-      assignedToEmployeeId: [null],
-      statusId: [1],
-      dueDate: [null]
+      assignedToEmployeeId: [data.selectedTask?.assignedToEmployeeId],
+      statusId: [data.selectedTask?.statusId || 1, Validators.required],
+      dueDate: [data.selectedTask?.dueDate || new Date()]
     });
 
     this.employees = this.data.employees;

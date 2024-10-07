@@ -12,8 +12,7 @@ public class ProjectCreateDtoValidator : AbstractValidator<ProjectCreateDto>
             .MaximumLength(100).WithMessage("Name must not exceed 100 characters");
 
         RuleFor(x => x.StartDate)
-            .NotNull().WithMessage("Start date is required")
-            .GreaterThanOrEqualTo(DateTime.Now.Date).WithMessage("Start date must be today or later");
+            .NotNull().WithMessage("Start date is required");
 
         RuleFor(x => x.EndDate)
             .GreaterThanOrEqualTo(x => x.StartDate).WithMessage("End date must be today or later than start date");

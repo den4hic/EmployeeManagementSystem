@@ -54,7 +54,7 @@
         class="task-list"
         (cdkDropListDropped)="onTaskDrop($event)"
       >
-        <mat-card class="task-card" *ngFor="let task of tasks[status.id]" cdkDrag>
+        <mat-card class="task-card" *ngFor="let task of tasks[status.id]" cdkDrag (click)="openEditTaskDialog(task)">
           <mat-card-header class="task-header">
             <mat-card-title>{{task.title}}</mat-card-title>
             <button mat-icon-button color="warn" (click)="confirmDeleteTask(task.id)">
