@@ -159,9 +159,14 @@ export class ProjectDashboardComponent implements OnInit {
   }
 
   openCreateTaskDialog(): void {
+    if (!this.selectedProject) {
+      return;
+    }
+
+    const projectEmployees = this.employees.filter(employee => this.selectedProject?.employees.some(projectEmployee => projectEmployee.id === employee.id));
     const dialogRef = this.dialog.open(CreateTaskDialogComponent, {
       width: '400px',
-      data: { selectedTask: null, projectId: this.selectedProject?.id, employees: this.employees }
+      data: { selectedTask: null, projectId: this.selectedProject.id, employees: projectEmployees }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -303,9 +308,13 @@ export class ProjectDashboardComponent implements OnInit {
   }
 
   openEditTaskDialog(task: TaskDto) {
+    if (!this.selectedProject) {
+      return;
+    }
+    const projectEmployees = this.employees.filter(employee => this.selectedProject?.employees.some(projectEmployee => projectEmployee.id === employee.id));
     const dialogRef = this.dialog.open(CreateTaskDialogComponent, {
       width: '400px',
-      data: { selectedTask: task, projectId: this.selectedProject?.id, employees: this.employees }
+      data: { selectedTask: task, projectId: this.selectedProject.id, employees: projectEmployees }
     });
 
     dialogRef.afterClosed().subscribe(result => {
