@@ -1,4 +1,5 @@
 import {ProjectDto} from "./project.dto";
+import {UserDto} from "./user.dto";
 
 export interface ManagerDto {
   id: number;
@@ -6,4 +7,5 @@ export interface ManagerDto {
   department: string;
   hireDate: Date;
   projects: ProjectDto[];
+  user: UserDto;
 }

@@ -10,11 +10,16 @@
     </mat-form-field>
 
     <div class="project-action-container">
-      <div>
+      <div *ngIf="selectedProject !== null">
         <button mat-raised-button color="accent" (click)="openEditProjectDialog()">Edit project</button>
       </div>
       <div>
         <button mat-raised-button color="primary" (click)="openCreateProjectDialog()">Create project</button>
+      </div>
+      <div *ngIf="selectedProject !== null">
+        <button mat-icon-button color="warn" (click)="confirmDelete(selectedProject.id)">
+          <mat-icon>delete</mat-icon>
+        </button>
       </div>
     </div>
   </div>

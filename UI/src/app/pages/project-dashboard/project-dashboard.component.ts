@@ -13,6 +13,9 @@ import {CreateProjectDialogComponent} from "../../shared/create-project-dialog/c
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {EmployeeService} from "../../services/employee.service";
 import {CreateProjectDto} from "../../services/dtos/create-project.dto";
+import {ManagerService} from "../../services/manager.service";
+import {ManagerDto} from "../../services/dtos/manager.dto";
+import {ConfirmDialogComponent} from "../../shared/confirm-dialog/confirm-dialog.component";
 
 @Component({
   selector: 'app-project-dashboard',
@@ -21,6 +24,7 @@ import {CreateProjectDto} from "../../services/dtos/create-project.dto";
 })
 export class ProjectDashboardComponent implements OnInit {
   employees: EmployeeDto[] = [];
+  managers: ManagerDto[] = [];
   projects: ProjectDto[] = [];
   selectedProject: ProjectDto | null = null;
   statuses: StatusDto[] = [];
@@ -34,6 +38,7 @@ export class ProjectDashboardComponent implements OnInit {
     private employeeService: EmployeeService,
     private taskService: TaskService,
     private statusService: StatusService,
+    private managerService: ManagerService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar
   ) {}
@@ -42,6 +47,16 @@ export class ProjectDashboardComponent implements OnInit {
     this.loadProjects();
     this.loadStatuses();
     this.loadEmployees();
+    this.loadManagers();
+  }
+
+  private loadManagers() {
+    this.managerService.getManagers().subscribe(
+      (managers) => {
+        this.managers = managers;
+        console.log('Managers:', managers);
+      }
+    )
   }
 
   loadProjects() {
@@ -223,6 +238,30 @@ export class ProjectDashboardComponent implements OnInit {
             this.loadProjects();
           }
         );
+      }
+    });
+  }
+
+  confirmDelete(projectId: number) {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '300px'
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.deleteProject(projectId);
+      }
+    });
+  }
+
+  private deleteProject(projectId: number) {
+    this.projectService.deleteProject(projectId).subscribe({
+      next: () => {
+        this.loadProjects();
+        this.snackBar.open('Project deleted successfully', 'Close', { duration: 3000 });
+      },
+      error: (error) => {
+        console.error('Error deleting project', error);
+        this.snackBar.open('Error deleting project', 'Close', { duration: 3000 });
       }
     });
   }

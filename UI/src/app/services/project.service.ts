@@ -26,4 +26,9 @@ export class ProjectService {
     const url = `${this.apiPath}`;
     return this.http.put(url, project);
   }
+
+  deleteProject(projectId: number) {
+    const url = `${this.apiPath}/${projectId}`;
+    return this.http.delete(url);
+  }
 }
