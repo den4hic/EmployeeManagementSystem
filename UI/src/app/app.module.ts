@@ -58,6 +58,7 @@ import { ProjectDashboardComponent } from './pages/project-dashboard/project-das
 import {CdkDrag, CdkDropList} from "@angular/cdk/drag-drop";
 import {MatProgressBar} from "@angular/material/progress-bar";
 import { CreateTaskDialogComponent } from './shared/create-task-dialog/create-task-dialog.component';
+import { ShowTaskDialogComponent } from './shared/show-task-dialog/show-task-dialog.component';
 
 @NgModule({
   declarations: [
@@ -76,7 +77,8 @@ import { CreateTaskDialogComponent } from './shared/create-task-dialog/create-ta
     StatItemComponent,
     CreateProjectDialogComponent,
     ProjectDashboardComponent,
-    CreateTaskDialogComponent
+    CreateTaskDialogComponent,
+    ShowTaskDialogComponent
   ],
   imports: [
     BrowserModule,

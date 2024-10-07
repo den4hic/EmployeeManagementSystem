@@ -21,6 +21,33 @@ public class UserRepository : CRUDRepositoryBase<User, UserDto, EmployeeManageme
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.AspNetUserId == id);
 
+        if (user?.Employee != null)
+        {
+            user.Employee.User = null;
+        }
+
+        if (user?.Manager != null)
+        {
+            user.Manager.User = null;
+        }
+
+        return user != null ? _mapper.Map<UserDto>(user) : null;
+    }
+
+    public async Task<UserDto> GetByAspNetUserIdDetailedAsync(string id)
+    {
+        var user = await _context.Users.Include(u => u.Manager).Include(u => u.Employee).FirstOrDefaultAsync(u => u.AspNetUserId == id);
+
+        if (user?.Employee != null)
+        {
+            user.Employee.User = null;
+        }
+
+        if (user?.Manager != null)
+        {
+            user.Manager.User = null;
+        }
+
         return user != null ? _mapper.Map<UserDto>(user) : null;
     }
 

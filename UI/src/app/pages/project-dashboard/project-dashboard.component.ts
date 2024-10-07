@@ -17,6 +17,9 @@ import {ManagerService} from "../../services/manager.service";
 import {ManagerDto} from "../../services/dtos/manager.dto";
 import {ConfirmDialogComponent} from "../../shared/confirm-dialog/confirm-dialog.component";
 import {UserService} from "../../services/user.service";
+import {JwtService} from "../../services/jwt.service";
+import {UserDto} from "../../services/dtos/user.dto";
+import {ShowTaskDialogComponent} from "../../shared/show-task-dialog/show-task-dialog.component";
 
 @Component({
   selector: 'app-project-dashboard',
@@ -33,6 +36,8 @@ export class ProjectDashboardComponent implements OnInit {
   connectedLists: string[] = [];
   totalTasks: number = 0;
   completedTasks: number = 0;
+  userRole: string | null = null;
+  user: UserDto | null = null;
 
   constructor(
     private projectService: ProjectService,
@@ -41,11 +46,18 @@ export class ProjectDashboardComponent implements OnInit {
     private statusService: StatusService,
     private managerService: ManagerService,
     private userService: UserService,
+    private jwtService: JwtService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar
   ) {}
 
   ngOnInit() {
+    this.userRole = this.jwtService.getUserRole();
+    this.userService.getUserInfo().subscribe(
+      (user) => {
+        this.user = user;
+      }
+    );
     this.loadProjects();
     this.loadStatuses();
     this.loadEmployees();
@@ -56,7 +68,6 @@ export class ProjectDashboardComponent implements OnInit {
     this.managerService.getManagers().subscribe(
       (managers) => {
         this.managers = managers;
-        console.log('Managers:', managers);
       }
     )
   }
@@ -65,7 +76,6 @@ export class ProjectDashboardComponent implements OnInit {
     this.projectService.getProjects().subscribe(
       (projects) => {
         this.projects = projects;
-        console.log(projects);
         if (projects.length > 0) {
           this.selectProject(projects[0]);
         }
@@ -86,7 +96,6 @@ export class ProjectDashboardComponent implements OnInit {
     this.employeeService.getEmployees().subscribe(
       (employees) => {
         this.employees = employees;
-        console.log('Employees:', employees);
       }
     );
   }
@@ -313,6 +322,13 @@ export class ProjectDashboardComponent implements OnInit {
     if (!this.selectedProject) {
       return;
     }
+    if (this.userRole === 'Employee') {
+      const infoDialogRef = this.dialog.open(ShowTaskDialogComponent, {
+        width: '600px',
+        data: { selectedTask: task, currentStatus: this.statuses.find(status => status.id === task.statusId) }
+      });
+      return;
+    }
     const projectEmployees = this.employees.filter(employee => this.selectedProject?.employees.some(projectEmployee => projectEmployee.id === employee.id));
     const dialogRef = this.dialog.open(CreateTaskDialogComponent, {
       width: '400px',
@@ -332,5 +348,9 @@ export class ProjectDashboardComponent implements OnInit {
         );
       }
     });
+  }
+
+  canDragTask(task: TaskDto) {
+    return this.userRole === 'Manager' || this.userRole === 'Admin' || this.user?.employee?.id === task.assignedToEmployeeId;
   }
 }

@@ -1,0 +1,29 @@
+<div class="task-dialog">
+  <h2 mat-dialog-title>Task Details</h2>
+  <mat-dialog-content *ngIf="data.selectedTask">
+    <div class="task-detail">
+      <label>Title:</label>
+      <span>{{ data.selectedTask.title }}</span>
+    </div>
+    <div class="task-detail">
+      <label>Description:</label>
+      <span>{{ data.selectedTask.description }}</span>
+    </div>
+    <div class="task-detail">
+      <label>Assigned To:</label>
+      <span>{{ data.selectedTask.assignedToEmployee.user.firstName + ' ' + data.selectedTask.assignedToEmployee.user.lastName }}</span>
+    </div>
+    <div class="task-detail">
+      <label>Status:</label>
+      <span>{{ data.currentStatus.name }}</span>
+    </div>
+    <div class="task-detail">
+      <label>Due Date:</label>
+      <span>{{ data.selectedTask.dueDate | date }}</span>
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()">Close</button>
+  </mat-dialog-actions>
+</div>
+

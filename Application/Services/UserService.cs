@@ -90,7 +90,7 @@ public class UserService : IUserService
         if (user == null)
             return Result<UserDto>.Failure($"User with username {username} not found");
 
-        var userDto = await _userRepository.GetByAspNetUserIdAsync(user.Id);
+        var userDto = await _userRepository.GetByAspNetUserIdDetailedAsync(user.Id);
         return userDto != null
             ? Result<UserDto>.Success(userDto)
             : Result<UserDto>.Failure($"UserDto for username {username} not found");
