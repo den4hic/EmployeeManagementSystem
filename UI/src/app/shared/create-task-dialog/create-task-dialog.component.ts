@@ -26,7 +26,7 @@ export class CreateTaskDialogComponent {
       title: [data.selectedTask?.title || '', Validators.required],
       description: [data.selectedTask?.description || ''],
       projectId: [this.data.projectId, Validators.required],
-      assignedToEmployeeId: [data.selectedTask?.assignedToEmployeeId],
+      assignedToEmployeeId: [data.selectedTask?.assignedToEmployeeId || null],
       statusId: [data.selectedTask?.statusId || 1, Validators.required],
       dueDate: [data.selectedTask?.dueDate || new Date()]
     });

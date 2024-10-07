@@ -30,6 +30,7 @@ export class CreateProjectDialogComponent {
 
   employees: EmployeeDto[] = [];
   statuses: StatusDto[] = [];
+  selectedProject: CreateProjectDto | null = null;
 
   constructor(
     private employeeService: EmployeeService,
@@ -46,16 +47,18 @@ export class CreateProjectDialogComponent {
       }
     );
 
+    this.selectedProject = this.data.selectedProject;
+
     this.valueForm = this.fb.group({
-      name: [data.selectedProject?.name || '', [Validators.required, Validators.maxLength(100)]],
-      description: [data.selectedProject?.description || ''],
-      startDate: [data.selectedProject?.startDate || '', [Validators.required, this.startDateValidator]],
-      endDate: [data.selectedProject?.endDate || ''],
+      name: [this.selectedProject?.name || '', [Validators.required, Validators.maxLength(100)]],
+      description: [this.selectedProject?.description || ''],
+      startDate: [this.selectedProject?.startDate || null, [Validators.required]],
+      endDate: [this.selectedProject?.endDate || null],
     });
 
     this.assignForm = this.fb.group({
-      employeeIds: [data.selectedProject?.employeeIds || [], Validators.required],
-      statusId: [data.selectedProject?.statusId || 1, Validators.required],
+      employeeIds: [this.selectedProject?.employeeIds || [], Validators.required],
+      statusId: [this.selectedProject?.statusId || 1, Validators.required],
     });
   }
 
@@ -70,7 +73,11 @@ export class CreateProjectDialogComponent {
   }
 
   endDateValidator(control: AbstractControl): { [key: string]: boolean } | null {
-    const startDate = this.valueForm?.get('startDate')?.value;
+    const startDateForm = this.valueForm?.get('startDate')
+    if (!startDateForm) {
+      return null;
+    }
+    const startDate = startDateForm.value;
     const endDate = new Date(control.value);
     if (startDate && endDate <= new Date(startDate)) {
       return { 'endDateInvalid': true };

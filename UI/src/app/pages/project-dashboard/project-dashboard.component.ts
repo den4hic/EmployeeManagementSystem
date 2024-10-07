@@ -168,12 +168,7 @@ export class ProjectDashboardComponent implements OnInit {
       if (result) {
         this.taskService.createTask(result).subscribe(
           (newTask) => {
-            const initialStatusId = this.statuses[0].id;
-            if (!this.tasks[initialStatusId]) {
-              this.tasks[initialStatusId] = [];
-            }
-            this.tasks[initialStatusId].push(newTask);
-            this.totalTasks++;
+            this.loadTasks(this.selectedProject?.id || 0);
           },
           (error) => {
             console.error('Error creating task:', error);
@@ -213,10 +208,23 @@ export class ProjectDashboardComponent implements OnInit {
           () => {
             this.snackBar.open('Project created successfully', 'Close', { duration: 3000 });
             this.loadProjects();
+          },
+          (error) => {
+            this.showError(error);
           }
         );
       }
     });
+  }
+  showError(error: any) {
+    let errorMessage = 'An unknown error occurred';
+    if (error.error && error.error.errors) {
+      const firstErrorKey = Object.keys(error.error.errors)[0];
+      if (firstErrorKey) {
+        errorMessage = error.error.errors[firstErrorKey][0];
+      }
+    }
+    this.snackBar.open(errorMessage, 'Close', { duration: 3000 });
   }
 
   openEditProjectDialog() {
@@ -232,10 +240,14 @@ export class ProjectDashboardComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         result.id = this.selectedProject?.id;
+        result.taskIds = this.selectedProject?.tasks.map(task => task.id) || [];
         this.projectService.updateProject(result).subscribe(
           () => {
             this.snackBar.open('Project update successfully', 'Close', { duration: 3000 });
             this.loadProjects();
+          },
+          error => {
+            this.showError(error);
           }
         );
       }
