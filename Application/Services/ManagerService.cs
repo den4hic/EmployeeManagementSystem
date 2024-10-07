@@ -38,7 +38,7 @@ namespace Application.Services
         {
             try
             {
-                var managers = await _managerRepository.GetAllAsync();
+                var managers = await _managerRepository.GetAllWithUsersAsync();
                 return Result<IEnumerable<ManagerDto>>.Success(managers);
             }
             catch (Exception ex)

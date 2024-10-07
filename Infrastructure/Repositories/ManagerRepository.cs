@@ -13,6 +13,16 @@ public class ManagerRepository : CRUDRepositoryBase<Manager, ManagerDto, Employe
     {
     }
 
+    public async Task<IEnumerable<ManagerDto>> GetAllWithUsersAsync()
+    {
+        var managers = await _context.Managers.Include(e => e.User).ToListAsync();
+        foreach (var manager in managers)
+        {
+            manager.User.Manager = null;
+        }
+        return _mapper.Map<IEnumerable<ManagerDto>>(managers);
+    }
+
     public async System.Threading.Tasks.Task<ManagerDto> GetByUserIdAsync(int userId)
     {
         var manager = await _context.Managers.FirstOrDefaultAsync(u => u.UserId == userId);

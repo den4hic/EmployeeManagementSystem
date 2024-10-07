@@ -16,4 +16,9 @@ export class ManagerService {
     const url = `${this.apiPath}`;
     return this.http.get<ManagerDto[]>(url);
   }
+
+  getManager(id: number): Observable<ManagerDto> {
+    const url = `${this.apiPath}/${id}`;
+    return this.http.get<ManagerDto>(url);
+  }
 }

@@ -9,6 +9,7 @@ import {StatusService} from "../../services/status.service";
 import {StatusDto} from "../../services/dtos/status.dto";
 import {STEPPER_GLOBAL_OPTIONS} from "@angular/cdk/stepper";
 import {ProjectDto} from "../../services/dtos/project.dto";
+import {ManagerDto} from "../../services/dtos/manager.dto";
 
 @Component({
   selector: 'app-create-project-dialog',
@@ -29,6 +30,7 @@ export class CreateProjectDialogComponent {
   employeeIds: number[] = [];
 
   employees: EmployeeDto[] = [];
+  managers: ManagerDto[] = [];
   statuses: StatusDto[] = [];
   selectedProject: CreateProjectDto | null = null;
 
@@ -37,9 +39,10 @@ export class CreateProjectDialogComponent {
     private statusService: StatusService,
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<CreateProjectDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { selectedProject: CreateProjectDto | null, managerId: number, employees: EmployeeDto[] }
+    @Inject(MAT_DIALOG_DATA) public data: { selectedProject: CreateProjectDto | null, managerId: number, employees: EmployeeDto[], managers: ManagerDto[] }
   ) {
     this.employees = this.data.employees;
+    this.managers = this.data.managers;
 
     statusService.getStatuses().subscribe(
       (statuses) => {
@@ -58,6 +61,7 @@ export class CreateProjectDialogComponent {
 
     this.assignForm = this.fb.group({
       employeeIds: [this.selectedProject?.employeeIds || [], Validators.required],
+      managerIds: [this.selectedProject?.managerIds || [], Validators.required],
       statusId: [this.selectedProject?.statusId || 1, Validators.required],
     });
   }

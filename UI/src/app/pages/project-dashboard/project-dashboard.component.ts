@@ -16,6 +16,7 @@ import {CreateProjectDto} from "../../services/dtos/create-project.dto";
 import {ManagerService} from "../../services/manager.service";
 import {ManagerDto} from "../../services/dtos/manager.dto";
 import {ConfirmDialogComponent} from "../../shared/confirm-dialog/confirm-dialog.component";
+import {UserService} from "../../services/user.service";
 
 @Component({
   selector: 'app-project-dashboard',
@@ -39,6 +40,7 @@ export class ProjectDashboardComponent implements OnInit {
     private taskService: TaskService,
     private statusService: StatusService,
     private managerService: ManagerService,
+    private userService: UserService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar
   ) {}
@@ -204,7 +206,7 @@ export class ProjectDashboardComponent implements OnInit {
   openCreateProjectDialog() {
     const dialogRef = this.dialog.open(CreateProjectDialogComponent, {
       width: '90vw',
-      data: { selectedProject: null, managerId: 1, employees: this.employees }
+      data: { selectedProject: null, managerId: 1, employees: this.employees, managers: this.managers }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -239,7 +241,7 @@ export class ProjectDashboardComponent implements OnInit {
     const createProjectDto = this.projectDtoToCreateProjectDto(this.selectedProject);
     const dialogRef = this.dialog.open(CreateProjectDialogComponent, {
       width: '90vw',
-      data: { selectedProject: createProjectDto, managerId: 1, employees: this.employees }
+      data: { selectedProject: createProjectDto, managerId: 1, employees: this.employees, managers: this.managers }
     });
 
     dialogRef.afterClosed().subscribe(result => {

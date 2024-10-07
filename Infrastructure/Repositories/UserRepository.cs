@@ -82,6 +82,10 @@ public class UserRepository : CRUDRepositoryBase<User, UserDto, EmployeeManageme
             {
                 user.Employee.User = null;
             }
+            if (user.Manager != null)
+            {
+                user.Manager.User = null;
+            }
             var userDto = _mapper.Map<UserDto>(user);
             userDtos.Add(userDto);
         }
