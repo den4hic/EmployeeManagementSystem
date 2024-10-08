@@ -2,6 +2,7 @@
 using Application.Common;
 using Application.DTOs;
 using AutoMapper;
+using Domain.Enum;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -53,7 +54,7 @@ public class AccountService : IAccountService
                 return Result<bool>.Failure(string.Join(", ", result.Errors.Select(e => e.Description)));
             }
 
-            var roleResult = await _userManager.AddToRoleAsync(user, "User");
+            var roleResult = await _userManager.AddToRoleAsync(user, UserRole.User.ToString());
             if (!roleResult.Succeeded)
             {
                 await _unitOfWork.RollbackAsync();
@@ -221,7 +222,7 @@ public class AccountService : IAccountService
                 return Result<bool>.Failure($"Failed to create admin: {string.Join(", ", result.Errors.Select(e => e.Description))}");
             }
 
-            var addRole = await _userManager.AddToRoleAsync(newAdmin, "Admin");
+            var addRole = await _userManager.AddToRoleAsync(newAdmin, UserRole.Admin.ToString());
             if (!addRole.Succeeded)
             {
                 await _unitOfWork.RollbackAsync();

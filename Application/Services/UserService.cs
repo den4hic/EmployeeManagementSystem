@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions;
 using Application.Common;
 using Application.DTOs;
+using Domain.Enum;
 using Microsoft.AspNetCore.Identity;
 
 namespace Application.Services;
@@ -144,7 +145,7 @@ public class UserService : IUserService
         try
         {
             var users = await _userRepository.GetAllAsync();
-            var totalAdmins = await _userManager.GetUsersInRoleAsync("Admin");
+            var totalAdmins = await _userManager.GetUsersInRoleAsync(UserRole.Admin.ToString());
             var blockedUsers = users.Count(u => u.IsBlocked);
             return Result<(int, int, int)>.Success((users.Count(), totalAdmins.Count, blockedUsers));
         }
