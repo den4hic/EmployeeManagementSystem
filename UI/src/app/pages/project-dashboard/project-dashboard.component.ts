@@ -38,6 +38,7 @@ export class ProjectDashboardComponent implements OnInit {
   completedTasks: number = 0;
   userRole: string | null = null;
   user: UserDto | null = null;
+  showOnlyMyTasks: boolean = false;
 
   constructor(
     private projectService: ProjectService,
@@ -105,7 +106,7 @@ export class ProjectDashboardComponent implements OnInit {
     this.loadTasks(project.id);
   }
 
-  loadTasks(projectId: number) {
+  loadTasks(projectId: number, employeeId?: number) {
     this.taskService.getTasksByProjectId(projectId).subscribe(
       (tasks) => {
         console.log('Tasks:', tasks);
@@ -113,7 +114,7 @@ export class ProjectDashboardComponent implements OnInit {
         this.totalTasks = tasks.length;
         this.completedTasks = tasks.filter(task => task.statusId === this.getCompletedStatusId()).length;
         this.statuses.forEach(status => {
-          this.tasks[status.id] = tasks.filter(task => task.statusId === status.id);
+          this.tasks[status.id] = tasks.filter(task => task.statusId === status.id && (!employeeId || task.assignedToEmployeeId === employeeId));
         });
       }
     );
@@ -352,5 +353,18 @@ export class ProjectDashboardComponent implements OnInit {
 
   canDragTask(task: TaskDto) {
     return this.userRole === 'Manager' || this.userRole === 'Admin' || this.user?.employee?.id === task.assignedToEmployeeId;
+  }
+
+  onTaskToogleChanged() {
+    if (!this.selectedProject) {
+      return;
+    }
+    if (this.selectedProject.id === 0) {
+      this.loadTasks(this.selectedProject.id);
+    } else if (this.showOnlyMyTasks) {
+      this.loadTasks(this.selectedProject.id, this.user?.employee?.id);
+    } else {
+      this.loadTasks(this.selectedProject.id);
+    }
   }
 }

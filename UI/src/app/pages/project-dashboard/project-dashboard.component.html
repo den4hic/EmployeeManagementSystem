@@ -41,6 +41,14 @@
     <mat-card-actions *ngIf="userRole !== 'Employee'">
       <button mat-raised-button color="primary" (click)="openCreateTaskDialog()">Create new task</button>
     </mat-card-actions>
+    <mat-card-actions *ngIf="userRole === 'Employee'">
+      <mat-slide-toggle
+          class="my-tasks-slider"
+          [(ngModel)]="showOnlyMyTasks"
+          (change)="onTaskToogleChanged()">
+        <b>My Tasks</b>
+      </mat-slide-toggle>
+    </mat-card-actions>
   </mat-card>
 
   <div class="kanban-board">
