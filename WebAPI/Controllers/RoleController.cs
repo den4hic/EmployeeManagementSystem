@@ -1,5 +1,6 @@
 ﻿using Application.Abstractions;
 using Application.DTOs;
+using Domain.Enum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,7 +29,7 @@ public class RoleController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = nameof(UserRole.Admin))]
     public async Task<IActionResult> CreateRole(string roleName)
     {
         var result = await _roleService.CreateRoleAsync(roleName);
@@ -40,7 +41,7 @@ public class RoleController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = nameof(UserRole.Admin))]
     public async Task<IActionResult> GetRoles()
     {
         var result = await _roleService.GetRolesAsync();
@@ -52,7 +53,7 @@ public class RoleController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = nameof(UserRole.Admin))]
     public async Task<IActionResult> GetRole(string id)
     {
         var result = await _roleService.GetRoleByIdAsync(id);
@@ -64,7 +65,7 @@ public class RoleController : ControllerBase
     }
 
     [HttpDelete("{roleName}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = nameof(UserRole.Admin))]
     public async Task<IActionResult> DeleteRole(string roleName)
     {
         var result = await _roleService.DeleteRoleAsync(roleName);
@@ -75,15 +76,13 @@ public class RoleController : ControllerBase
         return NotFound(result.Error);
     }
 
-    [HttpPost("assign-role")]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> AssignRole(int userId, string role, [FromBody] EmployeeManagerRoleDto roleData)
+    [HttpPost("assign-role/{userId}/{role}")]
+    [Authorize(Roles = nameof(UserRole.Admin))]
+    public async Task<IActionResult> AssignRole(int userId, UserRole role, [FromBody] EmployeeManagerRoleDto roleData)
     {
         var result = await _roleService.AssignRoleAsync(userId, role, roleData);
-        if (result.IsSuccess)
-        {
-            return Ok(new { Message = "Role assigned and entity created successfully" });
-        }
-        return BadRequest(result.Error);
+        return result.IsSuccess
+            ? Ok(new { Message = $"Role {role} assigned and entity created successfully" })
+            : BadRequest(result.Error);
     }
 }

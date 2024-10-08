@@ -1,11 +1,11 @@
 ﻿using Application.Abstractions;
 using Application.DTOs;
+using Domain.Enum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers;
 
-[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class EmployeeController : ControllerBase
@@ -17,6 +17,7 @@ public class EmployeeController : ControllerBase
         _employeeService = employeeService;
     }
 
+    [Authorize(Roles = nameof(UserRole.Admin))]
     [HttpPost]
     public async Task<ActionResult<EmployeeDto>> CreateEmployee(EmployeeDto employeeDto)
     {
@@ -34,6 +35,7 @@ public class EmployeeController : ControllerBase
         return BadRequest(result.Error);
     }
 
+    [Authorize(Roles = $"{nameof(UserRole.Admin)},{nameof(UserRole.Manager)},{nameof(UserRole.Employee)}")]
     [HttpGet("{id}")]
     public async Task<ActionResult<EmployeeDto>> GetEmployee(int id)
     {
@@ -47,6 +49,7 @@ public class EmployeeController : ControllerBase
         return NotFound(employee.Error);
     }
 
+    [Authorize(Roles = $"{nameof(UserRole.Admin)},{nameof(UserRole.Manager)},{nameof(UserRole.Employee)}")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<EmployeeDto>>> GetAllEmployees()
     {
@@ -60,6 +63,7 @@ public class EmployeeController : ControllerBase
         return BadRequest(employees.Error);
     }
 
+    [Authorize(Roles = $"{nameof(UserRole.Admin)},{nameof(UserRole.Employee)}")]
     [HttpPut]
     public async Task<ActionResult> UpdateEmployee(EmployeeDto employeeDto)
     {
@@ -78,6 +82,7 @@ public class EmployeeController : ControllerBase
         return BadRequest(result.Error);
     }
 
+    [Authorize(Roles = nameof(UserRole.Admin))]
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteEmployee(int id)
     {

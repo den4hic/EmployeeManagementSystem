@@ -1,5 +1,6 @@
 ﻿using Application.Abstractions;
 using Application.DTOs;
+using Domain.Enum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,6 +18,7 @@ public class ManagerController : ControllerBase
         _managerService = managerService;
     }
 
+    [Authorize(Roles = nameof(UserRole.Admin))]
     [HttpPost]
     public async Task<ActionResult<ManagerDto>> CreateManager(ManagerDto managerDto)
     {
@@ -35,6 +37,7 @@ public class ManagerController : ControllerBase
         return BadRequest(result.Error);
     }
 
+    [Authorize(Roles = $"{nameof(UserRole.Admin)},{nameof(UserRole.Manager)},{nameof(UserRole.Employee)}")]
     [HttpGet("{id}")]
     public async Task<ActionResult<ManagerDto>> GetManager(int id)
     {
@@ -48,6 +51,7 @@ public class ManagerController : ControllerBase
         return NotFound(manager.Error);
     }
 
+    [Authorize(Roles = $"{nameof(UserRole.Admin)},{nameof(UserRole.Manager)},{nameof(UserRole.Employee)}")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ManagerDto>>> GetAllManagers()
     {
@@ -61,6 +65,7 @@ public class ManagerController : ControllerBase
         return BadRequest(managers.Error);
     }
 
+    [Authorize(Roles = $"{nameof(UserRole.Admin)},{nameof(UserRole.Employee)}")]
     [HttpPut]
     public async Task<ActionResult> UpdateManager(ManagerDto managerDto)
     {
@@ -79,6 +84,7 @@ public class ManagerController : ControllerBase
         return BadRequest(result.Error);
     }
 
+    [Authorize(Roles = nameof(UserRole.Admin))]
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteManager(int id)
     {

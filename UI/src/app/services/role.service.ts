@@ -15,7 +15,7 @@ export class RoleService {
 
   assignRole(userId: number, role: string, roleData: EmployeeManagerRoleDto): Observable<any> {
     roleData.hireDate = new Date();
-    const url = `${this.apiPath}/assign-role?userId=${userId}&role=${role}`;
+    const url = `${this.apiPath}/assign-role/${userId}/${role}`;
     return this.http.post(url, roleData);
   }
 

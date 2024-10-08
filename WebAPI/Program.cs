@@ -1,5 +1,6 @@
 using Application.Extensions;
 using FluentValidation.AspNetCore;
+using Infrastructure.Constraint;
 using Infrastructure.Context;
 using Infrastructure.Extensions;
 using Infrastructure.Mappers;
