@@ -1,5 +1,6 @@
 ﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace Infrastructure.Context;
 
@@ -22,6 +23,8 @@ public partial class EmployeeManagementSystemDbContext : IdentityContext
     public virtual DbSet<Domain.Entities.Task> Tasks { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
+
+    public virtual DbSet<UserPhoto> UserPhotos { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -114,6 +117,7 @@ public partial class EmployeeManagementSystemDbContext : IdentityContext
             entity.Property(e => e.LastName).HasMaxLength(50);
             entity.Property(e => e.PhoneNumber).HasMaxLength(20);
             entity.Property(e => e.RefreshToken).HasMaxLength(50);
+            entity.Property(e => e.RefreshTokenExpiryTime).HasColumnType("datetime");
 
             entity.HasOne(u => u.AspNetUser)
                 .WithOne()
@@ -154,6 +158,24 @@ public partial class EmployeeManagementSystemDbContext : IdentityContext
                   .WithMany(m => m.ProjectEmployees)
                   .HasForeignKey(pm => pm.EmployeeId)
                   .OnDelete(DeleteBehavior.ClientSetNull);
+        });
+
+        builder.Entity<UserPhoto>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__UserPhot__3214EC07BD6B5155");
+
+            entity.ToTable("UserPhoto");
+
+            entity.HasIndex(e => e.UserId, "IX_UserPhoto_UserId");
+
+            entity.HasIndex(e => e.UserId, "UQ_UserPhoto_UserId").IsUnique();
+
+            entity.Property(e => e.ContentType).HasMaxLength(100);
+            entity.Property(e => e.UploadDate).HasDefaultValueSql("(getdate())");
+
+            entity.HasOne(d => d.User).WithOne(p => p.UserPhoto)
+                .HasForeignKey<UserPhoto>(d => d.UserId)
+                .HasConstraintName("FK_UserPhoto_User");
         });
 
         OnModelCreatingPartial(builder);

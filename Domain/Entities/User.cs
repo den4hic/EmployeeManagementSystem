@@ -27,4 +27,6 @@ public partial class User : IEntity<int>
     public virtual Employee? Employee { get; set; }
 
     public virtual Manager? Manager { get; set; }
+
+    public virtual UserPhoto? UserPhoto { get; set; }
 }

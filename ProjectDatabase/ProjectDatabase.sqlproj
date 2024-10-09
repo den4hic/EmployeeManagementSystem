@@ -78,5 +78,6 @@
     <Build Include="dbo\Tables\Task.sql" />
     <Build Include="dbo\Tables\ProjectEmployee.sql" />
     <Build Include="dbo\Tables\ProjectManager.sql" />
+    <Build Include="dbo\Tables\UserPhoto.sql" />
   </ItemGroup>
 </Project>
