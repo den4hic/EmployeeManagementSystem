@@ -1,0 +1,8 @@
+<h1 mat-dialog-title>Change Profile Photo</h1>
+<div mat-dialog-content>
+  <input type="file" (change)="onFileSelected($event)">
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Cancel</button>
+  <button mat-button (click)="onSaveClick()">Save</button>
+</div>

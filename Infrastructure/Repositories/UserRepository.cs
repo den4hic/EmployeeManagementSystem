@@ -36,7 +36,7 @@ public class UserRepository : CRUDRepositoryBase<User, UserDto, EmployeeManageme
 
     public async Task<UserDto> GetByAspNetUserIdDetailedAsync(string id)
     {
-        var user = await _context.Users.Include(u => u.Manager).Include(u => u.Employee).FirstOrDefaultAsync(u => u.AspNetUserId == id);
+        var user = await _context.Users.Include(u => u.Manager).Include(u => u.Employee).Include(u => u.UserPhoto).FirstOrDefaultAsync(u => u.AspNetUserId == id);
 
         if (user?.Employee != null)
         {
@@ -46,6 +46,11 @@ public class UserRepository : CRUDRepositoryBase<User, UserDto, EmployeeManageme
         if (user?.Manager != null)
         {
             user.Manager.User = null;
+        }
+
+        if (user?.UserPhoto != null)
+        {
+            user.UserPhoto.User = null;
         }
 
         return user != null ? _mapper.Map<UserDto>(user) : null;

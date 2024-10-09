@@ -1,11 +1,10 @@
 ﻿using Application.Abstractions;
 using Application.DTOs;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.Models;
 
 namespace WebAPI.Controllers;
 
-[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class UserPhotoController : ControllerBase
@@ -18,8 +17,9 @@ public class UserPhotoController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddUserPhoto([FromForm] IFormFile file, [FromForm] int userId)
+    public async Task<IActionResult> AddUserPhoto([FromForm] FileUploadRequest model)
     {
+        IFormFile file = model.File;
         if (file == null || file.Length == 0)
         {
             return BadRequest("File is empty");
@@ -30,7 +30,7 @@ public class UserPhotoController : ControllerBase
 
         var userPhotoDto = new UserPhotoDto
         {
-            UserId = userId,
+            UserId = model.UserId,
             PhotoData = memoryStream.ToArray(),
             ContentType = file.ContentType,
             UploadDate = DateTime.Now
@@ -72,7 +72,7 @@ public class UserPhotoController : ControllerBase
         return BadRequest(result.Error);
     }
 
-    [HttpDelete]
+    [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteUserPhoto(int id)
     {
         var result = await _userPhotoService.DeleteUserPhotoAsync(id);

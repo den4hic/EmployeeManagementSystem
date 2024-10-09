@@ -2,6 +2,12 @@ import { Component, inject, OnInit } from '@angular/core';
 import { UserService } from "../../services/user.service";
 import { UserDto } from "../../services/dtos/user.dto";
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {ConfirmDialogComponent} from "../../shared/confirm-dialog/confirm-dialog.component";
+import {MatDialog} from "@angular/material/dialog";
+import {UserPhotoService} from "../../services/user-photo.service";
+import {PhotoDialogComponent} from "../../shared/photo-dialog/photo-dialog.component";
+import {UserPhotoDto} from "../../services/dtos/user-photo.dto";
+import {FileUploadRequestDto} from "../../services/dtos/file-upload-request.dto";
 
 @Component({
   selector: 'app-profile',
@@ -16,7 +22,8 @@ export class ProfileComponent implements OnInit {
   public editMode = false;
   public userForm: FormGroup;
 
-  constructor() {
+  constructor(private dialog: MatDialog,
+              private userPhotoService: UserPhotoService) {
     this.userForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.maxLength(50)]],
       lastName: ['', [Validators.required, Validators.maxLength(50)]],
@@ -63,5 +70,77 @@ export class ProfileComponent implements OnInit {
         }
       });
     }
+  }
+
+
+  confirmDeletePhoto() {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '300px'
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.deleteUser(this.userModel?.userPhoto?.id!);
+      }
+    });
+  }
+
+  private deleteUser(photoId: number) {
+    this.userPhotoService.deleteTask(photoId).subscribe({
+      next: () => {
+        this.loadUserInfo(true);
+        console.log('User photo deleted');
+      },
+      error: (error) => {
+        console.error('Failed to delete user photo', error);
+      }
+    });
+  }
+
+  openPhotoDialog(): void {
+    const dialogRef = this.dialog.open(PhotoDialogComponent, {
+      width: '400px',
+      data: { userPhoto: this.userModel?.userPhoto }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.updatePhoto(result);
+      }
+    });
+  }
+
+  private updatePhoto(result: File) {
+    console.log('Updating photo', result);
+    if (this.userModel && this.userModel.userPhoto) {
+      const fileUploadRequest: FileUploadRequestDto = {
+        file: result,
+        userId: this.userModel.id
+      };
+      this.userPhotoService.updateUserPhoto(fileUploadRequest).subscribe({
+        next: () => {
+          this.loadUserInfo(true);
+          console.log('User photo updated');
+        },
+        error: (error) => {
+          console.error('Failed to update user photo', error);
+        }
+      });
+    } else if (this.userModel && !this.userModel.userPhoto) {
+      const fileUploadRequest: FileUploadRequestDto = {
+        file: result,
+        userId: this.userModel.id
+      };
+      console.log('Creating photo', fileUploadRequest);
+      this.userPhotoService.createUserPhoto(fileUploadRequest).subscribe({
+        next: () => {
+          this.loadUserInfo(true);
+          console.log('User photo created');
+        },
+        error: (error) => {
+          console.error('Failed to create user photo', error);
+        }
+      });
+    }
+    console.log(result);
   }
 }

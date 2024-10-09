@@ -7,4 +7,5 @@ export enum ApiPaths {
   Employee = 'employee',
   Manager = 'manager',
   Status = 'status',
+  UserPhoto = 'userPhoto',
 }

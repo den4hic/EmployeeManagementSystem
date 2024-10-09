@@ -18,4 +18,5 @@ public class UserDto : BaseDto<int>
     public virtual IdentityUser? AspNetUser { get; set; } = null!;
     public virtual EmployeeDto? Employee { get; set; } = null!;
     public virtual ManagerDto? Manager { get; set; } = null!;
+    public virtual UserPhotoDto? UserPhoto { get; set; } = null!;
 }

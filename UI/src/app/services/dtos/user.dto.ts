@@ -1,5 +1,6 @@
 import {ManagerDto} from "./manager.dto";
 import {EmployeeDto} from "./employee.dto";
+import {UserPhotoDto} from "./user-photo.dto";
 
 export interface UserDto {
   id: number;
@@ -11,5 +12,6 @@ export interface UserDto {
   isBlocked: boolean;
   manager: ManagerDto | null;
   employee: EmployeeDto | null;
+  userPhoto: UserPhotoDto | null;
   role: string;
 }

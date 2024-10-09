@@ -59,6 +59,7 @@ import {CdkDrag, CdkDropList} from "@angular/cdk/drag-drop";
 import {MatProgressBar} from "@angular/material/progress-bar";
 import { CreateTaskDialogComponent } from './shared/create-task-dialog/create-task-dialog.component';
 import { ShowTaskDialogComponent } from './shared/show-task-dialog/show-task-dialog.component';
+import { PhotoDialogComponent } from './shared/photo-dialog/photo-dialog.component';
 
 @NgModule({
   declarations: [
@@ -78,7 +79,8 @@ import { ShowTaskDialogComponent } from './shared/show-task-dialog/show-task-dia
     CreateProjectDialogComponent,
     ProjectDashboardComponent,
     CreateTaskDialogComponent,
-    ShowTaskDialogComponent
+    ShowTaskDialogComponent,
+    PhotoDialogComponent
   ],
   imports: [
     BrowserModule,
