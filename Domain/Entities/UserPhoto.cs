@@ -1,6 +1,8 @@
-﻿namespace Domain.Entities;
+﻿using Domain.Common;
 
-public class UserPhoto
+namespace Domain.Entities;
+
+public class UserPhoto : IEntity<int>
 {
     public int Id { get; set; }
 

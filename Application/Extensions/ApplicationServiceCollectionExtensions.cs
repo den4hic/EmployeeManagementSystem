@@ -19,6 +19,7 @@ public static class ApplicationServiceCollectionExtensions
         services.AddScoped<IStatusService, StatusService>();
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<IRoleService, RoleService>();
+        services.AddScoped<IUserPhotoService, UserPhotoService>();
         services.AddScoped<IJwtTokenService, JwtTokenService>();
 
         return services;

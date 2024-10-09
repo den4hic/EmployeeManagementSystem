@@ -32,5 +32,7 @@ public class MappingProfile : Profile
         CreateMap<EmployeeDto, EmployeeManagerRoleDto>().ReverseMap();
 
         CreateMap<ManagerDto, EmployeeManagerRoleDto>().ReverseMap();
+
+        CreateMap<UserPhoto, UserPhotoDto>().ReverseMap();
     }
 }

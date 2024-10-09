@@ -90,7 +90,7 @@ public class TaskService : ITaskService
     {
         try
         {
-            var task = _taskRepository.GetByIdAsync(taskId).Result;
+            var task = await _taskRepository.GetByIdAsync(taskId);
             if (task == null)
             {
                 return Result<bool>.Failure($"Task with id {taskId} not found");
