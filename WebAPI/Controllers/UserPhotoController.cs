@@ -84,4 +84,35 @@ public class UserPhotoController : ControllerBase
 
         return BadRequest(result.Error);
     }
+
+    [HttpPut]
+    public async Task<IActionResult> UpdateUserPhoto([FromForm] FileUploadRequest model)
+    {
+        IFormFile file = model.File;
+        if (file == null || file.Length == 0)
+        {
+            return BadRequest("File is empty");
+        }
+
+        using var memoryStream = new MemoryStream();
+        await file.CopyToAsync(memoryStream);
+
+        var userPhotoDto = new UserPhotoDto
+        {
+            Id = model.Id,
+            UserId = model.UserId,
+            PhotoData = memoryStream.ToArray(),
+            ContentType = file.ContentType,
+            UploadDate = DateTime.Now
+        };
+
+        var result = await _userPhotoService.UpdateUserPhotoAsync(userPhotoDto);
+
+        if (result.IsSuccess)
+        {
+            return NoContent();
+        }
+
+        return BadRequest(result.Error);
+    }
 }

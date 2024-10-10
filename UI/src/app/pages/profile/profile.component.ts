@@ -116,7 +116,7 @@ export class ProfileComponent implements OnInit {
         file: result,
         userId: this.userModel.id
       };
-      this.userPhotoService.updateUserPhoto(fileUploadRequest).subscribe({
+      this.userPhotoService.updateUserPhoto(fileUploadRequest, this.userModel.userPhoto.id).subscribe({
         next: () => {
           this.loadUserInfo(true);
           console.log('User photo updated');

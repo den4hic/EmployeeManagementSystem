@@ -391,10 +391,10 @@ export class ProjectDashboardComponent implements OnInit {
   }
 
   confirmRemoveEmployee(employee: EmployeeDto) {
-    
+
   }
 
   confirmRemoveManager(manager: ManagerDto) {
-    
+
   }
 }

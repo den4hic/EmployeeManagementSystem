@@ -17,9 +17,17 @@ export class UserPhotoService {
     return this.http.delete(url);
   }
 
-  updateUserPhoto(userPhoto: FileUploadRequestDto) {
+  updateUserPhoto(userPhoto: FileUploadRequestDto, id: number) {
     const url = `${this.apiPath}`;
-    return this.http.put(url, userPhoto);
+    const formData: FormData = new FormData();
+    console.log('Updating photo', userPhoto);
+    formData.append('File', userPhoto.file);
+    formData.append('UserId', userPhoto.userId.toString());
+    formData.append('Id', id.toString());
+    return this.http.put(url, formData, {
+      headers: {
+      }
+    });
   }
 
   createUserPhoto(model: FileUploadRequestDto) {
