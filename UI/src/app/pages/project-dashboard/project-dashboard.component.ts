@@ -23,6 +23,7 @@ import {CreateTaskDialogComponent} from '../../shared/create-task-dialog/create-
 import {CreateProjectDialogComponent} from '../../shared/create-project-dialog/create-project-dialog.component';
 import {ConfirmDialogComponent} from '../../shared/confirm-dialog/confirm-dialog.component';
 import {ShowTaskDialogComponent} from '../../shared/show-task-dialog/show-task-dialog.component';
+import {forkJoin} from "rxjs";
 
 @Component({
   selector: 'app-project-dashboard',
@@ -30,6 +31,12 @@ import {ShowTaskDialogComponent} from '../../shared/show-task-dialog/show-task-d
   styleUrls: ['./project-dashboard.component.css']
 })
 export class ProjectDashboardComponent implements OnInit {
+  showManagerSelect: boolean = false;
+  showEmployeeSelect: boolean = false;
+  selectedManagerToAdd: ManagerDto | null = null;
+  selectedEmployeeToAdd: EmployeeDto | null = null;
+  availableManagers: ManagerDto[] = [];
+  availableEmployees: EmployeeDto[] = [];
   employees: EmployeeDto[] = [];
   managers: ManagerDto[] = [];
   projects: ProjectDto[] = [];
@@ -64,10 +71,20 @@ export class ProjectDashboardComponent implements OnInit {
         this.user = user;
       }
     );
-    this.loadProjects();
     this.loadStatuses();
-    this.loadEmployees();
-    this.loadManagers();
+    forkJoin({
+      employees: this.employeeService.getEmployees(),
+      managers: this.managerService.getManagers(),
+      projects: this.projectService.getProjects()
+    }).subscribe(({ employees, managers, projects }) => {
+      this.employees = employees;
+      this.managers = managers;
+      this.projects = projects;
+
+      if (projects.length > 0) {
+        this.selectProject(projects[0]);
+      }
+    });
   }
 
   loadProjects() {
@@ -101,7 +118,6 @@ export class ProjectDashboardComponent implements OnInit {
   loadManagers() {
     this.managerService.getManagers().subscribe(
       (managers) => {
-        console.log('managers:', managers);
         this.managers = managers;
       }
     );
@@ -444,5 +460,79 @@ export class ProjectDashboardComponent implements OnInit {
         );
       }
     });
+  }
+
+  toggleManagerSelect() {
+    this.showManagerSelect = !this.showManagerSelect;
+    if (this.showManagerSelect) {
+      this.updateAvailableManagers();
+    }
+
+    this.showEmployeeSelect = false;
+  }
+
+  toggleEmployeeSelect() {
+    this.showEmployeeSelect = !this.showEmployeeSelect;
+    if (this.showEmployeeSelect) {
+      this.updateAvailableEmployees();
+    }
+
+    this.showManagerSelect = false;
+  }
+
+  updateAvailableManagers() {
+    if (!this.selectedProject) return;
+    this.availableManagers = this.managers.filter(manager =>
+      !this.selectedProject?.managers.some(projectManager => projectManager.id === manager.id)
+    );
+  }
+
+  updateAvailableEmployees() {
+    if (!this.selectedProject) return;
+    this.availableEmployees = this.employees.filter(employee =>
+      !this.selectedProject?.employees.some(projectEmployee => projectEmployee.id === employee.id)
+    );
+  }
+
+  addManager() {
+    if (!this.selectedProject || !this.selectedManagerToAdd) return;
+    const createProjectDto = this.projectDtoToCreateProjectDto(this.selectedProject);
+    const newProject = {
+      ...createProjectDto,
+      managerIds: [...createProjectDto.managerIds, this.selectedManagerToAdd.id]
+    };
+
+    this.projectService.updateProject(newProject).subscribe(
+      () => {
+        this.snackBar.open('Manager added successfully', 'Close', { duration: 3000 });
+        this.loadProjects();
+        this.showManagerSelect = false;
+        this.selectedManagerToAdd = null;
+      },
+      (error) => {
+        this.showError(error);
+      }
+    );
+  }
+
+  addEmployee() {
+    if (!this.selectedProject || !this.selectedEmployeeToAdd) return;
+    const createProjectDto = this.projectDtoToCreateProjectDto(this.selectedProject);
+    const newProject = {
+      ...createProjectDto,
+      employeeIds: [...createProjectDto.employeeIds, this.selectedEmployeeToAdd.id]
+    };
+
+    this.projectService.updateProject(newProject).subscribe(
+      () => {
+        this.snackBar.open('Employee added successfully', 'Close', { duration: 3000 });
+        this.loadProjects();
+        this.showEmployeeSelect = false;
+        this.selectedEmployeeToAdd = null;
+      },
+      (error) => {
+        this.showError(error);
+      }
+    );
   }
 }

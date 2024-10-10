@@ -4,6 +4,7 @@ using AutoMapper;
 using Domain.Entities;
 using Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Infrastructure.Repositories;
 
@@ -115,6 +116,11 @@ public class ProjectRepository : CRUDRepositoryBase<Project, ProjectDto, Employe
             }
         }
 
+        var removedEmployeeIds = project.ProjectEmployees
+            .Where(pe => !projectDto.EmployeeIds.Contains(pe.EmployeeId))
+            .Select(pe => pe.EmployeeId)
+            .ToList();
+        
         project.ProjectEmployees.Clear();
         foreach (var employeeId in projectDto.EmployeeIds)
         {
@@ -139,7 +145,21 @@ public class ProjectRepository : CRUDRepositoryBase<Project, ProjectDto, Employe
             }
         }
 
+        if (removedEmployeeIds.Any())
+        {
+            var tasksToUpdate = await _context.Tasks
+                    .Where(t => t.ProjectId == project.Id && t.AssignedToEmployeeId.HasValue && removedEmployeeIds.Contains(t.AssignedToEmployeeId.Value))
+                    .ToListAsync();
+
+
+            foreach (var task in tasksToUpdate)
+            {
+                task.AssignedToEmployeeId = null;
+            }
+        }
+
         await _context.SaveChangesAsync();
     }
+
 
 }

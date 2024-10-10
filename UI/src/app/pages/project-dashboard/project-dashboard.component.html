@@ -92,72 +92,84 @@
       <mat-card class="team-card managers-card">
         <mat-card-header>
           <mat-card-title>Project Managers</mat-card-title>
+          <div *ngIf="userRole !== 'Employee'" class="add-member-container">
+            <button mat-icon-button (click)="toggleManagerSelect()" *ngIf="!showManagerSelect">
+              <mat-icon>add</mat-icon>
+            </button>
+            <div *ngIf="showManagerSelect" class="select-container">
+              <mat-form-field>
+                <mat-select [(ngModel)]="selectedManagerToAdd">
+                  <mat-option *ngFor="let manager of availableManagers" [value]="manager">
+                    {{manager.user.firstName}} {{manager.user.lastName}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <button mat-raised-button color="primary" (click)="addManager()" [disabled]="!selectedManagerToAdd">Add</button>
+            </div>
+          </div>
         </mat-card-header>
         <mat-card-content>
-          <mat-accordion>
-            <mat-expansion-panel *ngFor="let manager of this.selectedProjectManagers">
-              <mat-expansion-panel-header>
-                <mat-panel-title>
-                  <img class="user-avatar" [src]="manager.user.userPhoto ? 'data:' + manager.user?.userPhoto?.contentType + ';base64,' + manager.user?.userPhoto?.photoData : 'assets/default-avatar.png'" [alt]="manager.user.firstName">
-                  {{manager.user.firstName}} {{manager.user.lastName}}
-                </mat-panel-title>
-                <mat-panel-description>
-                  {{manager.department}}
-                </mat-panel-description>
-              </mat-expansion-panel-header>
-              <p><strong>Email:</strong> {{manager.user.email}}</p>
-              <p><strong>Phone:</strong> {{manager.user.phoneNumber}}</p>
-              <p><strong>Department:</strong> {{manager.department}}</p>
-              <button *ngIf="userRole !== 'Employee'" [disabled]="manager.userId === user?.id" mat-raised-button color="warn" (click)="confirmRemoveManager(manager)">Remove from Project</button>
-            </mat-expansion-panel>
-          </mat-accordion>
+          <div class="scrollable-content">
+            <mat-accordion>
+              <mat-expansion-panel *ngFor="let manager of this.selectedProjectManagers">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    <img class="user-avatar" [src]="manager.user.userPhoto ? 'data:' + manager.user?.userPhoto?.contentType + ';base64,' + manager.user?.userPhoto?.photoData : 'assets/default-avatar.png'" [alt]="manager.user.firstName">
+                    {{manager.user.firstName}} {{manager.user.lastName}}
+                  </mat-panel-title>
+                  <mat-panel-description>
+                    {{manager.department}}
+                  </mat-panel-description>
+                </mat-expansion-panel-header>
+                <p><strong>Email:</strong> {{manager.user.email}}</p>
+                <p><strong>Phone:</strong> {{manager.user.phoneNumber}}</p>
+                <p><strong>Department:</strong> {{manager.department}}</p>
+                <button *ngIf="userRole !== 'Employee'" [disabled]="manager.userId === user?.id" mat-raised-button color="warn" (click)="confirmRemoveManager(manager)">Remove from Project</button>
+              </mat-expansion-panel>
+            </mat-accordion>
+          </div>
         </mat-card-content>
       </mat-card>
 
       <mat-card class="team-card employees-card">
         <mat-card-header>
           <mat-card-title>Team Members</mat-card-title>
+          <div *ngIf="userRole !== 'Employee'" class="add-member-container">
+            <button mat-icon-button (click)="toggleEmployeeSelect()" *ngIf="!showEmployeeSelect">
+              <mat-icon>add</mat-icon>
+            </button>
+            <div *ngIf="showEmployeeSelect" class="select-container">
+              <mat-form-field>
+                <mat-select [(ngModel)]="selectedEmployeeToAdd">
+                  <mat-option *ngFor="let employee of availableEmployees" [value]="employee">
+                    {{employee.user.firstName}} {{employee.user.lastName}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <button mat-raised-button color="primary" (click)="addEmployee()" [disabled]="!selectedEmployeeToAdd">Add</button>
+            </div>
+          </div>
         </mat-card-header>
         <mat-card-content>
-          <mat-accordion>
-            <mat-expansion-panel *ngFor="let employee of this.selectedProjectEmployees">
-              <mat-expansion-panel-header>
-                <mat-panel-title>
-                  <img class="user-avatar" [src]="employee.user.userPhoto ? 'data:' + employee.user?.userPhoto?.contentType + ';base64,' + employee.user?.userPhoto?.photoData : 'assets/default-avatar.png'" [alt]="employee.user.firstName">
-                  {{employee.user.firstName}} {{employee.user.lastName}}
-                </mat-panel-title>
-                <mat-panel-description>
-                  {{employee.position}}
-                </mat-panel-description>
-              </mat-expansion-panel-header>
-              <p><strong>Email:</strong> {{employee.user.email}}</p>
-              <p><strong>Phone:</strong> {{employee.user.phoneNumber}}</p>
-              <p><strong>Position:</strong> {{employee.position}}</p>
-              <button *ngIf="userRole !== 'Employee'" mat-raised-button color="warn" (click)="confirmRemoveEmployee(employee)">Remove from Project</button>
-            </mat-expansion-panel>
-          </mat-accordion>
-        </mat-card-content>
-      </mat-card>
-    </div>
-  </mat-tab>
-
-  <mat-tab label="Analytics">
-    <div class="analytics-container">
-      <mat-card class="chart-card">
-        <mat-card-header>
-          <mat-card-title>Task Status Distribution</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="chart-placeholder">Task Status Pie Chart</div>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="chart-card">
-        <mat-card-header>
-          <mat-card-title>Task Completion Timeline</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="chart-placeholder">Task Completion Line Chart</div>
+          <div class="scrollable-content">
+            <mat-accordion>
+              <mat-expansion-panel *ngFor="let employee of this.selectedProjectEmployees">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    <img class="user-avatar" [src]="employee.user.userPhoto ? 'data:' + employee.user?.userPhoto?.contentType + ';base64,' + employee.user?.userPhoto?.photoData : 'assets/default-avatar.png'" [alt]="employee.user.firstName">
+                    {{employee.user.firstName}} {{employee.user.lastName}}
+                  </mat-panel-title>
+                  <mat-panel-description>
+                    {{employee.position}}
+                  </mat-panel-description>
+                </mat-expansion-panel-header>
+                <p><strong>Email:</strong> {{employee.user.email}}</p>
+                <p><strong>Phone:</strong> {{employee.user.phoneNumber}}</p>
+                <p><strong>Position:</strong> {{employee.position}}</p>
+                <button *ngIf="userRole !== 'Employee'" mat-raised-button color="warn" (click)="confirmRemoveEmployee(employee)">Remove from Project</button>
+              </mat-expansion-panel>
+            </mat-accordion>
+          </div>
         </mat-card-content>
       </mat-card>
     </div>
