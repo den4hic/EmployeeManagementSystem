@@ -20,7 +20,7 @@
       <mat-select formControlName="assignedToEmployeeId">
         <mat-option [value]="null">No Employee</mat-option>
         <mat-option *ngFor="let employee of employees" [value]="employee.id">
-          {{employee.user.firstName + ' ' + employee.user.lastName}}
+          <div class="select-option-container"><img class="select-option-img" [src]="employee.user.userPhoto ? 'data:' + employee.user?.userPhoto?.contentType + ';base64,' + employee.user?.userPhoto?.photoData : 'assets/default-avatar.png'" [alt]="employee.position">{{ employee.user.firstName + ' ' + employee.user.lastName }}</div>
         </mat-option>
       </mat-select>
     </mat-form-field>

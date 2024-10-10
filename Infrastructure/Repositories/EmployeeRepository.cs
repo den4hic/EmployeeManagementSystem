@@ -15,10 +15,14 @@ namespace Infrastructure.Repositories
 
         public async Task<IEnumerable<EmployeeDto>> GetAllWithUsersAsync()
         {
-            var employees = await _context.Employees.Include(e => e.User).ToListAsync();
+            var employees = await _context.Employees.Include(e => e.User).ThenInclude(u => u.UserPhoto).ToListAsync();
             foreach (var employee in employees)
             {
                 employee.User.Employee = null;
+                if (employee.User.UserPhoto != null)
+                {
+                    employee.User.UserPhoto.User = null;
+                }
             }
             return _mapper.Map<IEnumerable<EmployeeDto>>(employees);
         }

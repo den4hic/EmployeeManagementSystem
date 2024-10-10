@@ -55,7 +55,7 @@
           <mat-form-field appearance="fill" class="full-width">
             <mat-label>Project Employees</mat-label>
             <mat-select formControlName="employeeIds" placeholder="Select project employee" multiple>
-              <mat-option *ngFor="let employee of employees" [value]="employee.id">{{ employee.user.firstName + ' ' + employee.user.lastName }}</mat-option>
+              <mat-option *ngFor="let employee of employees" [value]="employee.id"><div class="select-option-container"><img class="select-option-img" [src]="employee.user.userPhoto ? 'data:' + employee.user?.userPhoto?.contentType + ';base64,' + employee.user?.userPhoto?.photoData : 'assets/default-avatar.png'" [alt]="employee.position">{{ employee.user.firstName + ' ' + employee.user.lastName }}</div></mat-option>
             </mat-select>
 
             <mat-error *ngIf="assignForm.controls['employeeIds'].hasError('required')">
@@ -66,7 +66,7 @@
           <mat-form-field appearance="fill" class="full-width">
             <mat-label>Project Managers</mat-label>
             <mat-select formControlName="managerIds" placeholder="Select project manager" multiple>
-              <mat-option *ngFor="let manager of managers" [value]="manager.id">{{ manager.user.firstName + ' ' + manager.user.lastName }}</mat-option>
+              <mat-option *ngFor="let manager of managers" [value]="manager.id"><div class="select-option-container"><img class="select-option-img" [src]="manager.user.userPhoto ? 'data:' + manager.user?.userPhoto?.contentType + ';base64,' + manager.user?.userPhoto?.photoData : 'assets/default-avatar.png'" [alt]="manager.department">{{ manager.user.firstName + ' ' + manager.user.lastName }}</div></mat-option>
             </mat-select>
 
             <mat-error *ngIf="assignForm.controls['managerIds'].hasError('required')">

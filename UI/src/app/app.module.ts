@@ -60,6 +60,8 @@ import {MatProgressBar} from "@angular/material/progress-bar";
 import { CreateTaskDialogComponent } from './shared/create-task-dialog/create-task-dialog.component';
 import { ShowTaskDialogComponent } from './shared/show-task-dialog/show-task-dialog.component';
 import { PhotoDialogComponent } from './shared/photo-dialog/photo-dialog.component';
+import {MatTab, MatTabGroup} from "@angular/material/tabs";
+import {MatList, MatListItem} from "@angular/material/list";
 
 @NgModule({
   declarations: [
@@ -136,7 +138,11 @@ import { PhotoDialogComponent } from './shared/photo-dialog/photo-dialog.compone
     MatStepperNext,
     CdkDropList,
     CdkDrag,
-    MatProgressBar
+    MatProgressBar,
+    MatTabGroup,
+    MatTab,
+    MatList,
+    MatListItem
   ],
   providers: [
     provideHttpClient(withInterceptors([apiUrlInterceptor, tokenInterceptor]))

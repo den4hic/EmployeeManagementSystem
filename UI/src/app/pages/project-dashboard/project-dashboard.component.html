@@ -1,85 +1,153 @@
-<div class="project-dashboard">
-  <div class="project-table-container">
-    <mat-form-field appearance="fill">
-      <mat-label>Choose Project</mat-label>
-      <mat-select [(value)]="selectedProject" (selectionChange)="selectProject($event.value)">
-        <mat-option *ngFor="let project of projects" [value]="project">
-          {{project.name}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <div *ngIf="userRole !== 'Employee'" class="project-action-container">
-      <div *ngIf="selectedProject !== null">
-        <button mat-raised-button color="accent" (click)="openEditProjectDialog()">Edit project</button>
-      </div>
-      <div>
-        <button mat-raised-button color="primary" (click)="openCreateProjectDialog()">Create project</button>
-      </div>
-      <div *ngIf="selectedProject !== null">
-        <button mat-icon-button color="warn" (click)="confirmDelete(selectedProject.id)">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </div>
+<mat-toolbar class="top-toolbar">
+  <mat-form-field appearance="fill">
+    <mat-label>Select Project</mat-label>
+    <mat-select [(value)]="selectedProject" (selectionChange)="selectProject($event.value)">
+      <mat-option *ngFor="let project of projects" [value]="project">
+        {{project.name}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <span class="toolbar-spacer"></span>
+  <ng-container *ngIf="userRole !== 'Employee'">
+    <div class="toolbar-action-container">
+      <button mat-raised-button color="accent" (click)="openEditProjectDialog()" *ngIf="selectedProject">Edit Project</button>
+      <button mat-raised-button color="primary" (click)="openCreateProjectDialog()">Create Project</button>
+      <button mat-icon-button color="warn" (click)="confirmDelete(selectedProject.id)" *ngIf="selectedProject">
+        <mat-icon>delete</mat-icon>
+      </button>
     </div>
-  </div>
+  </ng-container>
+  <mat-slide-toggle *ngIf="userRole === 'Employee'" [(ngModel)]="showOnlyMyTasks" (change)="onTaskToogleChanged()">
+    My Tasks
+  </mat-slide-toggle>
+</mat-toolbar>
+<mat-tab-group animationDuration="0ms" (selectedTabChange)="onTabChange($event)">
+  <mat-tab label="Dashboard">
+    <div class="dashboard-container">
+      <mat-card class="project-summary">
+        <mat-card-header>
+          <mat-card-title>
+            <h2>{{selectedProject?.name || 'Select a Project'}}</h2>
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>{{selectedProject?.description}}</p>
+          <div class="project-stats">
+            <div class="stat-item">
+              <span class="stat-label">Progress</span>
+              <mat-progress-bar mode="determinate" [value]="getProjectProgress()"></mat-progress-bar>
+              <span class="stat-value">{{getProjectProgress() | number:'1.0-0'}}%</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Tasks</span>
+              <span class="stat-value">{{completedTasks}} / {{totalTasks}}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Start Date</span>
+              <span class="stat-value">{{selectedProject?.startDate | date}}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">End Date</span>
+              <span class="stat-value">{{selectedProject?.endDate | date}}</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
 
-  <mat-card *ngIf="selectedProject" class="project-info">
-    <mat-card-header>
-      <mat-card-title>{{selectedProject.name}}</mat-card-title>
-      <mat-card-subtitle>Project Progress: {{getProjectProgress() | number:'1.0-0'}}%</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      <p class="project-description">{{selectedProject.description}}</p>
-      <div class="project-dates">
-        <p><strong>Start:</strong> {{selectedProject.startDate | date}}</p>
-        <p><strong>End:</strong> {{selectedProject.endDate | date}}</p>
-      </div>
-      <mat-progress-bar mode="determinate" [value]="getProjectProgress()"></mat-progress-bar>
-      <p class="task-completion">Tasks Completed: {{completedTasks}} з {{totalTasks}}</p>
-    </mat-card-content>
-    <mat-card-actions *ngIf="userRole !== 'Employee'">
-      <button mat-raised-button color="primary" (click)="openCreateTaskDialog()">Create new task</button>
-    </mat-card-actions>
-    <mat-card-actions *ngIf="userRole === 'Employee'">
-      <mat-slide-toggle
-          class="my-tasks-slider"
-          [(ngModel)]="showOnlyMyTasks"
-          (change)="onTaskToogleChanged()">
-        <b>My Tasks</b>
-      </mat-slide-toggle>
-    </mat-card-actions>
-  </mat-card>
-
-  <div class="kanban-board">
-    <div class="kanban-column" *ngFor="let status of statuses">
-      <div class="kanban-content">
-        <h3>{{status.name}}</h3>
-        <div
-          cdkDropList
-          [cdkDropListData]="tasks[status.id]"
-          [id]="status.id.toString()"
-          [cdkDropListConnectedTo]="connectedLists"
-          class="task-list"
-          (cdkDropListDropped)="onTaskDrop($event)"
-        >
-          <mat-card class="task-card" *ngFor="let task of tasks[status.id]"
-                    cdkDrag
-                    [cdkDragDisabled]="!canDragTask(task)"
-                    (click)="openEditTaskDialog(task)">
-            <mat-card-header class="task-header">
-              <mat-card-title>{{task.title}}</mat-card-title>
-              <button *ngIf="userRole !== 'Employee'" mat-icon-button color="warn" (click)="confirmDeleteTask(task.id); $event.stopPropagation()">
-                <mat-icon>delete</mat-icon>
-              </button>
-            </mat-card-header>
-            <mat-card-content>
-              <p>{{task.description}}</p>
-              <p *ngIf="task.assignedToEmployee"><strong>Assigned:</strong> {{task.assignedToEmployee.user.firstName + ' ' + task.assignedToEmployee.user.lastName}}</p>
-            </mat-card-content>
-          </mat-card>
+      <div class="kanban-board">
+        <div *ngFor="let status of statuses" class="kanban-column mat-elevation-z4">
+          <h3>{{status.name}}</h3>
+          <div cdkDropList
+               [cdkDropListData]="tasks[status.id]"
+               [id]="status.id.toString()"
+               [cdkDropListConnectedTo]="connectedLists"
+               class="task-list"
+               (cdkDropListDropped)="onTaskDrop($event)">
+            <mat-card *ngFor="let task of tasks[status.id]"
+                      cdkDrag
+                      [cdkDragDisabled]="!canDragTask(task)"
+                      (click)="openEditTaskDialog(task)"
+                      class="task-card mat-elevation-z2">
+              <mat-card-header>
+                <mat-card-title>{{task.title}}</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <p>{{task.description}}</p>
+                <p *ngIf="task.assignedToEmployee"><strong>Assigned:</strong> {{task.assignedToEmployee.user.firstName}} {{task.assignedToEmployee.user.lastName}}</p>
+              </mat-card-content>
+              <mat-card-actions *ngIf="userRole !== 'Employee'">
+                <button mat-icon-button color="warn" (click)="confirmDeleteTask(task.id); $event.stopPropagation()">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </mat-card-actions>
+            </mat-card>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </mat-tab>
+
+  <mat-tab label="Team">
+    <div class="team-container">
+      <mat-card class="team-card managers-card">
+        <mat-card-header>
+          <mat-card-title>Project Managers</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-list>
+            <mat-list-item *ngFor="let manager of selectedProjectManagers">
+              <img class="list-image" matListItemAvatar [src]="manager.user.userPhoto ? 'data:' + manager.user?.userPhoto?.contentType + ';base64,' + manager.user?.userPhoto?.photoData : 'assets/default-avatar.png'" [alt]="manager.department">
+              <span matListItemTitle>{{manager.user.firstName}} {{manager.user.lastName}}</span>
+              <span matListItemLine>{{manager.user.email}}</span>
+            </mat-list-item>
+          </mat-list>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="team-card employees-card">
+        <mat-card-header>
+          <mat-card-title>Team Members</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-list>
+            <mat-list-item *ngFor="let employee of selectedProjectEmployees">
+              <img class="list-image" matListItemAvatar [src]="employee.user.userPhoto ? 'data:' + employee.user?.userPhoto?.contentType + ';base64,' + employee.user?.userPhoto?.photoData : 'assets/default-avatar.png'" [alt]="employee.position">
+              <span matListItemTitle>{{employee.user.firstName}} {{employee.user.lastName}}</span>
+              <span matListItemLine>{{employee.user.email}}</span>
+            </mat-list-item>
+          </mat-list>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </mat-tab>
+
+  <mat-tab label="Analytics">
+    <div class="analytics-container">
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Task Status Distribution</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <!-- Placeholder for a pie chart -->
+          <div class="chart-placeholder">Task Status Pie Chart</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Task Completion Timeline</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <!-- Placeholder for a line chart -->
+          <div class="chart-placeholder">Task Completion Line Chart</div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </mat-tab>
+</mat-tab-group>
+
+<div class="fab-container" *ngIf="userRole !== 'Employee'">
+  <button mat-fab color="primary" (click)="openCreateTaskDialog()" aria-label="Create new task">
+    <mat-icon>add</mat-icon>
+  </button>
 </div>

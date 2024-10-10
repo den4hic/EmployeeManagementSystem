@@ -1,30 +1,33 @@
-import {Component, Input, OnInit} from '@angular/core';
-import { ProjectService } from '../../services/project.service';
-import { TaskService } from '../../services/task.service';
-import { StatusService } from '../../services/status.service';
-import { ProjectDto } from '../../services/dtos/project.dto';
-import { TaskDto } from '../../services/dtos/task.dto';
-import { StatusDto } from '../../services/dtos/status.dto';
-import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import {EmployeeDto} from "../../services/dtos/employee.dto";
-import {CreateTaskDialogComponent} from "../../shared/create-task-dialog/create-task-dialog.component";
-import {MatDialog} from "@angular/material/dialog";
-import {CreateProjectDialogComponent} from "../../shared/create-project-dialog/create-project-dialog.component";
-import {MatSnackBar} from "@angular/material/snack-bar";
-import {EmployeeService} from "../../services/employee.service";
-import {CreateProjectDto} from "../../services/dtos/create-project.dto";
-import {ManagerService} from "../../services/manager.service";
-import {ManagerDto} from "../../services/dtos/manager.dto";
-import {ConfirmDialogComponent} from "../../shared/confirm-dialog/confirm-dialog.component";
-import {UserService} from "../../services/user.service";
-import {JwtService} from "../../services/jwt.service";
-import {UserDto} from "../../services/dtos/user.dto";
-import {ShowTaskDialogComponent} from "../../shared/show-task-dialog/show-task-dialog.component";
+import {Component, OnInit} from '@angular/core';
+import {MatDialog} from '@angular/material/dialog';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatTabChangeEvent} from '@angular/material/tabs';
+import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
+
+import {ProjectService} from '../../services/project.service';
+import {TaskService} from '../../services/task.service';
+import {StatusService} from '../../services/status.service';
+import {EmployeeService} from '../../services/employee.service';
+import {ManagerService} from '../../services/manager.service';
+import {UserService} from '../../services/user.service';
+import {JwtService} from '../../services/jwt.service';
+
+import {ProjectDto} from '../../services/dtos/project.dto';
+import {TaskDto} from '../../services/dtos/task.dto';
+import {StatusDto} from '../../services/dtos/status.dto';
+import {EmployeeDto} from '../../services/dtos/employee.dto';
+import {ManagerDto} from '../../services/dtos/manager.dto';
+import {UserDto} from '../../services/dtos/user.dto';
+
+import {CreateTaskDialogComponent} from '../../shared/create-task-dialog/create-task-dialog.component';
+import {CreateProjectDialogComponent} from '../../shared/create-project-dialog/create-project-dialog.component';
+import {ConfirmDialogComponent} from '../../shared/confirm-dialog/confirm-dialog.component';
+import {ShowTaskDialogComponent} from '../../shared/show-task-dialog/show-task-dialog.component';
 
 @Component({
   selector: 'app-project-dashboard',
   templateUrl: './project-dashboard.component.html',
-  styleUrls: ['./project-dashboard.component.css'],
+  styleUrls: ['./project-dashboard.component.css']
 })
 export class ProjectDashboardComponent implements OnInit {
   employees: EmployeeDto[] = [];
@@ -39,6 +42,8 @@ export class ProjectDashboardComponent implements OnInit {
   userRole: string | null = null;
   user: UserDto | null = null;
   showOnlyMyTasks: boolean = false;
+  selectedProjectManagers: ManagerDto[] = [];
+  selectedProjectEmployees: EmployeeDto[] = [];
 
   constructor(
     private projectService: ProjectService,
@@ -65,14 +70,6 @@ export class ProjectDashboardComponent implements OnInit {
     this.loadManagers();
   }
 
-  private loadManagers() {
-    this.managerService.getManagers().subscribe(
-      (managers) => {
-        this.managers = managers;
-      }
-    )
-  }
-
   loadProjects() {
     this.projectService.getProjects().subscribe(
       (projects) => {
@@ -93,7 +90,7 @@ export class ProjectDashboardComponent implements OnInit {
     );
   }
 
-  private loadEmployees() {
+  loadEmployees() {
     this.employeeService.getEmployees().subscribe(
       (employees) => {
         this.employees = employees;
@@ -101,20 +98,41 @@ export class ProjectDashboardComponent implements OnInit {
     );
   }
 
+  loadManagers() {
+    this.managerService.getManagers().subscribe(
+      (managers) => {
+        console.log('managers:', managers);
+        this.managers = managers;
+      }
+    );
+  }
+
   selectProject(project: ProjectDto) {
     this.selectedProject = project;
     this.loadTasks(project.id);
+    console.log('selectedProject:', project);
+    this.selectedProjectEmployees = this.employees.filter(employee =>
+      project.employees.some(projectEmployee => projectEmployee.id === employee.id)
+    );
+
+    this.selectedProjectManagers = this.managers.filter(manager =>
+      project.managers.some(projectManager => projectManager.id === manager.id)
+    );
+
+    console.log(this.selectedProjectEmployees);
   }
 
   loadTasks(projectId: number, employeeId?: number) {
     this.taskService.getTasksByProjectId(projectId).subscribe(
       (tasks) => {
-        console.log('Tasks:', tasks);
         this.tasks = {};
         this.totalTasks = tasks.length;
         this.completedTasks = tasks.filter(task => task.statusId === this.getCompletedStatusId()).length;
         this.statuses.forEach(status => {
-          this.tasks[status.id] = tasks.filter(task => task.statusId === status.id && (!employeeId || task.assignedToEmployeeId === employeeId));
+          this.tasks[status.id] = tasks.filter(task =>
+            task.statusId === status.id &&
+            (!employeeId || task.assignedToEmployeeId === employeeId)
+          );
         });
       }
     );
@@ -175,7 +193,9 @@ export class ProjectDashboardComponent implements OnInit {
       return;
     }
 
-    const projectEmployees = this.employees.filter(employee => this.selectedProject?.employees.some(projectEmployee => projectEmployee.id === employee.id));
+    const projectEmployees = this.employees.filter(employee =>
+      this.selectedProject?.employees.some(projectEmployee => projectEmployee.id === employee.id)
+    );
     const dialogRef = this.dialog.open(CreateTaskDialogComponent, {
       width: '400px',
       data: { selectedTask: null, projectId: this.selectedProject.id, employees: projectEmployees }
@@ -193,24 +213,6 @@ export class ProjectDashboardComponent implements OnInit {
         );
       }
     });
-  }
-
-  projectDtoToCreateProjectDto(project: ProjectDto): CreateProjectDto {
-    let result: CreateProjectDto;
-
-    result = {
-      id: project.id,
-      name: project.name,
-      description: project.description,
-      startDate: project.startDate,
-      endDate: project.endDate,
-      statusId: project.statusId,
-      managerIds: project.managers.map(manager => manager.id),
-      employeeIds: project.employees.map(employee => employee.id),
-      taskIds: project.tasks.map(task => task.id)
-    };
-
-    return result;
   }
 
   openCreateProjectDialog() {
@@ -233,16 +235,6 @@ export class ProjectDashboardComponent implements OnInit {
       }
     });
   }
-  showError(error: any) {
-    let errorMessage = 'An unknown error occurred';
-    if (error.error && error.error.errors) {
-      const firstErrorKey = Object.keys(error.error.errors)[0];
-      if (firstErrorKey) {
-        errorMessage = error.error.errors[firstErrorKey][0];
-      }
-    }
-    this.snackBar.open(errorMessage, 'Close', { duration: 3000 });
-  }
 
   openEditProjectDialog() {
     if (!this.selectedProject) {
@@ -260,7 +252,7 @@ export class ProjectDashboardComponent implements OnInit {
         result.taskIds = this.selectedProject?.tasks.map(task => task.id) || [];
         this.projectService.updateProject(result).subscribe(
           () => {
-            this.snackBar.open('Project update successfully', 'Close', { duration: 3000 });
+            this.snackBar.open('Project updated successfully', 'Close', { duration: 3000 });
             this.loadProjects();
           },
           error => {
@@ -330,7 +322,9 @@ export class ProjectDashboardComponent implements OnInit {
       });
       return;
     }
-    const projectEmployees = this.employees.filter(employee => this.selectedProject?.employees.some(projectEmployee => projectEmployee.id === employee.id));
+    const projectEmployees = this.employees.filter(employee =>
+      this.selectedProject?.employees.some(projectEmployee => projectEmployee.id === employee.id)
+    );
     const dialogRef = this.dialog.open(CreateTaskDialogComponent, {
       width: '400px',
       data: { selectedTask: task, projectId: this.selectedProject.id, employees: projectEmployees }
@@ -351,7 +345,7 @@ export class ProjectDashboardComponent implements OnInit {
     });
   }
 
-  canDragTask(task: TaskDto) {
+  canDragTask(task: TaskDto): boolean {
     return this.userRole === 'Manager' || this.userRole === 'Admin' || this.user?.employee?.id === task.assignedToEmployeeId;
   }
 
@@ -366,5 +360,33 @@ export class ProjectDashboardComponent implements OnInit {
     } else {
       this.loadTasks(this.selectedProject.id);
     }
+  }
+
+  onTabChange(event: MatTabChangeEvent) {
+  }
+
+  private projectDtoToCreateProjectDto(project: ProjectDto): any {
+    return {
+      id: project.id,
+      name: project.name,
+      description: project.description,
+      startDate: project.startDate,
+      endDate: project.endDate,
+      statusId: project.statusId,
+      managerIds: project.managers.map(manager => manager.id),
+      employeeIds: project.employees.map(employee => employee.id),
+      taskIds: project.tasks.map(task => task.id)
+    };
+  }
+
+  private showError(error: any) {
+    let errorMessage = 'An unknown error occurred';
+    if (error.error && error.error.errors) {
+      const firstErrorKey = Object.keys(error.error.errors)[0];
+      if (firstErrorKey) {
+        errorMessage = error.error.errors[firstErrorKey][0];
+      }
+    }
+    this.snackBar.open(errorMessage, 'Close', { duration: 3000 });
   }
 }

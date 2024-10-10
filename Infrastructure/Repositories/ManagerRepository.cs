@@ -15,10 +15,14 @@ public class ManagerRepository : CRUDRepositoryBase<Manager, ManagerDto, Employe
 
     public async Task<IEnumerable<ManagerDto>> GetAllWithUsersAsync()
     {
-        var managers = await _context.Managers.Include(e => e.User).ToListAsync();
+        var managers = await _context.Managers.Include(e => e.User).ThenInclude(u => u.UserPhoto).ToListAsync();
         foreach (var manager in managers)
         {
             manager.User.Manager = null;
+            if (manager.User.UserPhoto != null)
+            {
+                manager.User.UserPhoto.User = null;
+            }
         }
         return _mapper.Map<IEnumerable<ManagerDto>>(managers);
     }
