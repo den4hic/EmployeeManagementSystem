@@ -95,7 +95,7 @@
         </mat-card-header>
         <mat-card-content>
           <mat-accordion>
-            <mat-expansion-panel *ngFor="let manager of selectedProjectManagers">
+            <mat-expansion-panel *ngFor="let manager of this.selectedProjectManagers">
               <mat-expansion-panel-header>
                 <mat-panel-title>
                   <img class="user-avatar" [src]="manager.user.userPhoto ? 'data:' + manager.user?.userPhoto?.contentType + ';base64,' + manager.user?.userPhoto?.photoData : 'assets/default-avatar.png'" [alt]="manager.user.firstName">
@@ -108,7 +108,7 @@
               <p><strong>Email:</strong> {{manager.user.email}}</p>
               <p><strong>Phone:</strong> {{manager.user.phoneNumber}}</p>
               <p><strong>Department:</strong> {{manager.department}}</p>
-              <button *ngIf="userRole !== 'Employee'" mat-raised-button color="warn" (click)="confirmRemoveManager(manager)">Remove from Project</button>
+              <button *ngIf="userRole !== 'Employee'" [disabled]="manager.userId === user?.id" mat-raised-button color="warn" (click)="confirmRemoveManager(manager)">Remove from Project</button>
             </mat-expansion-panel>
           </mat-accordion>
         </mat-card-content>
@@ -120,7 +120,7 @@
         </mat-card-header>
         <mat-card-content>
           <mat-accordion>
-            <mat-expansion-panel *ngFor="let employee of selectedProjectEmployees">
+            <mat-expansion-panel *ngFor="let employee of this.selectedProjectEmployees">
               <mat-expansion-panel-header>
                 <mat-panel-title>
                   <img class="user-avatar" [src]="employee.user.userPhoto ? 'data:' + employee.user?.userPhoto?.contentType + ';base64,' + employee.user?.userPhoto?.photoData : 'assets/default-avatar.png'" [alt]="employee.user.firstName">

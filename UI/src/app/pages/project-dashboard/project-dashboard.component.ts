@@ -110,7 +110,6 @@ export class ProjectDashboardComponent implements OnInit {
   selectProject(project: ProjectDto) {
     this.selectedProject = project;
     this.loadTasks(project.id);
-    console.log('selectedProject:', project);
     this.selectedProjectEmployees = this.employees.filter(employee =>
       project.employees.some(projectEmployee => projectEmployee.id === employee.id)
     );
@@ -118,8 +117,6 @@ export class ProjectDashboardComponent implements OnInit {
     this.selectedProjectManagers = this.managers.filter(manager =>
       project.managers.some(projectManager => projectManager.id === manager.id)
     );
-
-    console.log(this.selectedProjectEmployees);
   }
 
   loadTasks(projectId: number, employeeId?: number) {
@@ -391,10 +388,61 @@ export class ProjectDashboardComponent implements OnInit {
   }
 
   confirmRemoveEmployee(employee: EmployeeDto) {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '300px'
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        if (!this.selectedProject) {
+          return;
+        }
+        const createProjectDto = this.projectDtoToCreateProjectDto(this.selectedProject);
+        const newProjectEmployeeIds = createProjectDto.employeeIds.filter((id: number) => id !== employee.id);
+        const newProject = {
+          ...createProjectDto,
+          employeeIds: newProjectEmployeeIds
+        };
 
+        this.projectService.updateProject(newProject).subscribe(
+          () => {
+            this.snackBar.open('Employee removed successfully', 'Close', { duration: 3000 });
+            this.loadProjects();
+          },
+          (error) => {
+            this.showError(error);
+          }
+        );
+      }
+    });
   }
 
   confirmRemoveManager(manager: ManagerDto) {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '300px'
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        if (!this.selectedProject) {
+          return;
+        }
+        const createProjectDto = this.projectDtoToCreateProjectDto(this.selectedProject);
+        const newProjectManagerIds = createProjectDto.managerIds.filter((id: number) => id !== manager.id);
 
+        const newProject = {
+          ...createProjectDto,
+          managerIds: newProjectManagerIds
+        };
+
+        this.projectService.updateProject(newProject).subscribe(
+          () => {
+            this.snackBar.open('Manager removed successfully', 'Close', { duration: 3000 });
+            this.loadProjects();
+          },
+          (error) => {
+            this.showError(error);
+          }
+        );
+      }
+    });
   }
 }
