@@ -58,11 +58,23 @@ public class UserRepository : CRUDRepositoryBase<User, UserDto, EmployeeManageme
 
     public async Task<IEnumerable<UserDto>> GetUsersWithDetailsAsync()
     {
-        var users = await _context.Users.Include(u => u.AspNetUser).Include(u => u.Employee).Include(u => u.Manager).ToListAsync();
+        var users = await _context.Users.Include(u => u.AspNetUser).Include(u => u.Employee).Include(u => u.Manager).Include(u => u.UserPhoto).ToListAsync();
 
         var userDtos = new List<UserDto>();
 
         foreach (var user in users) {
+            if (user.Employee != null)
+            {
+                user.Employee.User = null;
+            }
+            if (user.Manager != null)
+            {
+                user.Manager.User = null;
+            }
+            if (user.UserPhoto != null)
+            {
+                user.UserPhoto.User = null;
+            }
             var userDto = _mapper.Map<UserDto>(user);
             userDtos.Add(userDto);
         }
@@ -72,7 +84,7 @@ public class UserRepository : CRUDRepositoryBase<User, UserDto, EmployeeManageme
 
     public async Task<(IEnumerable<UserDto>, int)> GetUsersWithDetailsFilteredAsync(int page, int pageSize, string sortField, string sortDirection, string filter, string role)
     {
-        var query = _context.Users.Include(u => u.AspNetUser).Include(u => u.Employee).Include(u => u.Manager).AsQueryable();
+        var query = _context.Users.Include(u => u.AspNetUser).Include(u => u.Employee).Include(u => u.Manager).Include(u => u.UserPhoto).AsQueryable();
 
         var totalItems = await query.CountAsync();
 
@@ -117,6 +129,10 @@ public class UserRepository : CRUDRepositoryBase<User, UserDto, EmployeeManageme
             if (user.Manager != null)
             {
                 user.Manager.User = null;
+            }
+            if (user.UserPhoto != null)
+            {
+                user.UserPhoto.User = null;
             }
             var userDto = _mapper.Map<UserDto>(user);
             userDtos.Add(userDto);
