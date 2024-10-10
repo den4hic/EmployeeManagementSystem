@@ -93,6 +93,8 @@ export class UserService {
   }
 
   updateUserInfo(updatedUser: UserDto) {
+    updatedUser.employee = null;
+    updatedUser.manager = null;
     return this.http.put<void>(`${this.apiPath}`, updatedUser);
   }
 }

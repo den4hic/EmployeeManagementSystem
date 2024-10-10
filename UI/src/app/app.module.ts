@@ -62,6 +62,7 @@ import { ShowTaskDialogComponent } from './shared/show-task-dialog/show-task-dia
 import { PhotoDialogComponent } from './shared/photo-dialog/photo-dialog.component';
 import {MatTab, MatTabGroup} from "@angular/material/tabs";
 import {MatList, MatListItem} from "@angular/material/list";
+import { EditUserDialogComponent } from './shared/edit-user-dialog/edit-user-dialog.component';
 
 @NgModule({
   declarations: [
@@ -82,7 +83,8 @@ import {MatList, MatListItem} from "@angular/material/list";
     ProjectDashboardComponent,
     CreateTaskDialogComponent,
     ShowTaskDialogComponent,
-    PhotoDialogComponent
+    PhotoDialogComponent,
+    EditUserDialogComponent
   ],
   imports: [
     BrowserModule,

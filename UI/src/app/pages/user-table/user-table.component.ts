@@ -12,6 +12,7 @@ import { merge } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import {RoleService} from "../../services/role.service";
 import {MatSlideToggleChange} from "@angular/material/slide-toggle";
+import {EditUserDialogComponent} from "../../shared/edit-user-dialog/edit-user-dialog.component";
 
 @Component({
   selector: 'app-user-table',
@@ -182,6 +183,19 @@ export class UserTableComponent implements OnInit, AfterViewInit {
       error: (error) => {
         console.error('Error blocking user', error);
         this.showSnackBar('Error blocking user');
+      }
+    });
+  }
+
+  openEditDialog(user: UserDto) {
+    const dialogRef = this.dialog.open(EditUserDialogComponent, {
+      width: '400px',
+      data: { user: user }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadUsersPage();
       }
     });
   }
