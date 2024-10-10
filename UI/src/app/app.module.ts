@@ -63,6 +63,12 @@ import { PhotoDialogComponent } from './shared/photo-dialog/photo-dialog.compone
 import {MatTab, MatTabGroup} from "@angular/material/tabs";
 import {MatList, MatListItem} from "@angular/material/list";
 import { EditUserDialogComponent } from './shared/edit-user-dialog/edit-user-dialog.component';
+import {
+  MatAccordion,
+  MatExpansionPanel, MatExpansionPanelDescription,
+  MatExpansionPanelHeader,
+  MatExpansionPanelTitle
+} from "@angular/material/expansion";
 
 @NgModule({
   declarations: [
@@ -144,7 +150,12 @@ import { EditUserDialogComponent } from './shared/edit-user-dialog/edit-user-dia
     MatTabGroup,
     MatTab,
     MatList,
-    MatListItem
+    MatListItem,
+    MatAccordion,
+    MatExpansionPanel,
+    MatExpansionPanelHeader,
+    MatExpansionPanelTitle,
+    MatExpansionPanelDescription
   ],
   providers: [
     provideHttpClient(withInterceptors([apiUrlInterceptor, tokenInterceptor]))

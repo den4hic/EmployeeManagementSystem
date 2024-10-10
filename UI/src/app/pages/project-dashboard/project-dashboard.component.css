@@ -1,3 +1,34 @@
+.team-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.team-card {
+  height: 100%;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+mat-expansion-panel {
+  margin-bottom: 10px;
+}
+
+mat-panel-title {
+  display: flex;
+  align-items: center;
+}
+
+mat-panel-description {
+  justify-content: flex-end;
+}
+
 .toolbar-action-container {
   display: flex;
   align-items: center;

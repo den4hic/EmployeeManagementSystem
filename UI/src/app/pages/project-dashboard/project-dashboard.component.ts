@@ -389,4 +389,12 @@ export class ProjectDashboardComponent implements OnInit {
     }
     this.snackBar.open(errorMessage, 'Close', { duration: 3000 });
   }
+
+  confirmRemoveEmployee(employee: EmployeeDto) {
+    
+  }
+
+  confirmRemoveManager(manager: ManagerDto) {
+    
+  }
 }

@@ -94,13 +94,23 @@
           <mat-card-title>Project Managers</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-          <mat-list>
-            <mat-list-item *ngFor="let manager of selectedProjectManagers">
-              <img class="list-image" matListItemAvatar [src]="manager.user.userPhoto ? 'data:' + manager.user?.userPhoto?.contentType + ';base64,' + manager.user?.userPhoto?.photoData : 'assets/default-avatar.png'" [alt]="manager.department">
-              <span matListItemTitle>{{manager.user.firstName}} {{manager.user.lastName}}</span>
-              <span matListItemLine>{{manager.user.email}}</span>
-            </mat-list-item>
-          </mat-list>
+          <mat-accordion>
+            <mat-expansion-panel *ngFor="let manager of selectedProjectManagers">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <img class="user-avatar" [src]="manager.user.userPhoto ? 'data:' + manager.user?.userPhoto?.contentType + ';base64,' + manager.user?.userPhoto?.photoData : 'assets/default-avatar.png'" [alt]="manager.user.firstName">
+                  {{manager.user.firstName}} {{manager.user.lastName}}
+                </mat-panel-title>
+                <mat-panel-description>
+                  {{manager.department}}
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+              <p><strong>Email:</strong> {{manager.user.email}}</p>
+              <p><strong>Phone:</strong> {{manager.user.phoneNumber}}</p>
+              <p><strong>Department:</strong> {{manager.department}}</p>
+              <button *ngIf="userRole !== 'Employee'" mat-raised-button color="warn" (click)="confirmRemoveManager(manager)">Remove from Project</button>
+            </mat-expansion-panel>
+          </mat-accordion>
         </mat-card-content>
       </mat-card>
 
@@ -109,13 +119,23 @@
           <mat-card-title>Team Members</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-          <mat-list>
-            <mat-list-item *ngFor="let employee of selectedProjectEmployees">
-              <img class="list-image" matListItemAvatar [src]="employee.user.userPhoto ? 'data:' + employee.user?.userPhoto?.contentType + ';base64,' + employee.user?.userPhoto?.photoData : 'assets/default-avatar.png'" [alt]="employee.position">
-              <span matListItemTitle>{{employee.user.firstName}} {{employee.user.lastName}}</span>
-              <span matListItemLine>{{employee.user.email}}</span>
-            </mat-list-item>
-          </mat-list>
+          <mat-accordion>
+            <mat-expansion-panel *ngFor="let employee of selectedProjectEmployees">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <img class="user-avatar" [src]="employee.user.userPhoto ? 'data:' + employee.user?.userPhoto?.contentType + ';base64,' + employee.user?.userPhoto?.photoData : 'assets/default-avatar.png'" [alt]="employee.user.firstName">
+                  {{employee.user.firstName}} {{employee.user.lastName}}
+                </mat-panel-title>
+                <mat-panel-description>
+                  {{employee.position}}
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+              <p><strong>Email:</strong> {{employee.user.email}}</p>
+              <p><strong>Phone:</strong> {{employee.user.phoneNumber}}</p>
+              <p><strong>Position:</strong> {{employee.position}}</p>
+              <button *ngIf="userRole !== 'Employee'" mat-raised-button color="warn" (click)="confirmRemoveEmployee(employee)">Remove from Project</button>
+            </mat-expansion-panel>
+          </mat-accordion>
         </mat-card-content>
       </mat-card>
     </div>
@@ -128,7 +148,6 @@
           <mat-card-title>Task Status Distribution</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-          <!-- Placeholder for a pie chart -->
           <div class="chart-placeholder">Task Status Pie Chart</div>
         </mat-card-content>
       </mat-card>
@@ -138,7 +157,6 @@
           <mat-card-title>Task Completion Timeline</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-          <!-- Placeholder for a line chart -->
           <div class="chart-placeholder">Task Completion Line Chart</div>
         </mat-card-content>
       </mat-card>
