@@ -19,7 +19,7 @@ import {MatSlideToggleChange} from "@angular/material/slide-toggle";
   styleUrls: ['./user-table.component.scss']
 })
 export class UserTableComponent implements OnInit, AfterViewInit {
-  displayedColumns: string[] = ['select', 'id', 'firstName', 'lastName', 'email', 'phoneNumber', 'hireDate', 'role', 'isBlocked', 'actions'];
+  displayedColumns: string[] = ['select','userPhoto', 'id', 'firstName', 'lastName', 'email', 'phoneNumber', 'hireDate', 'role', 'isBlocked', 'actions'];
   dataSource = new MatTableDataSource<UserDto>();
   selectedUserIds: number[] = [];
   totalItems = 0;
@@ -77,6 +77,7 @@ export class UserTableComponent implements OnInit, AfterViewInit {
     ).subscribe(
       (response) => {
         this.dataSource.data = response.items;
+        console.log(response.items);
         this.totalItems = response.totalItems;
       },
       (error) => {

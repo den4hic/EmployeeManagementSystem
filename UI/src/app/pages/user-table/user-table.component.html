@@ -31,6 +31,13 @@
         </td>
       </ng-container>
 
+      <ng-container matColumnDef="userPhoto">
+        <th mat-header-cell *matHeaderCellDef>User Photo</th>
+        <td mat-cell *matCellDef="let user">
+          <img class="user-table-image" [src]="user.userPhoto ? 'data:' + user.userPhoto?.contentType + ';base64,' + user.userPhoto?.photoData : 'assets/default-avatar.png'" [alt]="user.firstName">
+        </td>
+      </ng-container>
+
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
         <td mat-cell *matCellDef="let user">{{ user.id }}</td>
