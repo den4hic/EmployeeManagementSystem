@@ -279,6 +279,7 @@ public class AccountService : IAccountService
     {
         return new List<Claim>
     {
+        new Claim(ClaimTypes.Name, user.UserName),
         new Claim("userData", user.UserName),
         new Claim("username", user.UserName),
         new Claim("role", role),

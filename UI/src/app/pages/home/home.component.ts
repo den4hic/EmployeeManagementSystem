@@ -10,7 +10,6 @@ import { Router } from '@angular/router';
 })
 export class HomeComponent implements OnInit {
   userRole: string | null = null;
-
   constructor(
     private authService: AuthService,
     private jwtService: JwtService,

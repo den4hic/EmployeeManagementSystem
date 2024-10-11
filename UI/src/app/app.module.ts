@@ -69,6 +69,7 @@ import {
   MatExpansionPanelHeader,
   MatExpansionPanelTitle
 } from "@angular/material/expansion";
+import { OnlineUsersComponent } from './shared/online-users/online-users.component';
 
 @NgModule({
   declarations: [
@@ -90,7 +91,8 @@ import {
     CreateTaskDialogComponent,
     ShowTaskDialogComponent,
     PhotoDialogComponent,
-    EditUserDialogComponent
+    EditUserDialogComponent,
+    OnlineUsersComponent
   ],
   imports: [
     BrowserModule,
