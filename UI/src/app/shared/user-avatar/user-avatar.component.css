@@ -1,0 +1,20 @@
+.avatar-container {
+  position: relative;
+  display: inline-block;
+}
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.online-badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  background-color: #44b700;
+  border-radius: 50%;
+  border: 2px solid white;
+}

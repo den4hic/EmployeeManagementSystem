@@ -1,34 +1,59 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
-using System.Collections.Concurrent;
+using System.Security.Claims;
 
 namespace WebAPI.Hubs;
 
 [Authorize]
 public class OnlineUsersHub : Hub
 {
-    private static ConcurrentDictionary<string, string> OnlineUsers = new ConcurrentDictionary<string, string>();
+    private static readonly Dictionary<string, string> OnlineUsers = new Dictionary<string, string>();
 
     public override async Task OnConnectedAsync()
     {
-        string userName = Context.User?.Identity?.Name ?? "Unknown";
-        string userId = Context.UserIdentifier ?? Context.ConnectionId;
-        OnlineUsers.TryAdd(userName, Context.ConnectionId);
-        await Clients.All.SendAsync("UserConnected", userName);
+        string userId = GetUserId(Context.User);
+        string connectionId = Context.ConnectionId;
+
+        lock (OnlineUsers)
+        {
+            if (!OnlineUsers.ContainsKey(connectionId))
+            {
+                OnlineUsers.Add(connectionId, userId);
+            }
+        }
+
+        await UpdateUserList();
         await base.OnConnectedAsync();
     }
 
     public override async Task OnDisconnectedAsync(Exception exception)
     {
-        string userName = Context.User?.Identity?.Name ?? "Unknown";
-        string userId = Context.UserIdentifier ?? Context.ConnectionId;
-        OnlineUsers.TryRemove(userName, out _);
-        await Clients.All.SendAsync("UserDisconnected", userName);
+        string connectionId = Context.ConnectionId;
+
+        lock (OnlineUsers)
+        {
+            if (OnlineUsers.ContainsKey(connectionId))
+            {
+                OnlineUsers.Remove(connectionId);
+            }
+        }
+
+        await UpdateUserList();
         await base.OnDisconnectedAsync(exception);
     }
 
-    public async Task GetOnlineUsers()
+    private async Task UpdateUserList()
     {
-        await Clients.Caller.SendAsync("OnlineUsers", OnlineUsers.Keys);
+        List<string> users;
+        lock (OnlineUsers)
+        {
+            users = OnlineUsers.Values.Distinct().ToList();
+        }
+        await Clients.All.SendAsync("UpdateUserList", users);
+    }
+
+    private string GetUserId(ClaimsPrincipal user)
+    {
+        return user.Claims.FirstOrDefault(c => c.Type == "id")?.Value ?? "0";
     }
 }

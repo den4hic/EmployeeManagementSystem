@@ -34,7 +34,11 @@
       <ng-container matColumnDef="userPhoto">
         <th mat-header-cell *matHeaderCellDef>User Photo</th>
         <td mat-cell *matCellDef="let user">
-          <img class="user-table-image" [src]="user.userPhoto ? 'data:' + user.userPhoto?.contentType + ';base64,' + user.userPhoto?.photoData : 'assets/default-avatar.png'" [alt]="user.firstName">
+          <app-user-avatar
+            [imageSrc]="user.userPhoto ? 'data:' + user.userPhoto?.contentType + ';base64,' + user.userPhoto?.photoData : 'assets/default-avatar.png'"
+            [altText]="user.firstName"
+            [userId]="user.id.toString()"
+          ></app-user-avatar>
         </td>
       </ng-container>
 

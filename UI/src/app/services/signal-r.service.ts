@@ -1,61 +1,71 @@
-import { Injectable } from '@angular/core';
-import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
-import { BehaviorSubject, Observable } from 'rxjs';
-import {JwtService} from "./jwt.service";
+import { HubConnection, HubConnectionBuilder, HubConnectionState } from '@microsoft/signalr';
+import {Injectable} from "@angular/core";
+import {BehaviorSubject, Observable} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
 })
 export class SignalRService {
   private hubConnection: HubConnection;
-  private onlineUsers = new BehaviorSubject<string[]>([]);
+  public onlineUsers = new BehaviorSubject<string[]>([]);
 
-  constructor(private jwtService: JwtService) {
+
+  constructor() {
     this.hubConnection = new HubConnectionBuilder()
       .withUrl('https://localhost:7110/onlineUsersHub', {
         accessTokenFactory: () => {
-          const token = this.jwtService.getToken();
+          const token = localStorage.getItem('accessToken');
           if (!token) {
             throw new Error('No token found');
           }
           return token;
         }
       })
+      .withAutomaticReconnect()
       .build();
-
-    this.hubConnection.on('UserConnected', (userId: string) => {
-      console.log(`User connected: ${userId}`);
-      this.updateOnlineUsers(userId, true);
-    });
-
-    this.hubConnection.on('UserDisconnected', (userId: string) => {
-      console.log(`User disconnected: ${userId}`);
-      this.updateOnlineUsers(userId, false);
-    });
-
-    this.hubConnection.on('OnlineUsers', (users: string[]) => {
-      console.log('Online users:', users);
-      this.onlineUsers.next(users);
-    });
-
+    this.createConnection();
     this.startConnection();
   }
 
-  private startConnection(): void {
-    this.hubConnection.start()
-      .then(() => {
-        console.log('Connected to SignalR Hub');
-        this.hubConnection.invoke('GetOnlineUsers');
-      })
-      .catch(err => console.error('Error while starting connection: ' + err));
+  private createConnection() {
+    this.hubConnection.on('UpdateUserList', (users: string[]) => {
+      this.onlineUsers.next(users);
+      console.log('Online users:', users);
+    });
+
+    this.hubConnection.onreconnecting((error) => {
+      console.log('Attempting to reconnect:', error);
+    });
+
+    this.hubConnection.onreconnected((connectionId) => {
+      console.log('Reconnected with ID:', connectionId);
+    });
+
+    this.hubConnection.onclose((error) => {
+      console.log('Connection closed:', error);
+      this.startConnection();
+    });
   }
 
-  private updateOnlineUsers(userId: string, isOnline: boolean): void {
-    const currentUsers = this.onlineUsers.value;
-    if (isOnline && !currentUsers.includes(userId)) {
-      this.onlineUsers.next([...currentUsers, userId]);
-    } else if (!isOnline) {
-      this.onlineUsers.next(currentUsers.filter(id => id !== userId));
+  private startConnection() {
+    if (this.hubConnection.state === HubConnectionState.Disconnected) {
+      this.hubConnection.start()
+        .then(() => console.log('Connection started'))
+        .catch(err => {
+          console.log('Error while starting connection: ' + err);
+          setTimeout(() => this.startConnection(), 5000);
+        });
+    }
+  }
+
+  public async disconnect() {
+    if (this.hubConnection.state === HubConnectionState.Connected) {
+      try {
+        await this.hubConnection.stop();
+        console.log('Disconnected');
+      } catch (err) {
+        console.log('Error while disconnecting: ' + err);
+      }
     }
   }
 

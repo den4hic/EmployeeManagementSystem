@@ -154,7 +154,7 @@ public class AccountService : IAccountService
                 return Result<TokenDto>.Failure("User has no role");
             }
 
-            var claims = CreateClaims(user, role, userDto.IsBlocked);
+            var claims = CreateClaims(userDto.Id, user, role, userDto.IsBlocked);
             var accessToken = _jwtTokenService.CreateJwtToken(claims);
             var refreshToken = await UpdateUserRefreshTokenAsync(user, populateExp);
 
@@ -275,11 +275,12 @@ public class AccountService : IAccountService
         }
     }
 
-    private IEnumerable<Claim> CreateClaims(IdentityUser user, string role, bool isBlocked)
+    private IEnumerable<Claim> CreateClaims(int id, IdentityUser user, string role, bool isBlocked)
     {
         return new List<Claim>
     {
         new Claim(ClaimTypes.Name, user.UserName),
+        new Claim("id", id.ToString()),
         new Claim("userData", user.UserName),
         new Claim("username", user.UserName),
         new Claim("role", role),

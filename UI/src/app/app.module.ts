@@ -70,6 +70,7 @@ import {
   MatExpansionPanelTitle
 } from "@angular/material/expansion";
 import { OnlineUsersComponent } from './shared/online-users/online-users.component';
+import { UserAvatarComponent } from './shared/user-avatar/user-avatar.component';
 
 @NgModule({
   declarations: [
@@ -92,7 +93,8 @@ import { OnlineUsersComponent } from './shared/online-users/online-users.compone
     ShowTaskDialogComponent,
     PhotoDialogComponent,
     EditUserDialogComponent,
-    OnlineUsersComponent
+    OnlineUsersComponent,
+    UserAvatarComponent
   ],
   imports: [
     BrowserModule,

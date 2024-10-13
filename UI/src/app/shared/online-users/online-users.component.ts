@@ -22,11 +22,17 @@ export class OnlineUsersComponent implements OnInit, OnDestroy {
     this.subscription = this.signalRService.getOnlineUsers().subscribe(
       users => this.onlineUsers = users
     );
+    window.addEventListener('beforeunload', this.handleUnload.bind(this));
   }
 
   ngOnDestroy() {
+    window.removeEventListener('beforeunload', this.handleUnload.bind(this));
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
+  }
+
+  private handleUnload() {
+    this.signalRService.disconnect();
   }
 }

@@ -61,7 +61,11 @@ builder.Services.AddRepositories();
 builder.Services.AddServices();
 builder.Services.AddValidators();
 builder.Services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(hubOptions =>
+{
+    hubOptions.ClientTimeoutInterval = TimeSpan.FromSeconds(15);
+    hubOptions.KeepAliveInterval = TimeSpan.FromSeconds(10);
+});
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddControllers();
