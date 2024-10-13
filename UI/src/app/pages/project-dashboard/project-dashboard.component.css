@@ -48,6 +48,7 @@ mat-expansion-panel {
 mat-panel-title {
   display: flex;
   align-items: center;
+  gap: 5px;
 }
 
 mat-panel-description {

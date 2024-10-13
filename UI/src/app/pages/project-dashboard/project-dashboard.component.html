@@ -114,7 +114,11 @@
               <mat-expansion-panel *ngFor="let manager of this.selectedProjectManagers">
                 <mat-expansion-panel-header>
                   <mat-panel-title>
-                    <img class="user-avatar" [src]="manager.user.userPhoto ? 'data:' + manager.user?.userPhoto?.contentType + ';base64,' + manager.user?.userPhoto?.photoData : 'assets/default-avatar.png'" [alt]="manager.user.firstName">
+                    <app-user-avatar
+                      [imageSrc]="manager.user.userPhoto ? 'data:' + manager.user?.userPhoto?.contentType + ';base64,' + manager.user?.userPhoto?.photoData : 'assets/default-avatar.png'"
+                      [altText]="manager.user.firstName"
+                      [userId]="manager.userId.toString()"
+                    ></app-user-avatar>
                     {{manager.user.firstName}} {{manager.user.lastName}}
                   </mat-panel-title>
                   <mat-panel-description>
@@ -156,7 +160,11 @@
               <mat-expansion-panel *ngFor="let employee of this.selectedProjectEmployees">
                 <mat-expansion-panel-header>
                   <mat-panel-title>
-                    <img class="user-avatar" [src]="employee.user.userPhoto ? 'data:' + employee.user?.userPhoto?.contentType + ';base64,' + employee.user?.userPhoto?.photoData : 'assets/default-avatar.png'" [alt]="employee.user.firstName">
+                    <app-user-avatar
+                      [imageSrc]="employee.user.userPhoto ? 'data:' + employee.user?.userPhoto?.contentType + ';base64,' + employee.user?.userPhoto?.photoData : 'assets/default-avatar.png'"
+                      [altText]="employee.user.firstName"
+                      [userId]="employee.userId.toString()"
+                    ></app-user-avatar>
                     {{employee.user.firstName}} {{employee.user.lastName}}
                   </mat-panel-title>
                   <mat-panel-description>
