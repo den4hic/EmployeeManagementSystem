@@ -24,6 +24,8 @@ import {CreateProjectDialogComponent} from '../../shared/create-project-dialog/c
 import {ConfirmDialogComponent} from '../../shared/confirm-dialog/confirm-dialog.component';
 import {ShowTaskDialogComponent} from '../../shared/show-task-dialog/show-task-dialog.component';
 import {forkJoin} from "rxjs";
+import {SignalRService} from "../../services/signal-r.service";
+import {NotificationType} from "../../services/enums/notification-type";
 
 @Component({
   selector: 'app-project-dashboard',
@@ -58,6 +60,7 @@ export class ProjectDashboardComponent implements OnInit {
     private taskService: TaskService,
     private statusService: StatusService,
     private managerService: ManagerService,
+    private signalRService: SignalRService,
     private userService: UserService,
     private jwtService: JwtService,
     private dialog: MatDialog,
@@ -218,6 +221,7 @@ export class ProjectDashboardComponent implements OnInit {
       if (result) {
         this.taskService.createTask(result).subscribe(
           (newTask) => {
+            this.signalRService.sendTaskUpdate(projectEmployees.find(employee => employee.id === newTask.assignedToEmployeeId)?.userId || 0, NotificationType.AssignedToTask);
             this.loadTasks(this.selectedProject?.id || 0);
           },
           (error) => {
@@ -300,21 +304,23 @@ export class ProjectDashboardComponent implements OnInit {
     });
   }
 
-  confirmDeleteTask(taskId: number) {
+  confirmDeleteTask(taskId: number, employeeId: number) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '300px'
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.deleteTask(taskId);
+        const userId = this.employees.find(employee => employee.id === employeeId)?.userId || 0;
+        this.deleteTask(taskId, userId);
       }
     });
   }
 
-  private deleteTask(taskId: number) {
+  private deleteTask(taskId: number, userId: number) {
     this.taskService.deleteTask(taskId).subscribe({
       next: () => {
         this.loadTasks(this.selectedProject?.id || 0);
+        this.signalRService.sendTaskUpdate(userId, NotificationType.TaskDeleted);
         this.snackBar.open('Task deleted successfully', 'Close', {duration: 3000});
       },
       error: (error) => {
@@ -346,6 +352,9 @@ export class ProjectDashboardComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         result.id = task.id;
+        if (result.assignedToEmployeeId !== task.assignedToEmployeeId) {
+          this.signalRService.sendTaskUpdate(projectEmployees.find(employee => employee.id === result.assignedToEmployeeId)?.userId || 0, NotificationType.AssignedToTask);
+        }
         this.taskService.updateTask(result).subscribe(
           () => {
             this.loadTasks(this.selectedProject?.id || 0);

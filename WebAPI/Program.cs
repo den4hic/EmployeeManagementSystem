@@ -101,7 +101,7 @@ app.MapControllers();
 
 app.UseEndpoints(endpoints =>
 {
-    endpoints.MapHub<OnlineUsersHub>("/onlineUsersHub");
+    endpoints.MapHub<NotificationHub>("/notificationHub");
 });
 
 app.Run();

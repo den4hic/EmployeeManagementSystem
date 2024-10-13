@@ -1,7 +1,10 @@
 ﻿using Application.Abstractions;
 using Application.DTOs;
+using Domain.Enum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using WebAPI.Hubs;
 
 namespace WebAPI.Controllers;
 

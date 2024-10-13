@@ -71,6 +71,7 @@ import {
 } from "@angular/material/expansion";
 import { OnlineUsersComponent } from './shared/online-users/online-users.component';
 import { UserAvatarComponent } from './shared/user-avatar/user-avatar.component';
+import { NotificationComponent } from './shared/notification/notification.component';
 
 @NgModule({
   declarations: [
@@ -94,7 +95,8 @@ import { UserAvatarComponent } from './shared/user-avatar/user-avatar.component'
     PhotoDialogComponent,
     EditUserDialogComponent,
     OnlineUsersComponent,
-    UserAvatarComponent
+    UserAvatarComponent,
+    NotificationComponent
   ],
   imports: [
     BrowserModule,

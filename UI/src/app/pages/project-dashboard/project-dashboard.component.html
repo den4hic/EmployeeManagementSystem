@@ -76,7 +76,7 @@
                 <p *ngIf="task.assignedToEmployee"><strong>Assigned:</strong> {{task.assignedToEmployee.user.firstName}} {{task.assignedToEmployee.user.lastName}}</p>
               </mat-card-content>
               <mat-card-actions *ngIf="userRole !== 'Employee'">
-                <button mat-icon-button color="warn" (click)="confirmDeleteTask(task.id); $event.stopPropagation()">
+                <button mat-icon-button color="warn" (click)="confirmDeleteTask(task.id, task.assignedToEmployeeId); $event.stopPropagation()">
                   <mat-icon>delete</mat-icon>
                 </button>
               </mat-card-actions>

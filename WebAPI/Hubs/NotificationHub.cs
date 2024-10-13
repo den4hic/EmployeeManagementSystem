@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Domain.Enum;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
 
 namespace WebAPI.Hubs;
 
 [Authorize]
-public class OnlineUsersHub : Hub
+public class NotificationHub : Hub
 {
     private static readonly Dictionary<string, string> OnlineUsers = new Dictionary<string, string>();
 
@@ -40,6 +41,12 @@ public class OnlineUsersHub : Hub
 
         await UpdateUserList();
         await base.OnDisconnectedAsync(exception);
+    }
+
+    public async Task SendNotification(string userId, NotificationType notificationType)
+    {
+        var connectionIds = OnlineUsers.Where(kvp => kvp.Value == userId).Select(kvp => kvp.Key).ToList();
+        await Clients.Clients(connectionIds).SendAsync("ReceiveNotification", notificationType);
     }
 
     private async Task UpdateUserList()

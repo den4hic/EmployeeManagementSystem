@@ -1,6 +1,8 @@
 import { HubConnection, HubConnectionBuilder, HubConnectionState } from '@microsoft/signalr';
 import {Injectable} from "@angular/core";
-import {BehaviorSubject, Observable} from "rxjs";
+import {BehaviorSubject, Observable, Subject} from "rxjs";
+import {NotificationType} from "./enums/notification-type";
+import {TaskDto} from "./dtos/task.dto";
 
 @Injectable({
   providedIn: 'root'
@@ -8,11 +10,11 @@ import {BehaviorSubject, Observable} from "rxjs";
 export class SignalRService {
   private hubConnection: HubConnection;
   public onlineUsers = new BehaviorSubject<string[]>([]);
-
+  public notifications = new Subject<NotificationType>();
 
   constructor() {
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl('https://localhost:7110/onlineUsersHub', {
+      .withUrl('https://localhost:7110/notificationHub', {
         accessTokenFactory: () => {
           const token = localStorage.getItem('accessToken');
           if (!token) {
@@ -31,6 +33,11 @@ export class SignalRService {
     this.hubConnection.on('UpdateUserList', (users: string[]) => {
       this.onlineUsers.next(users);
       console.log('Online users:', users);
+    });
+
+    this.hubConnection.on('ReceiveNotification', (message: NotificationType) => {
+      this.notifications.next(message);
+      console.log('Received notification:', message.toString());
     });
 
     this.hubConnection.onreconnecting((error) => {
@@ -71,5 +78,10 @@ export class SignalRService {
 
   public getOnlineUsers(): Observable<string[]> {
     return this.onlineUsers.asObservable();
+  }
+
+  sendTaskUpdate(userId: number, notificationType: NotificationType) {
+    this.hubConnection.invoke('SendNotification', userId.toString(), notificationType)
+      .catch(err => console.error(err));
   }
 }
