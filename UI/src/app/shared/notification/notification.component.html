@@ -1,1 +1,12 @@
-<p>notification works!</p>
+<div class="notification-container" [@notificationAnimation]="notifications.length">
+  <div *ngFor="let notification of notifications" class="notification" [ngClass]="notification.class">
+    <div class="notification-icon">
+      <i [class]="notification.icon"></i>
+    </div>
+    <div class="notification-content">
+      <h3>{{ notification.title }}</h3>
+      <p>{{ notification.message }}</p>
+    </div>
+    <button class="notification-close" (click)="removeNotification(notification)">×</button>
+  </div>
+</div>
