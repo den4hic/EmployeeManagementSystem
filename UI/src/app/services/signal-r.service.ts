@@ -3,6 +3,7 @@ import {Injectable} from "@angular/core";
 import {BehaviorSubject, Observable, Subject} from "rxjs";
 import {NotificationType} from "./enums/notification-type";
 import {TaskDto} from "./dtos/task.dto";
+import {NotificationModel} from "./dtos/notification";
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ import {TaskDto} from "./dtos/task.dto";
 export class SignalRService {
   private hubConnection: HubConnection;
   public onlineUsers = new BehaviorSubject<string[]>([]);
-  public notifications = new Subject<NotificationType>();
+  public notifications = new Subject<NotificationModel>();
 
   constructor() {
     this.hubConnection = new HubConnectionBuilder()
@@ -35,9 +36,10 @@ export class SignalRService {
       console.log('Online users:', users);
     });
 
-    this.hubConnection.on('ReceiveNotification', (message: NotificationType) => {
-      this.notifications.next(message);
-      console.log('Received notification:', message.toString());
+    this.hubConnection.on('ReceiveNotification', (message: NotificationType, task: TaskDto) => {
+      const notification : NotificationModel = { NotificationType: message, Task: task };
+      this.notifications.next(notification);
+      console.log('Received notification:', task);
     });
 
     this.hubConnection.onreconnecting((error) => {
@@ -80,8 +82,8 @@ export class SignalRService {
     return this.onlineUsers.asObservable();
   }
 
-  sendTaskUpdate(userId: number, notificationType: NotificationType) {
-    this.hubConnection.invoke('SendNotification', userId.toString(), notificationType)
+  sendTaskUpdate(userId: number, notificationType: NotificationType, taskDto: TaskDto) {
+    this.hubConnection.invoke('SendNotification', userId.toString(), notificationType, taskDto)
       .catch(err => console.error(err));
   }
 }

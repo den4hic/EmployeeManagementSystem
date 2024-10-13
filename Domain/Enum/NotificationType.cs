@@ -6,6 +6,6 @@ public enum NotificationType
     TaskStatusChanged,
     TaskDeleted,
     TaskCreated,
-    TaskUpdated,
+    UnassignedFromTask,
     TaskDueDateChanged
 }

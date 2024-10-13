@@ -1,4 +1,5 @@
-﻿using Domain.Enum;
+﻿using Application.DTOs;
+using Domain.Enum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
@@ -43,10 +44,10 @@ public class NotificationHub : Hub
         await base.OnDisconnectedAsync(exception);
     }
 
-    public async Task SendNotification(string userId, NotificationType notificationType)
+    public async Task SendNotification(string userId, NotificationType notificationType, TaskDto task)
     {
         var connectionIds = OnlineUsers.Where(kvp => kvp.Value == userId).Select(kvp => kvp.Key).ToList();
-        await Clients.Clients(connectionIds).SendAsync("ReceiveNotification", notificationType);
+        await Clients.Clients(connectionIds).SendAsync("ReceiveNotification", notificationType, task);
     }
 
     private async Task UpdateUserList()

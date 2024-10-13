@@ -3,6 +3,7 @@ import { Subscription } from 'rxjs';
 import { trigger, transition, style, animate } from '@angular/animations';
 import {SignalRService} from "../../services/signal-r.service";
 import {NotificationType} from "../../services/enums/notification-type";
+import {NotificationModel} from "../../services/dtos/notification";
 
 @Component({
   selector: 'app-notification',
@@ -28,8 +29,8 @@ export class NotificationComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.notificationSubscription = this.signalRService.notifications.subscribe(
-      (notificationType: NotificationType) => {
-        this.addNotification(notificationType);
+      (notificationModel: NotificationModel) => {
+        this.addNotification(notificationModel);
       }
     );
   }
@@ -40,46 +41,46 @@ export class NotificationComponent implements OnInit, OnDestroy {
     }
   }
 
-  private addNotification(notificationType: NotificationType) {
-    const notification = this.createNotification(notificationType);
+  private addNotification(notificationModel: NotificationModel) {
+    const notification = this.createNotification(notificationModel);
     this.notifications.unshift(notification);
     setTimeout(() => this.removeNotification(notification), 5000);
   }
 
-  private createNotification(notificationType: NotificationType) {
+  private createNotification(notificationModel: NotificationModel) {
     let title = '';
     let message = '';
     let icon = '';
     let notificationClass = '';
 
-    switch (notificationType) {
+    switch (notificationModel.NotificationType) {
       case NotificationType.AssignedToTask:
         title = 'New Task Assignment';
-        message = 'You have been assigned to a new task.';
+        message = `You have been assigned to a ${notificationModel.Task.title} task.`;
         icon = 'fas fa-tasks';
         notificationClass = 'notification-info';
         break;
       case NotificationType.TaskStatusChanged:
         title = 'Task Status Updated';
-        message = 'A task status has been updated.';
+        message = `A ${notificationModel.Task.title} task status has been updated.`;
         icon = 'fas fa-sync';
         notificationClass = 'notification-warning';
         break;
       case NotificationType.TaskDeleted:
         title = 'Task Deleted';
-        message = 'A task has been deleted.';
+        message = `A ${notificationModel.Task.title} task has been deleted.`;
         icon = 'fas fa-trash-alt';
         notificationClass = 'notification-danger';
         break;
       case NotificationType.TaskCreated:
         title = 'New Task Created';
-        message = 'A new task has been created.';
+        message = `A new ${notificationModel.Task.title} task has been created.`;
         icon = 'fas fa-plus-circle';
         notificationClass = 'notification-success';
         break;
-      case NotificationType.TaskUpdated:
-        title = 'Task Updated';
-        message = 'A task has been updated.';
+      case NotificationType.UnassignedFromTask:
+        title = 'Unassigned From Task';
+        message = `You have been unassigned from a ${notificationModel.Task.title} task.`;
         icon = 'fas fa-edit';
         notificationClass = 'notification-info';
         break;

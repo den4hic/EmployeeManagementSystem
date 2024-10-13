@@ -53,6 +53,7 @@ export class ProjectDashboardComponent implements OnInit {
   showOnlyMyTasks: boolean = false;
   selectedProjectManagers: ManagerDto[] = [];
   selectedProjectEmployees: EmployeeDto[] = [];
+  private allTasks: TaskDto[] = [];
 
   constructor(
     private projectService: ProjectService,
@@ -143,6 +144,7 @@ export class ProjectDashboardComponent implements OnInit {
       (tasks) => {
         this.tasks = {};
         this.totalTasks = tasks.length;
+        this.allTasks = tasks;
         this.completedTasks = tasks.filter(task => task.statusId === this.getCompletedStatusId()).length;
         this.statuses.forEach(status => {
           this.tasks[status.id] = tasks.filter(task =>
@@ -221,7 +223,7 @@ export class ProjectDashboardComponent implements OnInit {
       if (result) {
         this.taskService.createTask(result).subscribe(
           (newTask) => {
-            this.signalRService.sendTaskUpdate(projectEmployees.find(employee => employee.id === newTask.assignedToEmployeeId)?.userId || 0, NotificationType.AssignedToTask);
+            this.signalRService.sendTaskUpdate(projectEmployees.find(employee => employee.id === newTask.assignedToEmployeeId)?.userId || 0, NotificationType.AssignedToTask, newTask);
             this.loadTasks(this.selectedProject?.id || 0);
           },
           (error) => {
@@ -319,8 +321,10 @@ export class ProjectDashboardComponent implements OnInit {
   private deleteTask(taskId: number, userId: number) {
     this.taskService.deleteTask(taskId).subscribe({
       next: () => {
+        const task = this.allTasks.find(task => task.id === taskId);
+        if (!task) return;
+        this.signalRService.sendTaskUpdate(userId, NotificationType.TaskDeleted, task);
         this.loadTasks(this.selectedProject?.id || 0);
-        this.signalRService.sendTaskUpdate(userId, NotificationType.TaskDeleted);
         this.snackBar.open('Task deleted successfully', 'Close', {duration: 3000});
       },
       error: (error) => {
@@ -353,7 +357,8 @@ export class ProjectDashboardComponent implements OnInit {
       if (result) {
         result.id = task.id;
         if (result.assignedToEmployeeId !== task.assignedToEmployeeId) {
-          this.signalRService.sendTaskUpdate(projectEmployees.find(employee => employee.id === result.assignedToEmployeeId)?.userId || 0, NotificationType.AssignedToTask);
+          this.signalRService.sendTaskUpdate(projectEmployees.find(employee => employee.id === result.assignedToEmployeeId)?.userId || 0, NotificationType.AssignedToTask, result);
+          this.signalRService.sendTaskUpdate(projectEmployees.find(employee => employee.id === task.assignedToEmployeeId)?.userId || 0, NotificationType.UnassignedFromTask, result);
         }
         this.taskService.updateTask(result).subscribe(
           () => {
