@@ -4,6 +4,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
 import {SignalRService} from "../../services/signal-r.service";
 import {NotificationType} from "../../services/enums/notification-type";
 import {NotificationModel} from "../../services/dtos/notification";
+import {TaskStatus} from "../../services/enums/task-status";
 
 @Component({
   selector: 'app-notification',

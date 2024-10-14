@@ -168,6 +168,12 @@ export class ProjectDashboardComponent implements OnInit {
       );
 
       const task = event.container.data[event.currentIndex];
+      if (this.userRole !== 'Employee' && task.assignedToEmployeeId) {
+        const employee = this.employees.find(employee => employee.id === task.assignedToEmployeeId);
+        if (employee) {
+          this.signalRService.sendTaskUpdate(employee.userId, NotificationType.TaskStatusChanged, task);
+        }
+      }
       const newStatusId = parseInt(event.container.id);
       const previousStatusId = parseInt(event.previousContainer.id);
 
