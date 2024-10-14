@@ -93,8 +93,8 @@ export class SignalRService {
       .catch(err => console.error(err));
   }
 
-  sendProjectNotification(project: ProjectDto, message: string, notificationType: NotificationType) {
-    this.hubConnection.invoke('SendProjectNotification', project, message, notificationType)
+  sendProjectNotification(project: ProjectDto, notificationType: NotificationType) {
+    this.hubConnection.invoke('SendProjectNotification', project, notificationType)
       .catch(err => console.error(err));
   }
 }

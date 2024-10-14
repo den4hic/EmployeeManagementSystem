@@ -8,7 +8,7 @@ public class NotificationDto : BaseDto<int>
 {
     public int GroupId { get; set; }
 
-    public string Message { get; set; } = null!;
+    public string? Message { get; set; }
 
     public DateTime CreatedAt { get; set; }
 

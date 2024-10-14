@@ -1,5 +1,4 @@
 ﻿using Application.DTOs;
-using Application.Services;
 using Domain.Entities;
 using Domain.Enum;
 using Infrastructure.Context;
@@ -104,7 +103,8 @@ public class NotificationHub : Hub
         foreach (var user in usersToAdd)
         {
             group.UserNotificationGroups.Add(new UserNotificationGroups { User = user });
-            if (OnlineUsers.ContainsValue(user.Id.ToString())){
+            if (OnlineUsers.ContainsValue(user.Id.ToString()))
+            {
                 var connectionKvp = OnlineUsers.FirstOrDefault(kvp => kvp.Value == user.Id.ToString());
                 if (connectionKvp.Key != null)
                 {
@@ -144,7 +144,7 @@ public class NotificationHub : Hub
         await Clients.Caller.SendAsync("ReceiveGroupNotifications", notifications);
     }
 
-    public async Task SendProjectNotification(ProjectDto project, string message, NotificationType type)
+    public async Task SendProjectNotification(ProjectDto project, NotificationType type)
     {
         var groupName = $"Project_{project.Id}";
         var group = await _context.NotificationGroups
@@ -156,7 +156,6 @@ public class NotificationHub : Hub
         var notification = new Notification
         {
             GroupId = group.Id,
-            Message = message,
             CreatedAt = DateTime.UtcNow,
             Type = type
         };
@@ -168,7 +167,6 @@ public class NotificationHub : Hub
         {
             Id = notification.Id,
             GroupId = notification.GroupId,
-            Message = notification.Message,
             CreatedAt = notification.CreatedAt,
             Type = notification.Type
         };

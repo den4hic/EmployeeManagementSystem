@@ -252,7 +252,7 @@ export class ProjectDashboardComponent implements OnInit {
         this.projectService.createProject(result).subscribe(
           (project) => {
             this.signalRService.createProjectGroup(project.id);
-            this.signalRService.sendProjectNotification(project, "message", NotificationType.NewProject);
+            this.signalRService.sendProjectNotification(project, NotificationType.NewProject);
             this.snackBar.open('Project created successfully', 'Close', { duration: 3000 });
             this.loadProjects();
           },
