@@ -16,6 +16,10 @@ public partial class EmployeeManagementSystemDbContext : IdentityContext
 
     public virtual DbSet<Manager> Managers { get; set; }
 
+    public virtual DbSet<Notification> Notifications { get; set; }
+
+    public virtual DbSet<NotificationGroup> NotificationGroups { get; set; }
+
     public virtual DbSet<Project> Projects { get; set; }
 
     public virtual DbSet<Status> Statuses { get; set; }
@@ -57,6 +61,23 @@ public partial class EmployeeManagementSystemDbContext : IdentityContext
                 .HasForeignKey<Manager>(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Manager_User");
+        });
+
+        builder.Entity<Notification>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Notifica__3214EC07B9217727");
+
+            entity.HasOne(d => d.Group).WithMany(p => p.Notifications)
+                .HasForeignKey(d => d.GroupId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Notifications_NotificationGroups");
+        });
+
+        builder.Entity<NotificationGroup>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Notifica__3214EC07AFAAABF1");
+
+            entity.Property(e => e.Name).HasMaxLength(200);
         });
 
         builder.Entity<Project>(entity =>
@@ -158,6 +179,23 @@ public partial class EmployeeManagementSystemDbContext : IdentityContext
                   .WithMany(m => m.ProjectEmployees)
                   .HasForeignKey(pm => pm.EmployeeId)
                   .OnDelete(DeleteBehavior.ClientSetNull);
+        });
+
+        builder.Entity<UserNotificationGroups>(entity =>
+        {
+            entity.HasKey(e => new { e.UserId, e.GroupId });
+
+            entity.ToTable("UserNotificationGroups");
+
+            entity.HasOne(d => d.Group)
+                .WithMany(p => p.UserNotificationGroups)
+                .HasForeignKey(d => d.GroupId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(d => d.User)
+                .WithMany(p => p.UserNotificationGroups)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         builder.Entity<UserPhoto>(entity =>

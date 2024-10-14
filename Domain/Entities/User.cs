@@ -29,4 +29,6 @@ public partial class User : IEntity<int>
     public virtual Manager? Manager { get; set; }
 
     public virtual UserPhoto? UserPhoto { get; set; }
+
+    public virtual ICollection<UserNotificationGroups> UserNotificationGroups { get; set; } = new List<UserNotificationGroups>();
 }
