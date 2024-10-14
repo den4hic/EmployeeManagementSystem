@@ -56,6 +56,13 @@ public class UserRepository : CRUDRepositoryBase<User, UserDto, EmployeeManageme
         return user != null ? _mapper.Map<UserDto>(user) : null;
     }
 
+    public async Task<UserDto> GetUserByIdWithGroups(int id)
+    {
+        var user = await _context.Users.Include(u => u.UserNotificationGroups).ThenInclude(un => un.Group).FirstOrDefaultAsync(u => u.Id == id);
+
+        return user != null ? _mapper.Map<UserDto>(user) : null;
+    }
+
     public async Task<IEnumerable<UserDto>> GetUsersWithDetailsAsync()
     {
         var users = await _context.Users.Include(u => u.AspNetUser).Include(u => u.Employee).Include(u => u.Manager).Include(u => u.UserPhoto).ToListAsync();

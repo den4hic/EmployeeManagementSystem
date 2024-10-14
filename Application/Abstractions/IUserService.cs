@@ -14,4 +14,5 @@ public interface IUserService
     Task<Result<IEnumerable<UserDto>>> GetUsersWithDetailsAsync();
     Task<Result<(IEnumerable<UserDto>, int)>> GetUsersWithDetailsFilteredAsync(int page, int pageSize, string sortField, string sortDirection, string filter, string role);
     Task<Result<(int, int, int)>> GetUsersStatisticsAsync();
+    Task<Result<UserDto>> GetUserByIdWithGroups(int id);
 }

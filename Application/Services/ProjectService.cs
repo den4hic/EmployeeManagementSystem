@@ -18,6 +18,7 @@ public class ProjectService : IProjectService
         try
         {
             var project = await _projectRepository.CreateCustomAsync(projectDto);
+
             return Result<ProjectDto>.Success(project);
         }
         catch (Exception ex)
@@ -71,5 +72,13 @@ public class ProjectService : IProjectService
         {
             return Result<bool>.Failure(ex.Message);
         }
+    }
+
+    public async Task<Result<ProjectDto>> GetProjectByIdWithDetailsAsync(int id)
+    {
+        var project = await _projectRepository.GetProjectByIdWithDetailsAsync(id);
+        return project != null
+            ? Result<ProjectDto>.Success(project)
+            : Result<ProjectDto>.Failure($"Project with id {id} not found");
     }
 }

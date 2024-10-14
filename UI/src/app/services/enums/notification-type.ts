@@ -4,5 +4,6 @@ export enum NotificationType {
   TaskDeleted,
   TaskCreated,
   UnassignedFromTask,
-  TaskDueDateChanged
+  TaskDueDateChanged,
+  NewProject
 }

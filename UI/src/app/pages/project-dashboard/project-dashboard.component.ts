@@ -26,6 +26,7 @@ import {ShowTaskDialogComponent} from '../../shared/show-task-dialog/show-task-d
 import {forkJoin} from "rxjs";
 import {SignalRService} from "../../services/signal-r.service";
 import {NotificationType} from "../../services/enums/notification-type";
+import {CreateProjectDto} from "../../services/dtos/create-project.dto";
 
 @Component({
   selector: 'app-project-dashboard',
@@ -246,10 +247,12 @@ export class ProjectDashboardComponent implements OnInit {
       data: { selectedProject: null, managerId: 1, employees: this.employees, managers: this.managers }
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.projectService.createProject(result).subscribe(
-          () => {
+          (project) => {
+            this.signalRService.createProjectGroup(project.id);
+            this.signalRService.sendProjectNotification(project, "message", NotificationType.NewProject);
             this.snackBar.open('Project created successfully', 'Close', { duration: 3000 });
             this.loadProjects();
           },

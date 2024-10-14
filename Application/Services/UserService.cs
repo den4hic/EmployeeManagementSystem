@@ -154,4 +154,13 @@ public class UserService : IUserService
             return Result<(int, int, int)>.Failure($"Failed to retrieve user statistics: {ex.Message}");
         }
     }
+
+    public async Task<Result<UserDto>> GetUserByIdWithGroups(int id)
+    {
+        var userDto = await _userRepository.GetUserByIdWithGroups(id);
+
+        return userDto != null
+            ? Result<UserDto>.Success(userDto)
+            : Result<UserDto>.Failure("User was not found");
+    }
 }

@@ -53,35 +53,36 @@ export class NotificationComponent implements OnInit, OnDestroy {
     let message = '';
     let icon = '';
     let notificationClass = '';
+    const notificationTitle = notificationModel.NotificationTitle;
 
     switch (notificationModel.NotificationType) {
       case NotificationType.AssignedToTask:
         title = 'New Task Assignment';
-        message = `You have been assigned to a ${notificationModel.Task.title} task.`;
+        message = `You have been assigned to a ${notificationTitle} task.`;
         icon = 'fas fa-tasks';
         notificationClass = 'notification-info';
         break;
       case NotificationType.TaskStatusChanged:
         title = 'Task Status Updated';
-        message = `A ${notificationModel.Task.title} task status has been updated.`;
+        message = `A ${notificationTitle} task status has been updated.`;
         icon = 'fas fa-sync';
         notificationClass = 'notification-warning';
         break;
       case NotificationType.TaskDeleted:
         title = 'Task Deleted';
-        message = `A ${notificationModel.Task.title} task has been deleted.`;
+        message = `A ${notificationTitle} task has been deleted.`;
         icon = 'fas fa-trash-alt';
         notificationClass = 'notification-danger';
         break;
       case NotificationType.TaskCreated:
         title = 'New Task Created';
-        message = `A new ${notificationModel.Task.title} task has been created.`;
+        message = `A new ${notificationTitle} task has been created.`;
         icon = 'fas fa-plus-circle';
         notificationClass = 'notification-success';
         break;
       case NotificationType.UnassignedFromTask:
         title = 'Unassigned From Task';
-        message = `You have been unassigned from a ${notificationModel.Task.title} task.`;
+        message = `You have been unassigned from a ${notificationTitle} task.`;
         icon = 'fas fa-edit';
         notificationClass = 'notification-info';
         break;
@@ -90,6 +91,12 @@ export class NotificationComponent implements OnInit, OnDestroy {
         message = 'A task due date has been changed.';
         icon = 'fas fa-calendar-alt';
         notificationClass = 'notification-warning';
+        break;
+      case NotificationType.NewProject:
+        title = 'New Project Created';
+        message = `A new ${notificationTitle} project has been created.`;
+        icon = 'fas fa-project-diagram';
+        notificationClass = 'notification-success';
         break;
       default:
         title = 'New Notification';

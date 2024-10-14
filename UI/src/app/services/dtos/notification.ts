@@ -3,5 +3,5 @@ import {TaskDto} from "./task.dto";
 
 export interface NotificationModel {
   NotificationType: NotificationType;
-  Task: TaskDto;
+  NotificationTitle: string;
 }

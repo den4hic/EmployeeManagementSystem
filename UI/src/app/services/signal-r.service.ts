@@ -4,6 +4,7 @@ import {BehaviorSubject, Observable, Subject} from "rxjs";
 import {NotificationType} from "./enums/notification-type";
 import {TaskDto} from "./dtos/task.dto";
 import {NotificationModel} from "./dtos/notification";
+import {ProjectDto} from "./dtos/project.dto";
 
 @Injectable({
   providedIn: 'root'
@@ -36,10 +37,10 @@ export class SignalRService {
       console.log('Online users:', users);
     });
 
-    this.hubConnection.on('ReceiveNotification', (message: NotificationType, task: TaskDto) => {
-      const notification : NotificationModel = { NotificationType: message, Task: task };
+    this.hubConnection.on('ReceiveNotification', (message: NotificationType, taskTitle: string) => {
+      const notification : NotificationModel = { NotificationType: message, NotificationTitle: taskTitle };
       this.notifications.next(notification);
-      console.log('Received notification:', task);
+      console.log('Received notification:', taskTitle);
     });
 
     this.hubConnection.onreconnecting((error) => {
@@ -84,6 +85,16 @@ export class SignalRService {
 
   sendTaskUpdate(userId: number, notificationType: NotificationType, taskDto: TaskDto) {
     this.hubConnection.invoke('SendNotification', userId.toString(), notificationType, taskDto)
+      .catch(err => console.error(err));
+  }
+
+  createProjectGroup(id: number) {
+    this.hubConnection.invoke('CreateProjectGroup', id.toString())
+      .catch(err => console.error(err));
+  }
+
+  sendProjectNotification(project: ProjectDto, message: string, notificationType: NotificationType) {
+    this.hubConnection.invoke('SendProjectNotification', project, message, notificationType)
       .catch(err => console.error(err));
   }
 }

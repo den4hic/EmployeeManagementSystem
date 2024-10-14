@@ -4,7 +4,6 @@ using AutoMapper;
 using Domain.Entities;
 using Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace Infrastructure.Repositories;
 
@@ -58,6 +57,19 @@ public class ProjectRepository : CRUDRepositoryBase<Project, ProjectDto, Employe
         return _mapper.Map<ProjectDto>(project);
     }
 
+    public async Task<ProjectDto> GetProjectByIdWithDetailsAsync(int id)
+    {
+        var project = await _context.Projects
+            .Include(p => p.ProjectEmployees)
+            .ThenInclude(pe => pe.Employee)
+            .ThenInclude(e => e.User)
+            .Include(p => p.ProjectManagers)
+            .ThenInclude(pm => pm.Manager)
+            .ThenInclude(m => m.User)
+            .FirstOrDefaultAsync(p => p.Id == id);
+
+        return _mapper.Map<ProjectDto>(project);
+    }
 
     public async Task<IEnumerable<ProjectDto>> GetProjectsWithDetailsAsync()
     {
@@ -120,7 +132,7 @@ public class ProjectRepository : CRUDRepositoryBase<Project, ProjectDto, Employe
             .Where(pe => !projectDto.EmployeeIds.Contains(pe.EmployeeId))
             .Select(pe => pe.EmployeeId)
             .ToList();
-        
+
         project.ProjectEmployees.Clear();
         foreach (var employeeId in projectDto.EmployeeIds)
         {
