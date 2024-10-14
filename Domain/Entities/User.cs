@@ -18,6 +18,7 @@ public partial class User : IEntity<int>
     public string? PhoneNumber { get; set; }
 
     public string? RefreshToken { get; set; }
+
     public bool IsBlocked { get; set; }
 
     public DateTime? RefreshTokenExpiryTime { get; set; }
@@ -31,4 +32,6 @@ public partial class User : IEntity<int>
     public virtual UserPhoto? UserPhoto { get; set; }
 
     public virtual ICollection<UserNotificationGroups> UserNotificationGroups { get; set; } = new List<UserNotificationGroups>();
+
+    public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 }

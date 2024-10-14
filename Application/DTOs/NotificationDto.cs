@@ -6,7 +6,7 @@ namespace Application.DTOs;
 
 public class NotificationDto : BaseDto<int>
 {
-    public int GroupId { get; set; }
+    public int? GroupId { get; set; }
 
     public string? Message { get; set; }
 
@@ -14,5 +14,9 @@ public class NotificationDto : BaseDto<int>
 
     public NotificationType Type { get; set; }
 
-    public virtual NotificationGroupDto Group { get; set; } = null!;
+    public int? ReceiverId { get; set; }
+
+    public virtual NotificationGroup? Group { get; set; } = null!;
+
+    public virtual User? Receiver { get; set; }
 }

@@ -69,8 +69,12 @@ public partial class EmployeeManagementSystemDbContext : IdentityContext
 
             entity.HasOne(d => d.Group).WithMany(p => p.Notifications)
                 .HasForeignKey(d => d.GroupId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Notifications_NotificationGroups");
+
+            entity.HasOne(d => d.Receiver).WithMany(p => p.Notifications)
+                .HasForeignKey(d => d.ReceiverId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_Notifications_User");
         });
 
         builder.Entity<NotificationGroup>(entity =>

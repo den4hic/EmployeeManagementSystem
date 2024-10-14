@@ -7,7 +7,7 @@ public class Notification : IEntity<int>
 {
     public int Id { get; set; }
 
-    public int GroupId { get; set; }
+    public int? GroupId { get; set; }
 
     public string? Message { get; set; }
 
@@ -15,5 +15,9 @@ public class Notification : IEntity<int>
 
     public NotificationType Type { get; set; }
 
-    public virtual NotificationGroup Group { get; set; } = null!;
+    public int? ReceiverId { get; set; }
+
+    public virtual NotificationGroup? Group { get; set; } = null!;
+
+    public virtual User? Receiver { get; set; }
 }

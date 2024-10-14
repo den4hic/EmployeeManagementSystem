@@ -20,4 +20,5 @@ public class UserDto : BaseDto<int>
     public virtual ManagerDto? Manager { get; set; } = null!;
     public virtual UserPhotoDto? UserPhoto { get; set; } = null!;
     public virtual ICollection<NotificationGroupDto> NotificationGroups { get; set; } = new List<NotificationGroupDto>();
+    public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 }
