@@ -8,5 +8,7 @@ public enum NotificationType
     TaskCreated,
     UnassignedFromTask,
     TaskDueDateChanged,
-    NewProject
+    NewProject,
+    UnassignedFromProject,
+    ProjectDeleted
 }

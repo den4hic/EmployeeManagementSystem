@@ -59,49 +59,61 @@ export class NotificationComponent implements OnInit, OnDestroy {
       case NotificationType.AssignedToTask:
         title = 'New Task Assignment';
         message = `You have been assigned to a ${notificationTitle} task.`;
-        icon = 'fas fa-tasks';
+        icon = 'add_task';
         notificationClass = 'notification-info';
         break;
       case NotificationType.TaskStatusChanged:
         title = 'Task Status Updated';
         message = `A ${notificationTitle} task status has been updated.`;
-        icon = 'fas fa-sync';
+        icon = 'task';
         notificationClass = 'notification-warning';
         break;
       case NotificationType.TaskDeleted:
         title = 'Task Deleted';
         message = `A ${notificationTitle} task has been deleted.`;
-        icon = 'fas fa-trash-alt';
+        icon = 'delete_sweep';
         notificationClass = 'notification-danger';
         break;
       case NotificationType.TaskCreated:
         title = 'New Task Created';
         message = `A new ${notificationTitle} task has been created.`;
-        icon = 'fas fa-plus-circle';
+        icon = 'add_task';
         notificationClass = 'notification-success';
         break;
       case NotificationType.UnassignedFromTask:
         title = 'Unassigned From Task';
         message = `You have been unassigned from a ${notificationTitle} task.`;
-        icon = 'fas fa-edit';
+        icon = 'person_remove';
         notificationClass = 'notification-info';
         break;
       case NotificationType.TaskDueDateChanged:
         title = 'Task Due Date Changed';
         message = 'A task due date has been changed.';
-        icon = 'fas fa-calendar-alt';
+        icon = 'schedule';
         notificationClass = 'notification-warning';
         break;
       case NotificationType.NewProject:
         title = 'New Project Created';
         message = `A new ${notificationTitle} project has been created.`;
-        icon = 'fas fa-project-diagram';
+        icon = 'group';
         notificationClass = 'notification-success';
+        break;
+      case NotificationType.UnassignedFromProject:
+        title = 'Unassigned From Project';
+        message = `You have been unassigned from a ${notificationTitle} project.`;
+        icon = 'person_remove';
+        notificationClass = 'notification-info';
+        break;
+      case NotificationType.ProjectDeleted:
+        title = 'Project Deleted';
+        message = `A ${notificationTitle} project has been deleted.`;
+        icon = 'delete_sweep';
+        notificationClass = 'notification-danger';
         break;
       default:
         title = 'New Notification';
         message = 'You have a new notification.';
-        icon = 'fas fa-bell';
+        icon = 'task';
         notificationClass = 'notification-info';
     }
 

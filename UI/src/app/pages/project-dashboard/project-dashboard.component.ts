@@ -305,6 +305,10 @@ export class ProjectDashboardComponent implements OnInit {
   private deleteProject(projectId: number) {
     this.projectService.deleteProject(projectId).subscribe({
       next: () => {
+        if (!this.selectedProject) {
+          return;
+        }
+        this.signalRService.sendProjectNotification(this.selectedProject, NotificationType.ProjectDeleted);
         this.loadProjects();
         this.snackBar.open('Project deleted successfully', 'Close', { duration: 3000 });
       },

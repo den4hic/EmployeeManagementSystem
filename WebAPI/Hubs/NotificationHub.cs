@@ -163,14 +163,6 @@ public class NotificationHub : Hub
         _context.Notifications.Add(notification);
         await _context.SaveChangesAsync();
 
-        var notificationDto = new NotificationDto
-        {
-            Id = notification.Id,
-            GroupId = notification.GroupId,
-            CreatedAt = notification.CreatedAt,
-            Type = notification.Type
-        };
-
         await Clients.Group(groupName).SendAsync("ReceiveNotification", type, project.Name);
     }
 
