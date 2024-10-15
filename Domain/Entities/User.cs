@@ -34,4 +34,6 @@ public partial class User : IEntity<int>
     public virtual ICollection<UserNotificationGroups> UserNotificationGroups { get; set; } = new List<UserNotificationGroups>();
 
     public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+
+    public virtual ICollection<UserNotification> UserNotifications { get; set; } = new List<UserNotification>();
 }

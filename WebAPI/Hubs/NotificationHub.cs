@@ -148,6 +148,8 @@ public class NotificationHub : Hub
     {
         var groupName = $"Project_{project.Id}";
         var group = await _context.NotificationGroups
+            .Include(g => g.UserNotificationGroups)
+            .ThenInclude(ung => ung.User)
             .FirstOrDefaultAsync(g => g.Name == groupName);
 
         if (group == null)
@@ -163,12 +165,52 @@ public class NotificationHub : Hub
         _context.Notifications.Add(notification);
         await _context.SaveChangesAsync();
 
+        foreach (var userGroup in group.UserNotificationGroups)
+        {
+            var isUserOnline = OnlineUsers.ContainsValue(userGroup.User.Id.ToString());
+
+            var userNotification = new UserNotification
+            {
+                UserId = userGroup.UserId,
+                NotificationId = notification.Id,
+                IsRead = isUserOnline,
+                ReadAt = isUserOnline ? DateTime.UtcNow : null
+            };
+
+            _context.UserNotifications.Add(userNotification);
+        }
+
+        await _context.SaveChangesAsync();
+
         await Clients.Group(groupName).SendAsync("ReceiveNotification", type, project.Name);
     }
 
 
     public async Task SendNotification(string userId, NotificationType notificationType, TaskDto task)
     {
+        var notification = new Notification
+        {
+            ReceiverId = int.Parse(userId),
+            CreatedAt = DateTime.UtcNow,
+            Type = notificationType
+        };
+
+        _context.Notifications.Add(notification);
+        await _context.SaveChangesAsync();
+
+        var isUserOnline = OnlineUsers.ContainsValue(userId);
+
+        var userNotification = new UserNotification
+        {
+            UserId = int.Parse(userId),
+            NotificationId = notification.Id,
+            IsRead = isUserOnline,
+            ReadAt = isUserOnline ? DateTime.UtcNow : null
+        };
+
+        _context.UserNotifications.Add(userNotification);
+        await _context.SaveChangesAsync();
+
         var connectionIds = OnlineUsers.Where(kvp => kvp.Value == userId).Select(kvp => kvp.Key).ToList();
         await Clients.Clients(connectionIds).SendAsync("ReceiveNotification", notificationType, task.Title);
     }

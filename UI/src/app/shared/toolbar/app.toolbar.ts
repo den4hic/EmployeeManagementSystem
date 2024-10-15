@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import {SignalRService} from "../../services/signal-r.service";
 
 @Component({
   selector: 'app-toolbar',
@@ -10,6 +11,7 @@ import { AuthService } from '../../services/auth.service';
 export class ToolbarComponent {
   constructor(
     private authService: AuthService,
+    private signalRService: SignalRService,
     private router: Router
   ) {}
 
@@ -24,6 +26,7 @@ export class ToolbarComponent {
   logout(): void {
     this.authService.logout().subscribe(() => {
       this.router.navigate(['/login']);
+      this.signalRService.disconnect();
     });
   }
 }

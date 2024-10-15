@@ -20,4 +20,6 @@ public class Notification : IEntity<int>
     public virtual NotificationGroup? Group { get; set; } = null!;
 
     public virtual User? Receiver { get; set; }
+
+    public virtual ICollection<UserNotification> UserNotifications { get; set; } = new List<UserNotification>();
 }

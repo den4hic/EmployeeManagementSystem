@@ -28,6 +28,8 @@ public partial class EmployeeManagementSystemDbContext : IdentityContext
 
     public virtual DbSet<User> Users { get; set; }
 
+    public virtual DbSet<UserNotification> UserNotifications { get; set; }
+
     public virtual DbSet<UserPhoto> UserPhotos { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -200,6 +202,21 @@ public partial class EmployeeManagementSystemDbContext : IdentityContext
                 .WithMany(p => p.UserNotificationGroups)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<UserNotification>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__UserNoti__3214EC073BE4A006");
+
+            entity.HasOne(d => d.Notification).WithMany(p => p.UserNotifications)
+                .HasForeignKey(d => d.NotificationId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_UserNotifications_Notifications");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserNotifications)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_UserNotifications_User");
         });
 
         builder.Entity<UserPhoto>(entity =>
