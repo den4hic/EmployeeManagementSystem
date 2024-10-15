@@ -15,6 +15,7 @@ public static class InfrastructureServiceCollectionExtensions
         services.AddScoped<ITaskRepository, TaskRepository>();
         services.AddScoped<IStatusRepository, StatusRepository>();
         services.AddScoped<IUserPhotoRepository, UserPhotoRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
