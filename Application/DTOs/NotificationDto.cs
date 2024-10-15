@@ -19,4 +19,6 @@ public class NotificationDto : BaseDto<int>
     public virtual NotificationGroup? Group { get; set; } = null!;
 
     public virtual User? Receiver { get; set; }
+
+    public virtual ICollection<UserDto> Users { get; set; } = new List<UserDto>();
 }
