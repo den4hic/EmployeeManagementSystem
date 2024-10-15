@@ -163,4 +163,13 @@ public class UserService : IUserService
             ? Result<UserDto>.Success(userDto)
             : Result<UserDto>.Failure("User was not found");
     }
+
+    public async Task<Result<UserDto>> GetUserWithGroupsAsync(int id)
+    {
+        var userDto = await _userRepository.GetUsersWithGroupsAsync(id);
+
+        return userDto != null
+            ? Result<UserDto>.Success(userDto)
+            : Result<UserDto>.Failure("User was not found");
+    }
 }

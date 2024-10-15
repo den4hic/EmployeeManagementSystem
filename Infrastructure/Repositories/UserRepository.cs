@@ -147,4 +147,14 @@ public class UserRepository : CRUDRepositoryBase<User, UserDto, EmployeeManageme
 
         return (userDtos, totalItems);
     }
+
+    public async Task<UserDto> GetUsersWithGroupsAsync(int id)
+    {
+        var user = await _context.Users
+            .Include(u => u.UserNotificationGroups)
+            .ThenInclude(ung => ung.Group)
+            .FirstOrDefaultAsync(u => u.Id == id);
+
+        return _mapper.Map<UserDto>(user);
+    }
 }

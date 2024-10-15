@@ -9,4 +9,5 @@ public interface IUserRepository : ICRUDRepository<UserDto, int>
     Task<UserDto> GetUserByIdWithGroups(int id);
     Task<IEnumerable<UserDto>> GetUsersWithDetailsAsync();
     Task<(IEnumerable<UserDto>, int)> GetUsersWithDetailsFilteredAsync(int page, int pageSize, string sortField, string sortDirection, string filter, string role);
+    Task<UserDto> GetUsersWithGroupsAsync(int id);
 }

@@ -12,6 +12,10 @@ public class MappingProfile : Profile
         CreateMap<User, UserDto>()
             .ForMember(dest => dest.NotificationGroups, opt => opt.MapFrom(src => src.UserNotificationGroups.Select(ung => ung.Group)));
 
+        CreateMap<NotificationGroup, NotificationGroupDto>();
+
+        CreateMap<Notification, NotificationDto>();
+
         CreateMap<UserDto, User>();
 
         CreateMap<Employee, EmployeeDto>();

@@ -1,4 +1,6 @@
-﻿using Application.DTOs;
+﻿using Application.Abstractions;
+using Application.DTOs;
+using AutoMapper;
 using Domain.Entities;
 using Domain.Enum;
 using Infrastructure.Context;
@@ -15,28 +17,37 @@ public class NotificationHub : Hub
 {
     private static readonly Dictionary<string, string> OnlineUsers = new Dictionary<string, string>();
     private readonly EmployeeManagementSystemDbContext _context;
+    private readonly IUserService _userService;
+    private readonly IProjectService _projectService;
+    private readonly IMapper _mapper;
 
-    public NotificationHub(EmployeeManagementSystemDbContext context)
+    public NotificationHub(EmployeeManagementSystemDbContext context, IUserService userService, IProjectService projectService, IMapper mapper)
     {
         _context = context;
+        _userService = userService;
+        _projectService = projectService;
+        _mapper = mapper;
     }
 
     public override async Task OnConnectedAsync()
     {
         string userId = GetUserId(Context.User);
         string connectionId = Context.ConnectionId;
-        var user = await _context.Users
-            .Include(u => u.UserNotificationGroups)
-            .ThenInclude(ung => ung.Group)
-            .FirstOrDefaultAsync(u => u.Id.ToString() == userId);
+        var userResult = await _userService.GetUserByIdWithGroups(int.Parse(userId));
 
-        if (user != null)
+        if (userResult.IsSuccess)
         {
-            foreach (var userGroup in user.UserNotificationGroups)
+            var user = userResult.Value;
+
+            if (user != null)
             {
-                await Groups.AddToGroupAsync(connectionId, userGroup.Group.Name);
+                foreach (var userGroup in user.NotificationGroups)
+                {
+                    await Groups.AddToGroupAsync(connectionId, userGroup.Name);
+                }
             }
         }
+
 
         lock (OnlineUsers)
         {
@@ -54,17 +65,20 @@ public class NotificationHub : Hub
     {
         string userId = GetUserId(Context.User);
         string connectionId = Context.ConnectionId;
-        var user = await _context.Users
-            .Include(u => u.UserNotificationGroups)
-            .ThenInclude(ung => ung.Group)
-            .FirstOrDefaultAsync(u => u.Id.ToString() == userId);
+        var userResult = await _userService.GetUserByIdWithGroups(int.Parse(userId));
 
-        if (user != null)
+        if (userResult.IsSuccess)
         {
-            foreach (var userGroup in user.UserNotificationGroups)
+            var user = userResult.Value;
+
+            if (user != null)
             {
-                await Groups.RemoveFromGroupAsync(connectionId, userGroup.Group.Name);
+                foreach (var userGroup in user.NotificationGroups)
+                {
+                    await Groups.RemoveFromGroupAsync(connectionId, userGroup.Name);
+                }
             }
+
         }
 
         lock (OnlineUsers)
@@ -82,27 +96,23 @@ public class NotificationHub : Hub
     public async Task CreateProjectGroup(string id)
     {
         int projectId = int.Parse(id);
-        var project = await _context.Projects
-            .Include(p => p.ProjectEmployees)
-            .ThenInclude(pe => pe.Employee)
-            .ThenInclude(e => e.User)
-            .Include(p => p.ProjectManagers)
-            .ThenInclude(pm => pm.Manager)
-            .ThenInclude(m => m.User)
-            .FirstOrDefaultAsync(p => p.Id == projectId);
+        var projectResult = await _projectService.GetProjectByIdWithDetailsAsync(projectId);
 
-        if (project == null)
+        if (!projectResult.IsSuccess)
             return;
+
+        var project = projectResult.Value;
+
         var groupName = $"Project_{projectId}";
         var group = new NotificationGroup { Name = groupName };
 
-        var usersToAdd = project.ProjectEmployees.Select(pe => pe.Employee.User)
-            .Concat(project.ProjectManagers.Select(pm => pm.Manager.User))
+        var usersToAdd = project.Employees.Select(pe => pe.User)
+            .Concat(project.Managers.Select(pm => pm.User))
             .Distinct();
 
         foreach (var user in usersToAdd)
         {
-            group.UserNotificationGroups.Add(new UserNotificationGroups { User = user });
+            group.UserNotificationGroups.Add(new UserNotificationGroups { User = _mapper.Map<User>(user) });
             if (OnlineUsers.ContainsValue(user.Id.ToString()))
             {
                 var connectionKvp = OnlineUsers.FirstOrDefault(kvp => kvp.Value == user.Id.ToString());
