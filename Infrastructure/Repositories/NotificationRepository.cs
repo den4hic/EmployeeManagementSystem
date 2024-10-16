@@ -40,4 +40,19 @@ public class NotificationRepository : CRUDRepositoryBase<Notification, Notificat
 
         return _mapper.Map<IEnumerable<NotificationDto>>(unreadNotifications);
     }
+
+    public async System.Threading.Tasks.Task MarkNotificationAsReadAsync(int notificationId)
+    {
+        var userNotification = await _context.UserNotifications
+            .FirstOrDefaultAsync(un => un.NotificationId == notificationId);
+
+        if (userNotification == null)
+        {
+            throw new KeyNotFoundException($"Notification with ID {notificationId} not found.");
+        }
+
+        userNotification.IsRead = true;
+
+        await _context.SaveChangesAsync();
+    }
 }

@@ -27,7 +27,7 @@ public class ManagerRepository : CRUDRepositoryBase<Manager, ManagerDto, Employe
         return _mapper.Map<IEnumerable<ManagerDto>>(managers);
     }
 
-    public async System.Threading.Tasks.Task<ManagerDto> GetByUserIdAsync(int userId)
+    public async Task<ManagerDto> GetByUserIdAsync(int userId)
     {
         var manager = await _context.Managers.FirstOrDefaultAsync(u => u.UserId == userId);
 

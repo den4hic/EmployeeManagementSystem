@@ -36,4 +36,18 @@ public class NotificationService : INotificationService
 
         return Result<IEnumerable<NotificationDto>>.Success(notifications);
     }
+
+    public async Task<Result<bool>> MarkNotificationAsReadAsync(int notificationId)
+    {
+        try
+        {
+            await _notificationRepository.MarkNotificationAsReadAsync(notificationId);
+
+            return Result<bool>.Success(true);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return Result<bool>.Failure(ex.Message);
+        }
+    }
 }

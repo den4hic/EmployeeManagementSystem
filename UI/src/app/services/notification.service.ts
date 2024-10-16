@@ -21,4 +21,9 @@ export class NotificationService {
     const url = `${this.apiPath}/get-unread-notifications/${userId}`;
     return this.http.get<NotificationDto[]>(url);
   }
+
+  markNotificationAsRead(notificationId: number): Observable<void> {
+    const url = `${this.apiPath}/mark-notification-as-read/${notificationId}`;
+    return this.http.put<void>(url, null);
+  }
 }

@@ -20,6 +20,8 @@ export class ToolbarComponent implements OnInit {
   public notifications: NotificationDto[] = [];
   public isLoading = false;
   private notificationSubscription: Subscription = new Subscription();
+  public shownNotifications: NotificationDto[] = [];
+  private readonly maxNotifications = 4;
 
   constructor(
     private authService: AuthService,
@@ -83,7 +85,6 @@ export class ToolbarComponent implements OnInit {
       next: (notifications) => {
         notifications = notifications.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         this.notifications = notifications;
-        console.log('Notifications:', notifications);
         this.isLoading = false;
       },
       error: (error) => {
@@ -94,6 +95,10 @@ export class ToolbarComponent implements OnInit {
   }
 
   viewAllNotifications() {
+    for (const notification of this.notifications) {
+      this.notificationService.markNotificationAsRead(notification.id).subscribe();
+    }
+
     this.router.navigate(['/notifications']);
   }
 
@@ -148,5 +153,14 @@ export class ToolbarComponent implements OnInit {
         this.loadNotifications();
       }
     );
+  }
+
+  onNotificationMenuClick() {
+    this.shownNotifications = this.notifications.slice(0, this.maxNotifications);
+    for (const shownNotification of this.shownNotifications) {
+      this.notificationService.markNotificationAsRead(shownNotification.id).subscribe();
+    }
+
+    this.notifications = this.notifications.filter((notification) => !this.shownNotifications.includes(notification));
   }
 }
