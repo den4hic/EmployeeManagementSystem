@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
-import { SignalRService } from "../../services/signal-r.service";
-import { NotificationService } from "../../services/notification.service";
-import { UserService } from "../../services/user.service";
-import { UserDto } from "../../services/dtos/user.dto";
-import { NotificationDto } from "../../services/dtos/notification.dto";
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+import {AuthService} from '../../services/auth.service';
+import {SignalRService} from "../../services/signal-r.service";
+import {NotificationService} from "../../services/notification.service";
+import {UserService} from "../../services/user.service";
+import {UserDto} from "../../services/dtos/user.dto";
+import {NotificationDto} from "../../services/dtos/notification.dto";
 import {NotificationType} from "../../services/enums/notification-type";
 
 @Component({
@@ -69,7 +69,8 @@ export class ToolbarComponent implements OnInit {
 
     this.notificationService.getUserNotifications(this.user.id).subscribe({
       next: (notifications) => {
-        this.notifications = notifications.slice(0, 4); // Get only the latest 4 notifications
+        notifications = notifications.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        this.notifications = notifications.slice(0, 4);
         this.isLoading = false;
       },
       error: (error) => {
@@ -84,25 +85,23 @@ export class ToolbarComponent implements OnInit {
   }
 
   getNotificationText(notification: NotificationDto): string {
-    const action = this.getActionText(notification.type);
-    const target = this.getTargetText(notification.type);
-    return `${action} ${target}`;
+    return this.getActionText(notification.type);
   }
 
   private getActionText(type: NotificationType): string {
     switch (type) {
       case NotificationType.AssignedToTask:
-        return 'assigned to';
+        return 'assigned to a task';
       case NotificationType.TaskStatusChanged:
-        return 'changed status of';
+        return 'changed status of a task';
       case NotificationType.TaskDeleted:
-        return 'deleted';
+        return 'deleted task';
       case NotificationType.TaskCreated:
-        return 'created';
+        return 'created task';
       case NotificationType.UnassignedFromTask:
-        return 'unassigned from';
+        return 'unassigned from a task';
       case NotificationType.TaskDueDateChanged:
-        return 'changed due date of';
+        return 'changed due date of a task';
       case NotificationType.NewProject:
         return 'created new project';
       case NotificationType.UnassignedFromProject:
@@ -112,10 +111,6 @@ export class ToolbarComponent implements OnInit {
       default:
         return 'updated';
     }
-  }
-
-  private getTargetText(type: NotificationType): string {
-    return type.toString().includes('Task') ? 'task' : 'project';
   }
 
   getTimeAgo(date: Date): string {

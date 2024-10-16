@@ -25,7 +25,7 @@
         <div class="notification-content">
           <img [src]="'assets/default-avatar.png'" alt="User photo" class="user-photo">
           <div class="notification-text">
-            <strong>Sender</strong> {{ getNotificationText(notification) }}
+            <strong *ngIf="notification.sender">{{notification.sender.firstName + ' ' + notification.sender.lastName}}</strong> {{ getNotificationText(notification) }}
             <div class="notification-time">{{ getTimeAgo(notification.createdAt) }}</div>
           </div>
         </div>

@@ -39,6 +39,7 @@ export class NotificationsComponent implements OnInit {
         if (this.user && this.user.id) {
           this.notificationService.getUserNotifications(this.user.id).subscribe({
             next: (notifications) => {
+              notifications = notifications.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
               this.notifications = notifications;
             },
             error: (error) => {

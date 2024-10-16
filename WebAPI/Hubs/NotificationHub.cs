@@ -162,13 +162,16 @@ public class NotificationHub : Hub
             .ThenInclude(ung => ung.User)
             .FirstOrDefaultAsync(g => g.Name == groupName);
 
+        string userId = GetUserId(Context.User);
+
         if (group == null)
             return;
 
         var notification = new Notification
         {
+            SenderId = int.Parse(userId),
             GroupId = group.Id,
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = DateTime.Now,
             Type = type
         };
 
@@ -184,7 +187,7 @@ public class NotificationHub : Hub
                 UserId = userGroup.UserId,
                 NotificationId = notification.Id,
                 IsRead = isUserOnline,
-                ReadAt = isUserOnline ? DateTime.UtcNow : null
+                ReadAt = isUserOnline ? DateTime.Now : null
             };
 
             _context.UserNotifications.Add(userNotification);
@@ -196,32 +199,35 @@ public class NotificationHub : Hub
     }
 
 
-    public async Task SendNotification(string userId, NotificationType notificationType, TaskDto task)
+    public async Task SendNotification(string recieverUserId, NotificationType notificationType, TaskDto task)
     {
+        string userId = GetUserId(Context.User);
+
         var notification = new Notification
         {
-            ReceiverId = int.Parse(userId),
-            CreatedAt = DateTime.UtcNow,
+            SenderId = int.Parse(userId),
+            ReceiverId = int.Parse(recieverUserId),
+            CreatedAt = DateTime.Now,
             Type = notificationType
         };
 
         _context.Notifications.Add(notification);
         await _context.SaveChangesAsync();
 
-        var isUserOnline = OnlineUsers.ContainsValue(userId);
+        var isUserOnline = OnlineUsers.ContainsValue(recieverUserId);
 
         var userNotification = new UserNotification
         {
-            UserId = int.Parse(userId),
+            UserId = int.Parse(recieverUserId),
             NotificationId = notification.Id,
             IsRead = isUserOnline,
-            ReadAt = isUserOnline ? DateTime.UtcNow : null
+            ReadAt = isUserOnline ? DateTime.Now : null
         };
 
         _context.UserNotifications.Add(userNotification);
         await _context.SaveChangesAsync();
 
-        var connectionIds = OnlineUsers.Where(kvp => kvp.Value == userId).Select(kvp => kvp.Key).ToList();
+        var connectionIds = OnlineUsers.Where(kvp => kvp.Value == recieverUserId).Select(kvp => kvp.Key).ToList();
         await Clients.Clients(connectionIds).SendAsync("ReceiveNotification", notificationType, task.Title);
     }
 

@@ -75,6 +75,7 @@ import { NotificationComponent } from './shared/notification/notification.compon
 import {MatBadge} from "@angular/material/badge";
 import {MatDivider} from "@angular/material/divider";
 import { NotificationsComponent } from './pages/notifications/notifications.component';
+import {MatLine} from "@angular/material/core";
 
 @NgModule({
   declarations: [
@@ -167,7 +168,8 @@ import { NotificationsComponent } from './pages/notifications/notifications.comp
     MatExpansionPanelTitle,
     MatExpansionPanelDescription,
     MatBadge,
-    MatDivider
+    MatDivider,
+    MatLine
   ],
   providers: [
     provideHttpClient(withInterceptors([apiUrlInterceptor, tokenInterceptor]))

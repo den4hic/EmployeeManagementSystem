@@ -17,9 +17,13 @@ public class Notification : IEntity<int>
 
     public int? ReceiverId { get; set; }
 
+    public int? SenderId { get; set; }
+
     public virtual NotificationGroup? Group { get; set; } = null!;
 
     public virtual User? Receiver { get; set; }
+
+    public virtual User? Sender { get; set; }
 
     public virtual ICollection<UserNotification> UserNotifications { get; set; } = new List<UserNotification>();
 }
