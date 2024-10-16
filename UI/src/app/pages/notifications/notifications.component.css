@@ -1,0 +1,54 @@
+.notifications-container {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.notifications-title {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 16px;
+}
+.notification-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.notification-text {
+  flex-grow: 1;
+  color: #333;
+}
+.notification-time {
+  font-size: 0.8em;
+  color: #888;
+  margin-left: 8px;
+}
+.no-notifications {
+  text-align: center;
+  padding: 40px 20px;
+  color: #888;
+}
+.no-notifications mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+}
+mat-icon {
+  margin-right: 16px;
+}
+.highlight {
+  font-weight: bold;
+  color: #673AB7;
+}
+
+mat-list-item {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.icon-task { color: #4CAF50; }
+.icon-project { color: #2196F3; }
+.icon-warning { color: #FFC107; }

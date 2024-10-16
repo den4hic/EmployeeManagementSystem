@@ -1,0 +1,23 @@
+<div class="notifications-container">
+  <h2 class="notifications-title">Notifications</h2>
+  <mat-divider></mat-divider>
+  <mat-list>
+    <ng-container *ngFor="let notification of notifications; let last = last">
+      <mat-list-item [@fadeIn]>
+        <mat-icon matListIcon [ngClass]="getIconClass(notification.type)">{{ getIcon(notification.type) }}</mat-icon>
+        <div matLine class="notification-content">
+              <span class="notification-text">
+                <span class="highlight">{{notification.group.name}}</span>
+                {{ getNotificationText(notification) }}
+              </span>
+          <span class="notification-time">{{ getTimeAgo(notification.createdAt) }}</span>
+        </div>
+      </mat-list-item>
+      <mat-divider *ngIf="!last"></mat-divider>
+    </ng-container>
+  </mat-list>
+  <div *ngIf="notifications.length === 0" class="no-notifications">
+    <mat-icon>notifications_off</mat-icon>
+    <p>No notifications</p>
+  </div>
+</div>

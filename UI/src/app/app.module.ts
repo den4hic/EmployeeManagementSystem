@@ -72,6 +72,9 @@ import {
 import { OnlineUsersComponent } from './shared/online-users/online-users.component';
 import { UserAvatarComponent } from './shared/user-avatar/user-avatar.component';
 import { NotificationComponent } from './shared/notification/notification.component';
+import {MatBadge} from "@angular/material/badge";
+import {MatDivider} from "@angular/material/divider";
+import { NotificationsComponent } from './pages/notifications/notifications.component';
 
 @NgModule({
   declarations: [
@@ -96,7 +99,8 @@ import { NotificationComponent } from './shared/notification/notification.compon
     EditUserDialogComponent,
     OnlineUsersComponent,
     UserAvatarComponent,
-    NotificationComponent
+    NotificationComponent,
+    NotificationsComponent
   ],
   imports: [
     BrowserModule,
@@ -161,7 +165,9 @@ import { NotificationComponent } from './shared/notification/notification.compon
     MatExpansionPanel,
     MatExpansionPanelHeader,
     MatExpansionPanelTitle,
-    MatExpansionPanelDescription
+    MatExpansionPanelDescription,
+    MatBadge,
+    MatDivider
   ],
   providers: [
     provideHttpClient(withInterceptors([apiUrlInterceptor, tokenInterceptor]))

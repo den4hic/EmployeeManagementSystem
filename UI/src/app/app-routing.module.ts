@@ -11,6 +11,8 @@ import {roleGuard} from "./guards/role.guard";
 import {BlockedComponent} from "./pages/blocked/blocked.component";
 import {blockGuard} from "./guards/block.guard";
 import {ProjectDashboardComponent} from "./pages/project-dashboard/project-dashboard.component";
+import {NotificationComponent} from "./shared/notification/notification.component";
+import {NotificationsComponent} from "./pages/notifications/notifications.component";
 
 const routes: Routes = [
   {
@@ -51,6 +53,14 @@ const routes: Routes = [
   {
     path: 'projects',
     component: ProjectDashboardComponent,
+    canActivate: [roleGuard],
+    data: {
+      roles: ['Admin', 'Manager', 'Employee']
+    }
+  },
+  {
+    path: 'notifications',
+    component: NotificationsComponent,
     canActivate: [roleGuard],
     data: {
       roles: ['Admin', 'Manager', 'Employee']

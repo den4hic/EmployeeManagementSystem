@@ -16,11 +16,17 @@ public class NotificationRepository : CRUDRepositoryBase<Notification, Notificat
     public async Task<IEnumerable<NotificationDto>> GetNotificationsWithDetailsByUserId(int userId)
     {
         var notifications = _context.Notifications
+            .Include(n => n.Group)
             .Include(n => n.UserNotifications)
             .ThenInclude(un => un.User)
-            .Where(n => n.UserNotifications.Any(un => un.UserId == userId))
-            .Select(n => _mapper.Map<NotificationDto>(n));
+            .Where(n => n.UserNotifications.Any(un => un.UserId == userId));
 
-        return await notifications.ToListAsync();
+        foreach (var notification in notifications)
+        {
+            if (notification.Group != null)
+                notification.Group.Notifications = null;
+        }
+
+        return await notifications.Select(n => _mapper.Map<NotificationDto>(n)).ToListAsync();
     }
 }
