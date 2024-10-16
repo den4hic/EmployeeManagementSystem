@@ -172,4 +172,31 @@ public class UserService : IUserService
             ? Result<UserDto>.Success(userDto)
             : Result<UserDto>.Failure("User was not found");
     }
+
+    public async Task<Result<bool>> AddUserToNotificationGroup(int userId, string groupName)
+    {
+        try
+        {
+            await _userRepository.AddUserToNotificationGroup(userId, groupName);
+            return Result<bool>.Success(true);
+        }
+        catch (Exception ex)
+        {
+            return Result<bool>.Failure($"Failed to add user to notification group: {ex.Message}");
+        }
+    }
+
+    public async Task<Result<bool>> RemoveUserFromNotificationGroup(int userId, string groupName)
+    {
+        try
+        {
+            await _userRepository.RemoveUserFromNotificationGroup(userId, groupName);
+            return Result<bool>.Success(true);
+        }
+        catch (Exception ex)
+        {
+            return Result<bool>.Failure($"Failed to remove user from notification group: {ex.Message}");
+        }
+    }
+
 }

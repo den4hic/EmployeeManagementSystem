@@ -208,30 +208,9 @@ public class NotificationHub : Hub
     public async Task AddUserToGroup(int userId, string projectId)
     {
         var groupName = $"Project_{projectId}";
-        var user = await _context.Users
-            .Include(u => u.UserNotificationGroups)
-            .ThenInclude(un => un.Group)
-            .FirstOrDefaultAsync(u => u.Id == userId);
+        var result = await _userService.AddUserToNotificationGroup(userId, groupName);
 
-        if (user == null)
-        {
-            throw new ArgumentException($"User with ID {userId} not found");
-        }
-
-        if (!user.UserNotificationGroups.Any(ung => ung.Group.Name == groupName))
-        {
-            var group = await _context.NotificationGroups.FirstOrDefaultAsync(g => g.Name == groupName);
-
-            if (group == null)
-            {
-                throw new ArgumentException($"Group {groupName} not found");
-            }
-
-            user.UserNotificationGroups.Add(new UserNotificationGroups { User = user, Group = group });
-            await _context.SaveChangesAsync();
-        }
-        
-        if (OnlineUsers.ContainsValue(userId.ToString()))
+        if (result.IsSuccess && OnlineUsers.ContainsValue(userId.ToString()))
         {
             var connectionId = OnlineUsers.FirstOrDefault(kvp => kvp.Value == userId.ToString()).Key;
             if (connectionId != null)
@@ -244,24 +223,9 @@ public class NotificationHub : Hub
     public async Task RemoveUserFromGroup(int userId, string projectId)
     {
         var groupName = $"Project_{projectId}";
-        var user = await _context.Users
-            .Include(u => u.UserNotificationGroups)
-            .ThenInclude(un => un.Group)
-            .FirstOrDefaultAsync(u => u.Id == userId);
+        var result = await _userService.RemoveUserFromNotificationGroup(userId, groupName);
 
-        if (user == null)
-        {
-            throw new ArgumentException($"User with ID {userId} not found");
-        }
-
-        var userGroup = user.UserNotificationGroups.FirstOrDefault(ung => ung.Group.Name == groupName);
-        if (userGroup != null)
-        {
-            user.UserNotificationGroups.Remove(userGroup);
-            await _context.SaveChangesAsync();
-        }
-
-        if (OnlineUsers.ContainsValue(userId.ToString()))
+        if (result.IsSuccess && OnlineUsers.ContainsValue(userId.ToString()))
         {
             var connectionId = OnlineUsers.FirstOrDefault(kvp => kvp.Value == userId.ToString()).Key;
             if (connectionId != null)
@@ -270,7 +234,6 @@ public class NotificationHub : Hub
             }
         }
     }
-
 
     private async Task UpdateUserList()
     {

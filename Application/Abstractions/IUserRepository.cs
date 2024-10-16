@@ -10,4 +10,6 @@ public interface IUserRepository : ICRUDRepository<UserDto, int>
     Task<IEnumerable<UserDto>> GetUsersWithDetailsAsync();
     Task<(IEnumerable<UserDto>, int)> GetUsersWithDetailsFilteredAsync(int page, int pageSize, string sortField, string sortDirection, string filter, string role);
     Task<UserDto> GetUsersWithGroupsAsync(int id);
+    Task AddUserToNotificationGroup(int userId, string groupName);
+    Task RemoveUserFromNotificationGroup(int userId, string groupName);
 }

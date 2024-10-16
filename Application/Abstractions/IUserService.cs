@@ -16,4 +16,6 @@ public interface IUserService
     Task<Result<(int, int, int)>> GetUsersStatisticsAsync();
     Task<Result<UserDto>> GetUserByIdWithGroups(int id);
     Task<Result<UserDto>> GetUserWithGroupsAsync(int id);
+    Task<Result<bool>> AddUserToNotificationGroup(int userId, string groupName);
+    Task<Result<bool>> RemoveUserFromNotificationGroup(int userId, string groupName);
 }

@@ -5,6 +5,7 @@ using Domain.Entities;
 using Infrastructure.Context;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Repositories;
 
@@ -157,4 +158,51 @@ public class UserRepository : CRUDRepositoryBase<User, UserDto, EmployeeManageme
 
         return _mapper.Map<UserDto>(user);
     }
+
+    public async Task AddUserToNotificationGroup(int userId, string groupName)
+    {
+        var user = await _context.Users
+            .Include(u => u.UserNotificationGroups)
+            .ThenInclude(un => un.Group)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user == null)
+        {
+            throw new ArgumentException($"User with ID {userId} not found");
+        }
+
+        if (!user.UserNotificationGroups.Any(ung => ung.Group.Name == groupName))
+        {
+            var group = await _context.NotificationGroups.FirstOrDefaultAsync(g => g.Name == groupName);
+
+            if (group == null)
+            {
+                throw new ArgumentException($"Group {groupName} not found");
+            }
+
+            user.UserNotificationGroups.Add(new UserNotificationGroups { User = user, Group = group });
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public async Task RemoveUserFromNotificationGroup(int userId, string groupName)
+    {
+        var user = await _context.Users
+            .Include(u => u.UserNotificationGroups)
+            .ThenInclude(un => un.Group)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user == null)
+        {
+            throw new ArgumentException($"User with ID {userId} not found");
+        }
+
+        var userGroup = user.UserNotificationGroups.FirstOrDefault(ung => ung.Group.Name == groupName);
+        if (userGroup != null)
+        {
+            user.UserNotificationGroups.Remove(userGroup);
+            await _context.SaveChangesAsync();
+        }
+    }
+
 }
