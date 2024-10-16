@@ -31,6 +31,12 @@ public class MappingProfile : Profile
                 Id = src.Sender.Id,
                 FirstName = src.Sender.FirstName,
                 LastName = src.Sender.LastName,
+                UserPhoto = src.Sender.UserPhoto != null ? new UserPhotoDto
+                {
+                    Id = src.Sender.UserPhoto.Id,
+                    PhotoData = src.Sender.UserPhoto.PhotoData,
+                    ContentType = src.Sender.UserPhoto.ContentType
+                } : null
             })).ReverseMap();
 
         CreateMap<UserDto, User>();

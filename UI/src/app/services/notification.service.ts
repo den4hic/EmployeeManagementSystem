@@ -16,4 +16,9 @@ export class NotificationService {
     const url = `${this.apiPath}/get-notifications/${userId}`;
     return this.http.get<NotificationDto[]>(url);
   }
+
+  getUnreadNotifications(userId: number): Observable<NotificationDto[]> {
+    const url = `${this.apiPath}/get-unread-notifications/${userId}`;
+    return this.http.get<NotificationDto[]>(url);
+  }
 }

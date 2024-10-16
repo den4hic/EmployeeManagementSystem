@@ -11,9 +11,13 @@
       <div *ngIf="isLoading" class="loading-indicator">Loading...</div>
       <ng-container *ngIf="!isLoading">
         <div *ngIf="notifications.length === 0" class="no-notifications">No new notifications</div>
-        <div *ngFor="let notification of notifications" class="notification-item">
+        <div *ngFor="let notification of notifications.slice(0,4)" class="notification-item">
           <div class="notification-content">
-            <img [src]="'assets/default-avatar.png'" alt="User photo" class="user-photo">
+            <app-user-avatar
+              [imageSrc]="notification.sender.userPhoto ? 'data:' + notification.sender.userPhoto.contentType + ';base64,' + notification.sender.userPhoto?.photoData : 'assets/default-avatar.png'"
+              [altText]="notification.type.toString()"
+              [userId]="notification.sender.id.toString()"
+            ></app-user-avatar>
             <div class="notification-text">
               <strong *ngIf="notification.sender">{{notification.sender.firstName + ' ' + notification.sender.lastName}}</strong> {{ getNotificationText(notification) }}
               <div class="notification-time">{{ getTimeAgo(notification.createdAt) }}</div>

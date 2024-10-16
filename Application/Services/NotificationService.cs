@@ -24,4 +24,16 @@ public class NotificationService : INotificationService
 
         return Result<IEnumerable<NotificationDto>>.Success(notifications);
     }
+
+    public async Task<Result<IEnumerable<NotificationDto>>> GetUnreadNotificationsForUserAsync(int userId)
+    {
+        var notifications = await _notificationRepository.GetUnreadNotificationsForUserAsync(userId);
+
+        if (notifications == null)
+        {
+            return Result<IEnumerable<NotificationDto>>.Failure("Notifications not found.");
+        }
+
+        return Result<IEnumerable<NotificationDto>>.Success(notifications);
+    }
 }

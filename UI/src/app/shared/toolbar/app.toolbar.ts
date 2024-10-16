@@ -79,10 +79,11 @@ export class ToolbarComponent implements OnInit {
   loadNotifications() {
     if (!this.user) return;
 
-    this.notificationService.getUserNotifications(this.user.id).subscribe({
+    this.notificationService.getUnreadNotifications(this.user.id).subscribe({
       next: (notifications) => {
         notifications = notifications.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        this.notifications = notifications.slice(0, 4);
+        this.notifications = notifications;
+        console.log('Notifications:', notifications);
         this.isLoading = false;
       },
       error: (error) => {

@@ -5,18 +5,21 @@
     <ng-container *ngFor="let notification of notifications; let last = last">
       <mat-list-item [@fadeIn]>
         <mat-icon matListIcon [ngClass]="getIconClass(notification.type)">{{ getIcon(notification.type) }}</mat-icon>
+
         <div *ngIf="notification.group" matLine class="notification-content">
-              <span class="notification-text">
-                <span *ngIf="notification.sender" class="highlight">{{notification.sender.firstName + ' ' + notification.sender.lastName}}</span>
-                {{ getActionText(notification.type) }}
-              </span>
-          <span class="notification-time">{{ getTimeAgo(notification.createdAt) }}</span>
+            <span class="notification-text">
+              <span *ngIf="notification.sender" class="highlight">{{notification.sender.firstName + ' ' + notification.sender.lastName}}</span>
+              {{ getActionText(notification.type) }}
+            </span>
+          <span class="notification-time">
+            {{ getTimeAgo(notification.createdAt) }}
+          </span>
         </div>
         <div *ngIf="notification.receiver" matLine class="notification-content">
-              <span class="notification-text">
-                <span *ngIf="notification.sender" class="highlight">{{notification.sender.firstName + ' ' + notification.sender.lastName}}</span>
-                {{ getActionText(notification.type) }}
-              </span>
+            <span class="notification-text">
+              <span *ngIf="notification.sender" class="highlight">{{notification.sender.firstName + ' ' + notification.sender.lastName}}</span>
+              {{ getActionText(notification.type) }}
+            </span>
           <span class="notification-time">{{ getTimeAgo(notification.createdAt) }}</span>
         </div>
       </mat-list-item>
