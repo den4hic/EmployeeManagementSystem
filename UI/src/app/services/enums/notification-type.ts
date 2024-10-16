@@ -7,5 +7,6 @@ export enum NotificationType {
   TaskDueDateChanged,
   NewProject,
   UnassignedFromProject,
+  AssignedToProject,
   ProjectDeleted
 }

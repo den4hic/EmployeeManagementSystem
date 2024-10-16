@@ -129,33 +129,6 @@ public class NotificationHub : Hub
         await _context.SaveChangesAsync();
     }
 
-    public async Task GetGroupNotifications(int groupId)
-    {
-        var userId = GetUserId(Context.User);
-        var user = await _context.Users
-            .Include(u => u.UserNotificationGroups)
-            .FirstOrDefaultAsync(u => u.Id.ToString() == userId);
-
-        if (user == null || !user.UserNotificationGroups.Any(ung => ung.GroupId == groupId))
-            return;
-
-        var notifications = await _context.Notifications
-            .Where(n => n.GroupId == groupId)
-            .OrderByDescending(n => n.CreatedAt)
-            .Take(50)
-            .Select(n => new NotificationDto
-            {
-                Id = n.Id,
-                GroupId = n.GroupId,
-                Message = n.Message,
-                CreatedAt = n.CreatedAt,
-                Type = n.Type
-            })
-            .ToListAsync();
-
-        await Clients.Caller.SendAsync("ReceiveGroupNotifications", notifications);
-    }
-
     public async Task SendProjectNotification(ProjectDto project, NotificationType type)
     {
         var groupName = $"Project_{project.Id}";
@@ -197,11 +170,10 @@ public class NotificationHub : Hub
 
         await _context.SaveChangesAsync();
 
-        await Clients.OthersInGroup(groupName).SendAsync("ReceiveNotification", type, project.Name);
+        await Clients.Group(groupName).SendAsync("ReceiveNotification", type, project.Name);
     }
 
-
-    public async Task SendNotification(string recieverUserId, NotificationType notificationType, TaskDto task)
+    public async Task SendNotification(string recieverUserId, NotificationType notificationType, string notificationTitle)
     {
         string userId = GetUserId(Context.User);
 
@@ -230,8 +202,75 @@ public class NotificationHub : Hub
         await _context.SaveChangesAsync();
 
         var connectionIds = OnlineUsers.Where(kvp => kvp.Value == recieverUserId).Select(kvp => kvp.Key).ToList();
-        await Clients.Clients(connectionIds).SendAsync("ReceiveNotification", notificationType, task.Title);
+        await Clients.Clients(connectionIds).SendAsync("ReceiveNotification", notificationType, notificationTitle);
     }
+
+    public async Task AddUserToGroup(int userId, string projectId)
+    {
+        var groupName = $"Project_{projectId}";
+        var user = await _context.Users
+            .Include(u => u.UserNotificationGroups)
+            .ThenInclude(un => un.Group)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user == null)
+        {
+            throw new ArgumentException($"User with ID {userId} not found");
+        }
+
+        if (!user.UserNotificationGroups.Any(ung => ung.Group.Name == groupName))
+        {
+            var group = await _context.NotificationGroups.FirstOrDefaultAsync(g => g.Name == groupName);
+
+            if (group == null)
+            {
+                throw new ArgumentException($"Group {groupName} not found");
+            }
+
+            user.UserNotificationGroups.Add(new UserNotificationGroups { User = user, Group = group });
+            await _context.SaveChangesAsync();
+        }
+        
+        if (OnlineUsers.ContainsValue(userId.ToString()))
+        {
+            var connectionId = OnlineUsers.FirstOrDefault(kvp => kvp.Value == userId.ToString()).Key;
+            if (connectionId != null)
+            {
+                await Groups.AddToGroupAsync(connectionId, groupName);
+            }
+        }
+    }
+
+    public async Task RemoveUserFromGroup(int userId, string projectId)
+    {
+        var groupName = $"Project_{projectId}";
+        var user = await _context.Users
+            .Include(u => u.UserNotificationGroups)
+            .ThenInclude(un => un.Group)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user == null)
+        {
+            throw new ArgumentException($"User with ID {userId} not found");
+        }
+
+        var userGroup = user.UserNotificationGroups.FirstOrDefault(ung => ung.Group.Name == groupName);
+        if (userGroup != null)
+        {
+            user.UserNotificationGroups.Remove(userGroup);
+            await _context.SaveChangesAsync();
+        }
+
+        if (OnlineUsers.ContainsValue(userId.ToString()))
+        {
+            var connectionId = OnlineUsers.FirstOrDefault(kvp => kvp.Value == userId.ToString()).Key;
+            if (connectionId != null)
+            {
+                await Groups.RemoveFromGroupAsync(connectionId, groupName);
+            }
+        }
+    }
+
 
     private async Task UpdateUserList()
     {

@@ -27,10 +27,10 @@ export class SignalRService {
       console.log('Online users:', users);
     });
 
-    this.hubConnection.on('ReceiveNotification', (message: NotificationType, taskTitle: string) => {
-      const notification : NotificationModel = { NotificationType: message, NotificationTitle: taskTitle };
+    this.hubConnection.on('ReceiveNotification', (message: NotificationType, notTitle: string) => {
+      const notification : NotificationModel = { NotificationType: message, NotificationTitle: notTitle };
       this.notifications.next(notification);
-      console.log('Received notification:', taskTitle);
+      console.log('Received notification:', notTitle);
     });
 
     this.hubConnection.onreconnecting((error) => {
@@ -79,8 +79,8 @@ export class SignalRService {
     return this.onlineUsers.asObservable();
   }
 
-  sendTaskUpdate(userId: number, notificationType: NotificationType, taskDto: TaskDto) {
-    this.hubConnection?.invoke('SendNotification', userId.toString(), notificationType, taskDto)
+  sendSingleNotification(userId: number, notificationType: NotificationType, notTitle: string) {
+    this.hubConnection?.invoke('SendNotification', userId.toString(), notificationType, notTitle)
       .catch(err => console.error(err));
   }
 
@@ -109,5 +109,15 @@ export class SignalRService {
       .build();
     this.createConnection();
     this.startConnection();
+  }
+
+  addUserToGroup(userId: number, number: number) {
+    this.hubConnection?.invoke('AddUserToGroup', userId, number.toString())
+      .catch(err => console.error(err));
+  }
+
+  removeUserFromGroup(userId: number, number: number) {
+    this.hubConnection?.invoke('RemoveUserFromGroup', userId, number.toString())
+      .catch(err => console.error(err));
   }
 }

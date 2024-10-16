@@ -26,7 +26,6 @@ import {ShowTaskDialogComponent} from '../../shared/show-task-dialog/show-task-d
 import {forkJoin} from "rxjs";
 import {SignalRService} from "../../services/signal-r.service";
 import {NotificationType} from "../../services/enums/notification-type";
-import {CreateProjectDto} from "../../services/dtos/create-project.dto";
 
 @Component({
   selector: 'app-project-dashboard',
@@ -172,7 +171,7 @@ export class ProjectDashboardComponent implements OnInit {
       if (this.userRole !== 'Employee' && task.assignedToEmployeeId) {
         const employee = this.employees.find(employee => employee.id === task.assignedToEmployeeId);
         if (employee) {
-          this.signalRService.sendTaskUpdate(employee.userId, NotificationType.TaskStatusChanged, task);
+          this.signalRService.sendSingleNotification(employee.userId, NotificationType.TaskStatusChanged, task.title);
         }
       }
       const newStatusId = parseInt(event.container.id);
@@ -230,7 +229,7 @@ export class ProjectDashboardComponent implements OnInit {
       if (result) {
         this.taskService.createTask(result).subscribe(
           (newTask) => {
-            this.signalRService.sendTaskUpdate(projectEmployees.find(employee => employee.id === newTask.assignedToEmployeeId)?.userId || 0, NotificationType.AssignedToTask, newTask);
+            this.signalRService.sendSingleNotification(projectEmployees.find(employee => employee.id === newTask.assignedToEmployeeId)?.userId || 0, NotificationType.AssignedToTask, newTask.title);
             this.loadTasks(this.selectedProject?.id || 0);
           },
           (error) => {
@@ -336,7 +335,7 @@ export class ProjectDashboardComponent implements OnInit {
       next: () => {
         const task = this.allTasks.find(task => task.id === taskId);
         if (!task) return;
-        this.signalRService.sendTaskUpdate(userId, NotificationType.TaskDeleted, task);
+        this.signalRService.sendSingleNotification(userId, NotificationType.TaskDeleted, task.title);
         this.loadTasks(this.selectedProject?.id || 0);
         this.snackBar.open('Task deleted successfully', 'Close', {duration: 3000});
       },
@@ -370,8 +369,8 @@ export class ProjectDashboardComponent implements OnInit {
       if (result) {
         result.id = task.id;
         if (result.assignedToEmployeeId !== task.assignedToEmployeeId) {
-          this.signalRService.sendTaskUpdate(projectEmployees.find(employee => employee.id === result.assignedToEmployeeId)?.userId || 0, NotificationType.AssignedToTask, result);
-          this.signalRService.sendTaskUpdate(projectEmployees.find(employee => employee.id === task.assignedToEmployeeId)?.userId || 0, NotificationType.UnassignedFromTask, result);
+          this.signalRService.sendSingleNotification(projectEmployees.find(employee => employee.id === result.assignedToEmployeeId)?.userId || 0, NotificationType.AssignedToTask, result.title);
+          this.signalRService.sendSingleNotification(projectEmployees.find(employee => employee.id === task.assignedToEmployeeId)?.userId || 0, NotificationType.UnassignedFromTask, result.title);
         }
         this.taskService.updateTask(result).subscribe(
           () => {
@@ -448,6 +447,8 @@ export class ProjectDashboardComponent implements OnInit {
 
         this.projectService.updateProject(newProject).subscribe(
           () => {
+            this.signalRService.sendSingleNotification(employee.userId, NotificationType.UnassignedFromProject, this.selectedProject?.name || '');
+            this.signalRService.removeUserFromGroup(employee.userId, this.selectedProject?.id || 0);
             this.snackBar.open('Employee removed successfully', 'Close', { duration: 3000 });
             this.loadProjects();
           },
@@ -478,6 +479,8 @@ export class ProjectDashboardComponent implements OnInit {
 
         this.projectService.updateProject(newProject).subscribe(
           () => {
+            this.signalRService.sendSingleNotification(manager.userId, NotificationType.UnassignedFromProject, this.selectedProject?.name || '');
+            this.signalRService.removeUserFromGroup(manager.userId, this.selectedProject?.id || 0);
             this.snackBar.open('Manager removed successfully', 'Close', { duration: 3000 });
             this.loadProjects();
           },
@@ -531,6 +534,10 @@ export class ProjectDashboardComponent implements OnInit {
 
     this.projectService.updateProject(newProject).subscribe(
       () => {
+        if (!this.selectedManagerToAdd)
+          return;
+        this.signalRService.sendSingleNotification(this.selectedManagerToAdd.userId, NotificationType.AssignedToProject, this.selectedProject?.name || '');
+        this.signalRService.addUserToGroup(this.selectedManagerToAdd.userId, this.selectedProject?.id || 0);
         this.snackBar.open('Manager added successfully', 'Close', { duration: 3000 });
         this.loadProjects();
         this.showManagerSelect = false;
@@ -552,6 +559,11 @@ export class ProjectDashboardComponent implements OnInit {
 
     this.projectService.updateProject(newProject).subscribe(
       () => {
+        if (!this.selectedEmployeeToAdd)
+          return;
+
+        this.signalRService.sendSingleNotification(this.selectedEmployeeToAdd.userId, NotificationType.AssignedToProject, this.selectedProject?.name || '');
+        this.signalRService.addUserToGroup(this.selectedEmployeeToAdd.userId, this.selectedProject?.id || 0);
         this.snackBar.open('Employee added successfully', 'Close', { duration: 3000 });
         this.loadProjects();
         this.showEmployeeSelect = false;
