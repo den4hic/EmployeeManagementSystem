@@ -96,23 +96,25 @@ public class NotificationHub : Hub
     public async Task CreateProjectGroup(string id)
     {
         int projectId = int.Parse(id);
-        var projectResult = await _projectService.GetProjectByIdWithDetailsAsync(projectId);
-
-        if (!projectResult.IsSuccess)
-            return;
-
-        var project = projectResult.Value;
+        var project = await _context.Projects
+            .Include(p => p.ProjectEmployees)
+            .ThenInclude(pe => pe.Employee)
+            .ThenInclude(e => e.User)
+            .Include(p => p.ProjectManagers)
+            .ThenInclude(pm => pm.Manager)
+            .ThenInclude(m => m.User)
+            .FirstOrDefaultAsync(p => p.Id == projectId);
 
         var groupName = $"Project_{projectId}";
         var group = new NotificationGroup { Name = groupName };
 
-        var usersToAdd = project.Employees.Select(pe => pe.User)
-            .Concat(project.Managers.Select(pm => pm.User))
+        var usersToAdd = project.ProjectEmployees.Select(pe => pe.Employee.User)
+            .Concat(project.ProjectManagers.Select(pm => pm.Manager.User))
             .Distinct();
 
         foreach (var user in usersToAdd)
         {
-            group.UserNotificationGroups.Add(new UserNotificationGroups { User = _mapper.Map<User>(user) });
+            group.UserNotificationGroups.Add(new UserNotificationGroups { User = user });
             if (OnlineUsers.ContainsValue(user.Id.ToString()))
             {
                 var connectionKvp = OnlineUsers.FirstOrDefault(kvp => kvp.Value == user.Id.ToString());
@@ -195,7 +197,7 @@ public class NotificationHub : Hub
 
         await _context.SaveChangesAsync();
 
-        await Clients.Group(groupName).SendAsync("ReceiveNotification", type, project.Name);
+        await Clients.OthersInGroup(groupName).SendAsync("ReceiveNotification", type, project.Name);
     }
 
 

@@ -10,28 +10,18 @@ import {ProjectDto} from "./dtos/project.dto";
   providedIn: 'root'
 })
 export class SignalRService {
-  private hubConnection: HubConnection;
+  private hubConnection: HubConnection | null = null;
   public onlineUsers = new BehaviorSubject<string[]>([]);
   public notifications = new Subject<NotificationModel>();
 
   constructor() {
-    this.hubConnection = new HubConnectionBuilder()
-      .withUrl('https://localhost:7110/notificationHub', {
-        accessTokenFactory: () => {
-          const token = localStorage.getItem('accessToken');
-          if (!token) {
-            throw new Error('No token found');
-          }
-          return token;
-        }
-      })
-      .withAutomaticReconnect()
-      .build();
-    this.createConnection();
-    this.startConnection();
+    this.connect();
   }
 
   private createConnection() {
+    if (!this.hubConnection) {
+      return;
+    }
     this.hubConnection.on('UpdateUserList', (users: string[]) => {
       this.onlineUsers.next(users);
       console.log('Online users:', users);
@@ -58,6 +48,9 @@ export class SignalRService {
   }
 
   private startConnection() {
+    if (!this.hubConnection) {
+      return;
+    }
     if (this.hubConnection.state === HubConnectionState.Disconnected) {
       this.hubConnection.start()
         .then(() => console.log('Connection started'))
@@ -69,6 +62,9 @@ export class SignalRService {
   }
 
   public async disconnect() {
+    if (!this.hubConnection) {
+      return;
+    }
     if (this.hubConnection.state === HubConnectionState.Connected) {
       try {
         await this.hubConnection.stop();
@@ -84,17 +80,34 @@ export class SignalRService {
   }
 
   sendTaskUpdate(userId: number, notificationType: NotificationType, taskDto: TaskDto) {
-    this.hubConnection.invoke('SendNotification', userId.toString(), notificationType, taskDto)
+    this.hubConnection?.invoke('SendNotification', userId.toString(), notificationType, taskDto)
       .catch(err => console.error(err));
   }
 
   createProjectGroup(id: number) {
-    this.hubConnection.invoke('CreateProjectGroup', id.toString())
+    this.hubConnection?.invoke('CreateProjectGroup', id.toString())
       .catch(err => console.error(err));
   }
 
   sendProjectNotification(project: ProjectDto, notificationType: NotificationType) {
-    this.hubConnection.invoke('SendProjectNotification', project, notificationType)
+    this.hubConnection?.invoke('SendProjectNotification', project, notificationType)
       .catch(err => console.error(err));
+  }
+
+  public connect() {
+    this.hubConnection = new HubConnectionBuilder()
+      .withUrl('https://localhost:7110/notificationHub', {
+        accessTokenFactory: () => {
+          const token = localStorage.getItem('accessToken');
+          if (!token) {
+            throw new Error('No token found');
+          }
+          return token;
+        }
+      })
+      .withAutomaticReconnect()
+      .build();
+    this.createConnection();
+    this.startConnection();
   }
 }

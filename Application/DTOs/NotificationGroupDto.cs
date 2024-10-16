@@ -1,8 +1,9 @@
-﻿using Domain.Entities;
+﻿using Application.Common;
+using Domain.Entities;
 
 namespace Application.DTOs;
 
-public class NotificationGroupDto
+public class NotificationGroupDto : BaseDto<int>
 {
     public string Name { get; set; } = null!;
 

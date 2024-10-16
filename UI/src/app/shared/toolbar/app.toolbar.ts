@@ -7,6 +7,7 @@ import {UserService} from "../../services/user.service";
 import {UserDto} from "../../services/dtos/user.dto";
 import {NotificationDto} from "../../services/dtos/notification.dto";
 import {NotificationType} from "../../services/enums/notification-type";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-toolbar',
@@ -17,6 +18,7 @@ export class ToolbarComponent implements OnInit {
   public user: UserDto | null = null;
   public notifications: NotificationDto[] = [];
   public isLoading = false;
+  private notificationSubscription: Subscription = new Subscription();
 
   constructor(
     private authService: AuthService,
@@ -27,6 +29,14 @@ export class ToolbarComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.loadUserDataIfNeeded();
+    this.subscribeToNotifications();
+  }
+
+  ngOnDestroy() {
+    if (this.notificationSubscription) {
+      this.notificationSubscription.unsubscribe();
+    }
   }
 
   isAuthenticated(): boolean {
@@ -128,4 +138,12 @@ export class ToolbarComponent implements OnInit {
     return `${days} days ago`;
   }
 
+  private subscribeToNotifications() {
+    this.notificationSubscription = this.signalRService.notifications.subscribe(
+      (notification) => {
+        console.log('Received new notification:', notification);
+        this.loadNotifications();
+      }
+    );
+  }
 }

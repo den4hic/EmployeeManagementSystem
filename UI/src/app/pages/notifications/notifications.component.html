@@ -8,14 +8,14 @@
         <div *ngIf="notification.group" matLine class="notification-content">
               <span class="notification-text">
                 <span *ngIf="notification.sender" class="highlight">{{notification.sender.firstName + ' ' + notification.sender.lastName}}</span>
-                {{ getNotificationText(notification) }}
+                {{ getActionText(notification.type) }}
               </span>
           <span class="notification-time">{{ getTimeAgo(notification.createdAt) }}</span>
         </div>
         <div *ngIf="notification.receiver" matLine class="notification-content">
               <span class="notification-text">
                 <span *ngIf="notification.sender" class="highlight">{{notification.sender.firstName + ' ' + notification.sender.lastName}}</span>
-                {{ getNotificationText(notification) }}
+                {{ getActionText(notification.type) }}
               </span>
           <span class="notification-time">{{ getTimeAgo(notification.createdAt) }}</span>
         </div>

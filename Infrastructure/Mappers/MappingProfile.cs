@@ -12,9 +12,26 @@ public class MappingProfile : Profile
         CreateMap<User, UserDto>()
             .ForMember(dest => dest.NotificationGroups, opt => opt.MapFrom(src => src.UserNotificationGroups.Select(ung => ung.Group)));
 
-        CreateMap<NotificationGroup, NotificationGroupDto>();
+        CreateMap<NotificationGroup, NotificationGroupDto>().ReverseMap();
 
-        CreateMap<Notification, NotificationDto>();
+        CreateMap<Notification, NotificationDto>()
+            .ForMember(dest => dest.Group, opt => opt.MapFrom(src => new NotificationGroupDto
+            {
+                Id = src.Group.Id,
+                Name = src.Group.Name
+            }))
+            .ForMember(dest => dest.Receiver, opt => opt.MapFrom(src => new UserDto
+            {
+                Id = src.Receiver.Id,
+                FirstName = src.Receiver.FirstName,
+                LastName = src.Receiver.LastName,
+            }))
+            .ForMember(dest => dest.Sender, opt => opt.MapFrom(src => new UserDto
+            {
+                Id = src.Sender.Id,
+                FirstName = src.Sender.FirstName,
+                LastName = src.Sender.LastName,
+            })).ReverseMap();
 
         CreateMap<UserDto, User>();
 

@@ -5,6 +5,8 @@ import {NotificationType} from '../../services/enums/notification-type';
 import {UserService} from "../../services/user.service";
 import {UserDto} from "../../services/dtos/user.dto";
 import {animate, style, transition, trigger} from '@angular/animations';
+import {SignalRService} from "../../services/signal-r.service";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-notifications',
@@ -22,14 +24,32 @@ import {animate, style, transition, trigger} from '@angular/animations';
 export class NotificationsComponent implements OnInit {
   notifications: NotificationDto[] = [];
   user: UserDto | null = null;
+  private notificationSubscription: Subscription = new Subscription();
 
   constructor(
     private notificationService: NotificationService,
+    private signalRService: SignalRService,
     private userService: UserService
   ) {}
 
   ngOnInit() {
     this.loadNotifications();
+    this.subscribeToNotifications();
+  }
+
+  ngOnDestroy() {
+    if (this.notificationSubscription) {
+      this.notificationSubscription.unsubscribe();
+    }
+  }
+
+  private subscribeToNotifications() {
+    this.notificationSubscription = this.signalRService.notifications.subscribe(
+      (notification) => {
+        console.log('Received new notification:', notification);
+        this.loadNotifications();
+      }
+    );
   }
 
   loadNotifications() {
@@ -51,11 +71,7 @@ export class NotificationsComponent implements OnInit {
     );
   }
 
-  getNotificationText(notification: NotificationDto): string {
-    return this.getActionText(notification.type);
-  }
-
-  private getActionText(type: NotificationType): string {
+  public getActionText(type: NotificationType): string {
     switch (type) {
       case NotificationType.AssignedToTask:
         return 'assigned you to a task';
@@ -81,9 +97,9 @@ export class NotificationsComponent implements OnInit {
   }
 
   getIcon(type: NotificationType): string {
-    if (type.toString().includes('Task')) {
+    if (type < 6) {
       return 'assignment';
-    } else if (type.toString().includes('Project')) {
+    } else if (type >= 6 && type < 9) {
       return 'folder';
     } else {
       return 'notifications';
@@ -91,9 +107,9 @@ export class NotificationsComponent implements OnInit {
   }
 
   getIconClass(type: NotificationType): string {
-    if (type.toString().includes('Task')) {
+    if (type < 6) {
       return 'icon-task';
-    } else if (type.toString().includes('Project')) {
+    } else if (type >= 6 && type < 9) {
       return 'icon-project';
     } else {
       return 'icon-warning';
