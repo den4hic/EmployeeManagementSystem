@@ -3,7 +3,35 @@
   <span class="spacer"></span>
 
   <ng-container *ngIf="isAuthenticated(); else loginRegister">
-    <ng-container *ngTemplateOutlet="authenticatedContent"></ng-container>
+    <ng-container *ngIf="loadUserDataIfNeeded()"></ng-container>
+    <button mat-icon-button [matMenuTriggerFor]="notificationMenu">
+      <mat-icon [matBadge]="notifications.length" matBadgeColor="warn">notifications</mat-icon>
+    </button>
+    <mat-menu #notificationMenu="matMenu" class="notification-menu">
+      <div *ngIf="isLoading" class="loading-indicator">Loading...</div>
+      <ng-container *ngIf="!isLoading">
+        <div *ngIf="notifications.length === 0" class="no-notifications">No new notifications</div>
+        <div *ngFor="let notification of notifications" class="notification-item">
+          <div class="notification-content">
+            <img [src]="'assets/default-avatar.png'" alt="User photo" class="user-photo">
+            <div class="notification-text">
+              <strong *ngIf="notification.sender">{{notification.sender.firstName + ' ' + notification.sender.lastName}}</strong> {{ getNotificationText(notification) }}
+              <div class="notification-time">{{ getTimeAgo(notification.createdAt) }}</div>
+            </div>
+          </div>
+        </div>
+        <mat-divider *ngIf="notifications.length > 0"></mat-divider>
+        <button mat-menu-item (click)="viewAllNotifications()" class="view-all">VIEW ALL</button>
+      </ng-container>
+    </mat-menu>
+
+    <button mat-icon-button [matMenuTriggerFor]="userMenu">
+      <img [src]="user?.userPhoto?.photoData || 'assets/default-avatar.png'" alt="User photo" class="user-avatar">
+    </button>
+    <mat-menu #userMenu="matMenu">
+      <button mat-menu-item (click)="goToProfile()">Profile</button>
+      <button mat-menu-item (click)="logout()">Logout</button>
+    </mat-menu>
   </ng-container>
 
   <ng-template #loginRegister>
@@ -11,37 +39,5 @@
     <a mat-button routerLink="/register">Register</a>
   </ng-template>
 </mat-toolbar>
-
-<ng-template #authenticatedContent>
-  <ng-container *ngIf="loadUserDataIfNeeded()"></ng-container>
-  <button mat-icon-button [matMenuTriggerFor]="notificationMenu">
-    <mat-icon [matBadge]="notifications.length" matBadgeColor="warn">notifications</mat-icon>
-  </button>
-  <mat-menu #notificationMenu="matMenu" class="notification-menu">
-    <div *ngIf="isLoading" class="loading-indicator">Loading...</div>
-    <ng-container *ngIf="!isLoading">
-      <div *ngIf="notifications.length === 0" class="no-notifications">No new notifications</div>
-      <div *ngFor="let notification of notifications" class="notification-item">
-        <div class="notification-content">
-          <img [src]="'assets/default-avatar.png'" alt="User photo" class="user-photo">
-          <div class="notification-text">
-            <strong *ngIf="notification.sender">{{notification.sender.firstName + ' ' + notification.sender.lastName}}</strong> {{ getNotificationText(notification) }}
-            <div class="notification-time">{{ getTimeAgo(notification.createdAt) }}</div>
-          </div>
-        </div>
-      </div>
-      <mat-divider *ngIf="notifications.length > 0"></mat-divider>
-      <button mat-menu-item (click)="viewAllNotifications()" class="view-all">VIEW ALL</button>
-    </ng-container>
-  </mat-menu>
-
-  <button mat-icon-button [matMenuTriggerFor]="userMenu">
-    <img [src]="user?.userPhoto?.photoData || 'assets/default-avatar.png'" alt="User photo" class="user-avatar">
-  </button>
-  <mat-menu #userMenu="matMenu">
-    <button mat-menu-item (click)="goToProfile()">Profile</button>
-    <button mat-menu-item (click)="logout()">Logout</button>
-  </mat-menu>
-</ng-template>
 
 <router-outlet></router-outlet>

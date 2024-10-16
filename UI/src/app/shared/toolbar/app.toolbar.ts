@@ -8,6 +8,7 @@ import {UserDto} from "../../services/dtos/user.dto";
 import {NotificationDto} from "../../services/dtos/notification.dto";
 import {NotificationType} from "../../services/enums/notification-type";
 import {Subscription} from "rxjs";
+import {JwtService} from "../../services/jwt.service";
 
 @Component({
   selector: 'app-toolbar',
@@ -22,6 +23,7 @@ export class ToolbarComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
+    private jwtService: JwtService,
     private signalRService: SignalRService,
     private notificationService: NotificationService,
     private userService: UserService,
@@ -40,7 +42,7 @@ export class ToolbarComponent implements OnInit {
   }
 
   isAuthenticated(): boolean {
-    return this.authService.isAuthenticated();
+    return !this.jwtService.isTokenExpired();
   }
 
   goToProfile(): void {

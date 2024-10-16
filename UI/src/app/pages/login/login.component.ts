@@ -6,6 +6,7 @@ import {JwtService} from "../../services/jwt.service";
 import {Router} from "@angular/router";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {SignalRService} from "../../services/signal-r.service";
+import {UserService} from "../../services/user.service";
 
 @Component({
   selector: 'app-login',
@@ -18,7 +19,7 @@ export class LoginComponent {
   hidePassword = true;
   private snackBar = inject(MatSnackBar);
 
-  constructor(private authService: AuthService, private jwtService: JwtService, private fb: FormBuilder, private signalRService: SignalRService) {
+  constructor(private userService: UserService, private authService: AuthService, private jwtService: JwtService, private fb: FormBuilder, private signalRService: SignalRService) {
     this.loginForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
@@ -33,6 +34,7 @@ export class LoginComponent {
           console.log('Login successful', response);
           console.log('User role:', this.jwtService.getUserRole());
           this.signalRService.connect();
+          this.userService.getUserInfo(true);
           this.router.navigate(['/']);
         },
         error => {
