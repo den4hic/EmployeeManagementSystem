@@ -42,10 +42,10 @@ public class NotificationController : ControllerBase
         return NotFound(notifications.Error);
     }
 
-    [HttpPut("mark-notification-as-read/{notificationId}")]
-    public async Task<IActionResult> MarkNotificationAsRead(int notificationId)
+    [HttpPut("mark-notification-as-read/{notificationId}/{userId}")]
+    public async Task<IActionResult> MarkNotificationAsRead(int notificationId, int userId)
     {
-        var result = await _notificationService.MarkNotificationAsReadAsync(notificationId);
+        var result = await _notificationService.MarkNotificationAsReadAsync(notificationId, userId);
 
         if (result.IsSuccess)
         {

@@ -6,5 +6,5 @@ public interface INotificationRepository : ICRUDRepository<NotificationDto, int>
 {
     Task<IEnumerable<NotificationDto>> GetNotificationsWithDetailsByUserId(int userId);
     Task<IEnumerable<NotificationDto>> GetUnreadNotificationsForUserAsync(int userId);
-    Task MarkNotificationAsReadAsync(int notificationId);
+    Task MarkNotificationAsReadAsync(int notificationId, int userId);
 }

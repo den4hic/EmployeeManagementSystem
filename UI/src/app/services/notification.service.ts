@@ -22,8 +22,8 @@ export class NotificationService {
     return this.http.get<NotificationDto[]>(url);
   }
 
-  markNotificationAsRead(notificationId: number): Observable<void> {
-    const url = `${this.apiPath}/mark-notification-as-read/${notificationId}`;
+  markNotificationAsRead(notificationId: number, userId: number): Observable<void> {
+    const url = `${this.apiPath}/mark-notification-as-read/${notificationId}/${userId}`;
     return this.http.put<void>(url, null);
   }
 }

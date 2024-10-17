@@ -41,10 +41,10 @@ public class NotificationRepository : CRUDRepositoryBase<Notification, Notificat
         return _mapper.Map<IEnumerable<NotificationDto>>(unreadNotifications);
     }
 
-    public async System.Threading.Tasks.Task MarkNotificationAsReadAsync(int notificationId)
+    public async System.Threading.Tasks.Task MarkNotificationAsReadAsync(int notificationId, int userId)
     {
         var userNotification = await _context.UserNotifications
-            .FirstOrDefaultAsync(un => un.NotificationId == notificationId);
+            .FirstOrDefaultAsync(un => un.NotificationId == notificationId && un.UserId == userId);
 
         if (userNotification == null)
         {

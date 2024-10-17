@@ -37,11 +37,11 @@ public class NotificationService : INotificationService
         return Result<IEnumerable<NotificationDto>>.Success(notifications);
     }
 
-    public async Task<Result<bool>> MarkNotificationAsReadAsync(int notificationId)
+    public async Task<Result<bool>> MarkNotificationAsReadAsync(int notificationId, int userId)
     {
         try
         {
-            await _notificationRepository.MarkNotificationAsReadAsync(notificationId);
+            await _notificationRepository.MarkNotificationAsReadAsync(notificationId, userId);
 
             return Result<bool>.Success(true);
         }

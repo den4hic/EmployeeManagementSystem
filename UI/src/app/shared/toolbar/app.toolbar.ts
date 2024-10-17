@@ -22,6 +22,7 @@ export class ToolbarComponent implements OnInit {
   private notificationSubscription: Subscription = new Subscription();
   public shownNotifications: NotificationDto[] = [];
   private readonly maxNotifications = 4;
+  private userDto: UserDto | null = null;
 
   constructor(
     private authService: AuthService,
@@ -96,7 +97,9 @@ export class ToolbarComponent implements OnInit {
 
   viewAllNotifications() {
     for (const notification of this.notifications) {
-      this.notificationService.markNotificationAsRead(notification.id).subscribe();
+      if (!this.user)
+        return;
+      this.notificationService.markNotificationAsRead(notification.id, this.user.id).subscribe();
     }
 
     this.router.navigate(['/notifications']);
@@ -158,7 +161,9 @@ export class ToolbarComponent implements OnInit {
   onNotificationMenuClick() {
     this.shownNotifications = this.notifications.slice(0, this.maxNotifications);
     for (const shownNotification of this.shownNotifications) {
-      this.notificationService.markNotificationAsRead(shownNotification.id).subscribe();
+      if (!this.user)
+          return
+      this.notificationService.markNotificationAsRead(shownNotification.id, this.user.id).subscribe();
     }
 
     this.notifications = this.notifications.filter((notification) => !this.shownNotifications.includes(notification));
