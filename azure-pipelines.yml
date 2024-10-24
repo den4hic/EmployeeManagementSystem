@@ -11,10 +11,7 @@ variables:
   dacpacFile: '**/*.dacpac'
 
 steps:
-- task: UseDotNet@2
-  inputs:
-    packageType: 'sdk'
-    version: '8.x.x'
+- task: NuGetToolInstaller@1
 
 - task: DotNetCoreCLI@2
   inputs:
