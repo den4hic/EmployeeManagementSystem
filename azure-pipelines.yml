@@ -4,37 +4,25 @@ pool:
     - agent.name -equals SelfHostedAgent
 
 variables:
-  buildConfiguration: 'Release'
-  buildPlatform: 'Any CPU'
   solution: '**/*.sln'
-  publishDir: '$(Build.ArtifactStagingDirectory)/drop'
-  dacpacFile: '**/*.dacpac'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
 
 steps:
 - task: NuGetToolInstaller@1
 
-- task: DotNetCoreCLI@2
+- task: NuGetCommand@2
   inputs:
-    command: 'restore'
-    projects: '$(solution)'
+    restoreSolution: '$(solution)'
 
-- task: DotNetCoreCLI@2
+- task: VSBuild@1
   inputs:
-    command: 'build'
+    solution: '$(solution)'
+    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
 
-- task: DotNetCoreCLI@2
+- task: VSTest@2
   inputs:
-    command: 'publish'
-    publishWebProjects: true
-
-- task: CopyFiles@2
-  inputs:
-    SourceFolder: '$(System.DefaultWorkingDirectory)'
-    Contents: '$(dacpacFile)'
-    TargetFolder: '$(publishDir)'
-
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(publishDir)'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
