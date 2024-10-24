@@ -28,7 +28,8 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
-    publishWebProjects: true
+    projects: '$(solution)'
+    arguments: '--configuration $(buildConfiguration) --output $(publishDir)'
 
 - task: CopyFiles@2
   inputs:
