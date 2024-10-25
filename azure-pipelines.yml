@@ -41,32 +41,31 @@ steps:
 
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(publishDir)'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
+    PathtoPublish: '$(publishDir)/WebAPI.zip'
+    ArtifactName: 'WebAPI'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(publishDir)/ProjectDatabase/bin/Release/ProjectDatabase.dacpac'
+    ArtifactName: 'ProjectDB'
 
 - task: NodeTool@0
   inputs:
     versionSpec: '20.x'
 
 - script: |
-    cd $(System.DefaultWorkingDirectory)/$(uiProjectPath)
-    npm install
-  displayName: 'Install UI project dependencies'
+    npm install & npm run build
+  workingDirectory: $(Build.Repository.LocalPath)/UI
+  displayName: 'Install UI project dependencies and run build'
 
-- script: |
-    cd $(System.DefaultWorkingDirectory)/$(uiProjectPath)
-    npm run build --prod
-  displayName: 'Build UI project'
+# - task: CopyFiles@2
+#   inputs:
+#     SourceFolder: '$(System.DefaultWorkingDirectory)'
+#     Contents: '**'
+#     TargetFolder: '$(uiPublishDir)'
 
-- task: CopyFiles@2
-  inputs:
-    SourceFolder: '$(System.DefaultWorkingDirectory)'
-    Contents: '**'
-    TargetFolder: '$(uiPublishDir)'
-
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(uiPublishDir)'
-    ArtifactName: 'ui'
-    publishLocation: 'Container'
+# - task: PublishBuildArtifacts@1
+#   inputs:
+#     PathtoPublish: '$(uiPublishDir)'
+#     ArtifactName: 'ui'
+#     publishLocation: 'Container'
