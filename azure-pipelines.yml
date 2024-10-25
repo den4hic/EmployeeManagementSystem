@@ -9,6 +9,8 @@ variables:
   solution: '**/*.sln'
   publishDir: '$(Build.ArtifactStagingDirectory)/drop'
   dacpacFile: '**/*.dacpac'
+  uiProjectPath: 'UIProject'
+  uiPublishDir: '$(Build.ArtifactStagingDirectory)/ui'
 
 steps:
 - task: NuGetToolInstaller@1
@@ -41,4 +43,30 @@ steps:
   inputs:
     PathtoPublish: '$(publishDir)'
     ArtifactName: 'drop'
+    publishLocation: 'Container'
+
+- task: NodeTool@0
+  inputs:
+    versionSpec: '20.x'
+
+- script: |
+    cd $(System.DefaultWorkingDirectory)/$(uiProjectPath)
+    npm install
+  displayName: 'Install UI project dependencies'
+
+- script: |
+    cd $(System.DefaultWorkingDirectory)/$(uiProjectPath)
+    npm run build --prod
+  displayName: 'Build UI project'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(System.DefaultWorkingDirectory)'
+    Contents: '**'
+    TargetFolder: '$(uiPublishDir)'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(uiPublishDir)'
+    ArtifactName: 'ui'
     publishLocation: 'Container'
