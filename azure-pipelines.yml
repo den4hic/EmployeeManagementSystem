@@ -1,0 +1,84 @@
+pool:
+  name: 'Default'
+  demands:
+    - agent.name -equals SelfHostedAgent
+
+variables:
+  buildConfiguration: 'Release'
+  buildPlatform: 'Any CPU'
+  solution: '**/*.sln'
+  publishDir: '$(Build.ArtifactStagingDirectory)/drop'
+  dacpacFile: '**/*.dacpac'
+  uiProjectPath: 'UI'
+  uiPublishDir: '$(Build.ArtifactStagingDirectory)/ui'
+
+steps:
+#Asp.net core pipelines
+- task: NuGetToolInstaller@1
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    projects: '$(solution)'
+
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    msbuildArgs: '/p:Configuration=Release /p:Platform="Any CPU"'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    projects: '$(solution)'
+    arguments: '--configuration $(buildConfiguration) --output $(publishDir)'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(System.DefaultWorkingDirectory)'
+    Contents: '$(dacpacFile)'
+    TargetFolder: '$(publishDir)'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(publishDir)/WebAPI.zip'
+    ArtifactName: 'WebAPI'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(publishDir)/ProjectDatabase/bin/Release/ProjectDatabase.dacpac'
+    ArtifactName: 'ProjectDB'
+
+#Angular pipelines
+- task: NodeTool@0
+  inputs:
+    versionSpec: '20.x'
+
+- task: Npm@1
+  displayName: 'Install Angular dependencies'
+  inputs:
+    command: 'install'
+    workingDir: '$(System.DefaultWorkingDirectory)/$(uiProjectPath)'
+
+- task: Npm@1
+  displayName: 'Build Angular'
+  inputs:
+    command: 'custom'
+    workingDir: '$(System.DefaultWorkingDirectory)/$(uiProjectPath)'
+    customCommand: 'run build'
+
+- task: ArchiveFiles@2
+  displayName: 'Archive Angular files'
+  inputs:
+    rootFolderOrFile: '$(System.DefaultWorkingDirectory)/$(uiProjectPath)/dist'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '$(uiPublishDir)/UI.zip'
+    replaceExistingArchive: true
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Angular artifacts'
+  inputs:
+    PathtoPublish: '$(uiPublishDir)/UI.zip'
+    ArtifactName: 'UI'
