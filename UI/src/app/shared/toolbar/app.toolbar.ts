@@ -136,18 +136,18 @@ export class ToolbarComponent implements OnInit {
 
   getTimeAgo(date: Date): string {
     const now = new Date();
-    const diff = now.getTime() - new Date(date).getTime();
-    const minutes = Math.floor(diff / 60000);
-    if (minutes < 60) {
-      return `${minutes} min ago`;
+      const diff = now.getTime() - new Date(date).getTime();
+      const minutes = Math.floor(diff / 60000);
+      if (minutes < 60) {
+        return `${minutes} min ago`;
+      }
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) {
+        return `${hours} hours ago`;
+      }
+      const days = Math.floor(hours / 24);
+      return `${days} days ago`;
     }
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) {
-      return `${hours} hours ago`;
-    }
-    const days = Math.floor(hours / 24);
-    return `${days} days ago`;
-  }
 
   private subscribeToNotifications() {
     this.notificationSubscription = this.signalRService.notifications.subscribe(
