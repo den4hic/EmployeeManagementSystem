@@ -9,10 +9,11 @@ variables:
   solution: '**/*.sln'
   publishDir: '$(Build.ArtifactStagingDirectory)/drop'
   dacpacFile: '**/*.dacpac'
-  uiProjectPath: 'UIProject'
+  uiProjectPath: 'UI'
   uiPublishDir: '$(Build.ArtifactStagingDirectory)/ui'
 
 steps:
+#Asp.net core pipelines
 - task: NuGetToolInstaller@1
 
 - task: DotNetCoreCLI@2
@@ -49,23 +50,33 @@ steps:
     PathtoPublish: '$(publishDir)/ProjectDatabase/bin/Release/ProjectDatabase.dacpac'
     ArtifactName: 'ProjectDB'
 
+#Angular pipelines
 - task: NodeTool@0
   inputs:
     versionSpec: '20.x'
 
-- script: |
-    npm install & npm run build
-  workingDirectory: $(Build.Repository.LocalPath)/UI
-  displayName: 'Install UI project dependencies and run build'
+- task: Npm@1
+  displayName: 'Install Angular dependencies'
+  inputs:
+    command: 'install'
+    workingDir: '$(System.DefaultWorkingDirectory)/$(uiProjectPath)'
 
-# - task: CopyFiles@2
-#   inputs:
-#     SourceFolder: '$(System.DefaultWorkingDirectory)'
-#     Contents: '**'
-#     TargetFolder: '$(uiPublishDir)'
+- task: Npm@1
+  displayName: 'Build Angular'
+  inputs:
+    command: 'custom'
+    workingDir: '$(System.DefaultWorkingDirectory)/$(uiProjectPath)'
+    customCommand: 'run build'
 
-# - task: PublishBuildArtifacts@1
-#   inputs:
-#     PathtoPublish: '$(uiPublishDir)'
-#     ArtifactName: 'ui'
-#     publishLocation: 'Container'
+- task: CopyFiles@2
+  displayName: 'Copy Angular build files'
+  inputs:
+    SourceFolder: '$(System.DefaultWorkingDirectory)/$(uiProjectPath)/dist'
+    Contents: '**'
+    TargetFolder: '$(uiPublishDir)'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Angular artifacts'
+  inputs:
+    PathtoPublish: '$(uiPublishDir)'
+    ArtifactName: 'UI'
