@@ -2,16 +2,28 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 3.0"
+      version = "~> 4.0"
     }
   }
 }
 
 provider "azurerm" {
-  features {}
+  features {
+    key_vault {
+      purge_soft_delete_on_destroy    = true
+      recover_soft_deleted_key_vaults = true
+    }
+  }
+
+  subscription_id = "3ec5c0ac-5b6f-4a11-9982-b335e0ba3b94"
 }
 
 data "azurerm_client_config" "current" {}
+
+resource "azurerm_resource_group" "rg" {
+  name     = "${var.project_name}-rg"
+  location = var.location
+}
 
 resource "azurerm_key_vault" "kv" {
   name                        = "${var.project_name}-kv"
@@ -42,17 +54,12 @@ resource "azurerm_key_vault" "kv" {
   }
 }
 
-resource "azurerm_resource_group" "rg" {
-  name     = "${var.project_name}-rg"
-  location = var.location
-}
-
 resource "azurerm_mssql_server" "sql" {
   name                         = "${var.project_name}-sql"
   resource_group_name          = azurerm_resource_group.rg.name
   location                     = azurerm_resource_group.rg.location
   version                      = "12.0"
-  administrator_login          = "admin"
+  administrator_login          = "sqladmin"
   administrator_login_password = "Password@123"
 }
 
@@ -62,27 +69,30 @@ resource "azurerm_mssql_database" "db" {
   collation      = "SQL_Latin1_General_CP1_CI_AS"
   license_type   = "LicenseIncluded"
   max_size_gb    = 2
-  sku_name       = "Free"
+  sku_name       = "Basic"
 }
 
 resource "azurerm_service_plan" "plan" {
   name                = "${var.project_name}-plan"
   resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
+  location            = var.location_app
+
+  sku_name            = "S1"
   os_type             = "Windows"
-  sku_name            = "F1"
 }
 
 resource "azurerm_windows_web_app" "api" {
   name                = "${var.project_name}-api"
   resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
+  location            = azurerm_service_plan.plan.location
   service_plan_id     = azurerm_service_plan.plan.id
 
   site_config {
     application_stack {
       dotnet_version = "v8.0"
     }
+
+    always_on = false
   }
 
   app_settings = {

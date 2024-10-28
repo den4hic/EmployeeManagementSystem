@@ -1,2 +1,3 @@
 project_name = "employee-system"
-location     = "West Europe"
+location     = "East US 2"
+location_app = "West Europe"
