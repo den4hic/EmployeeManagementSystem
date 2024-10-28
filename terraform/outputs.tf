@@ -3,7 +3,7 @@ output "api_url" {
 }
 
 output "ui_url" {
-  value = azurerm_static_site.ui.default_host_name
+  value = azurerm_static_web_app.ui.default_host_name
 }
 
 output "sql_server_name" {
