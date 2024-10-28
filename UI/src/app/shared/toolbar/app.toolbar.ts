@@ -22,6 +22,7 @@ export class ToolbarComponent implements OnInit {
   private notificationSubscription: Subscription = new Subscription();
   public shownNotifications: NotificationDto[] = [];
   private readonly maxNotifications = 4;
+  private userDto: UserDto | null = null;
 
   constructor(
     private authService: AuthService,
@@ -96,7 +97,9 @@ export class ToolbarComponent implements OnInit {
 
   viewAllNotifications() {
     for (const notification of this.notifications) {
-      this.notificationService.markNotificationAsRead(notification.id).subscribe();
+      if (!this.user)
+        return;
+      this.notificationService.markNotificationAsRead(notification.id, this.user.id).subscribe();
     }
 
     this.router.navigate(['/notifications']);
@@ -133,18 +136,18 @@ export class ToolbarComponent implements OnInit {
 
   getTimeAgo(date: Date): string {
     const now = new Date();
-    const diff = now.getTime() - new Date(date).getTime();
-    const minutes = Math.floor(diff / 60000);
-    if (minutes < 60) {
-      return `${minutes} min ago`;
+      const diff = now.getTime() - new Date(date).getTime();
+      const minutes = Math.floor(diff / 60000);
+      if (minutes < 60) {
+        return `${minutes} min ago`;
+      }
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) {
+        return `${hours} hours ago`;
+      }
+      const days = Math.floor(hours / 24);
+      return `${days} days ago`;
     }
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) {
-      return `${hours} hours ago`;
-    }
-    const days = Math.floor(hours / 24);
-    return `${days} days ago`;
-  }
 
   private subscribeToNotifications() {
     this.notificationSubscription = this.signalRService.notifications.subscribe(
@@ -158,7 +161,9 @@ export class ToolbarComponent implements OnInit {
   onNotificationMenuClick() {
     this.shownNotifications = this.notifications.slice(0, this.maxNotifications);
     for (const shownNotification of this.shownNotifications) {
-      this.notificationService.markNotificationAsRead(shownNotification.id).subscribe();
+      if (!this.user)
+          return
+      this.notificationService.markNotificationAsRead(shownNotification.id, this.user.id).subscribe();
     }
 
     this.notifications = this.notifications.filter((notification) => !this.shownNotifications.includes(notification));

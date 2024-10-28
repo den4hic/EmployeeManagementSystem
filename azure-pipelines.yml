@@ -68,15 +68,17 @@ steps:
     workingDir: '$(System.DefaultWorkingDirectory)/$(uiProjectPath)'
     customCommand: 'run build'
 
-- task: CopyFiles@2
-  displayName: 'Copy Angular build files'
+- task: ArchiveFiles@2
+  displayName: 'Archive Angular files'
   inputs:
-    SourceFolder: '$(System.DefaultWorkingDirectory)/$(uiProjectPath)/dist'
-    Contents: '**'
-    TargetFolder: '$(uiPublishDir)'
+    rootFolderOrFile: '$(System.DefaultWorkingDirectory)/$(uiProjectPath)/dist'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '$(uiPublishDir)/UI.zip'
+    replaceExistingArchive: true
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Angular artifacts'
   inputs:
-    PathtoPublish: '$(uiPublishDir)'
+    PathtoPublish: '$(uiPublishDir)/UI.zip'
     ArtifactName: 'UI'
