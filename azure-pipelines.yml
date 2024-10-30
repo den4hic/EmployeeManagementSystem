@@ -14,6 +14,7 @@ variables:
   dacpacFile: '**/*.dacpac'
   uiProjectPath: 'UI'
   uiPublishDir: '$(Build.ArtifactStagingDirectory)/ui'
+  terraformProjectPath: 'terraform'
 
 stages:
   - stage: Backend
@@ -95,3 +96,51 @@ stages:
             inputs:
               PathtoPublish: '$(uiPublishDir)/UI.zip'
               ArtifactName: 'UI'
+  - stage: Terraform
+    displayName: 'Validate and Publich Terraform'
+    jobs:
+      - job: BuildTerraform
+        steps:
+          - task: TerraformTaskV4@4
+            displayName: Tf init
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendServiceArm: 'Azure subscription 1 (3ec5c0ac-5b6f-4a11-9982-b335e0ba3b94)'
+              backendAzureRmResourceGroupName: 'employee-system-rg'
+              backendAzureRmStorageAccountName: 'employeesystemstorage'
+              backendAzureRmContainerName: 'prod-tfstate'
+              backendAzureRmKey: 'prod.terraform.tfstate'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/$(terraformProjectPath)'
+          - task: TerraformTaskV4@4
+            displayName: Tf validate
+            inputs:
+              provider: 'azurerm'
+              command: 'validate'
+          - task: TerraformTaskV4@4
+            displayName: Tf format
+            inputs:
+              provider: 'azurerm'
+              command: 'custom'
+              outputTo: 'console'
+              customCommand: 'fmt'
+              environmentServiceNameAzureRM: 'Azure subscription 1 (3ec5c0ac-5b6f-4a11-9982-b335e0ba3b94)'
+          - task: TerraformTaskV4@4
+            displayName: Tf plan
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/$(terraformProjectPath)'
+              environmentServiceNameAzureRM: 'Azure subscription 1 (3ec5c0ac-5b6f-4a11-9982-b335e0ba3b94)'
+          - task: ArchiveFiles@2
+            displayName: Archive files
+            inputs:
+              rootFolderOrFile: '$(Build.SourcesDirectory)/terraform'
+              includeRootFolder: false
+              archiveType: 'zip'
+              archiveFile: '$(Build.ArtifactStagingDirectory)/Terraform.zip'
+              replaceExistingArchive: true
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/Terraform.zip'
+              ArtifactName: 'Terraform'

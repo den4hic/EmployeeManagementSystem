@@ -2,11 +2,7 @@
   <mat-card>
     <mat-card-header>
       <div mat-card-avatar class="user-photo" (click)="openPhotoDialog()">
-        <img [src]="'data:' + userModel?.userPhoto?.contentType + ';base64,' + userModel?.userPhoto?.photoData"
-             alt="Profile Photo"
-             *ngIf="userModel?.userPhoto"
-             style="max-width: 100%; max-height: 100%; border-radius: 50%; cursor: pointer;">
-        <mat-icon *ngIf="!userModel?.userPhoto">account_circle</mat-icon>
+        <img [src]="userModel != null && userModel.userPhoto != null ? 'data:' + userModel?.userPhoto?.contentType + ';base64,' + userModel?.userPhoto?.photoData : 'assets/default-avatar.png'" alt="No Photo">
       </div>
       <mat-card-title>Hi, {{userModel?.username}}</mat-card-title>
     </mat-card-header>

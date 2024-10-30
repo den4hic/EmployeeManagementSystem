@@ -1,8 +1,68 @@
-<h1 mat-dialog-title>Change Profile Photo</h1>
-<div mat-dialog-content>
-  <input type="file" (change)="onFileSelected($event)">
-</div>
-<div mat-dialog-actions>
-  <button mat-button (click)="onNoClick()">Cancel</button>
-  <button mat-button (click)="onSaveClick()">Save</button>
+<div class="photo-dialog">
+  <div class="change-photo-title">
+    <h2>
+      Change Profile Photo
+    </h2>
+    <button mat-icon-button class="close-button" (click)="onNoClick()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content>
+    <div
+      class="upload-container"
+      [class.drag-active]="dragActive"
+      (dragenter)="handleDrag($event)"
+      (dragover)="handleDrag($event)"
+      (dragleave)="handleDrag($event)"
+      (drop)="handleDrop($event)"
+    >
+      <ng-container *ngIf="!previewUrl; else previewTpl">
+        <mat-icon class="upload-icon">photo_camera</mat-icon>
+        <p class="upload-text">Drag and drop your photo here or</p>
+        <button mat-raised-button color="primary" (click)="fileInput.click()">
+          <mat-icon>upload</mat-icon>
+          Browse Files
+        </button>
+        <input
+          #fileInput
+          type="file"
+          hidden
+          accept="image/*"
+          (change)="onFileSelected($event)"
+        >
+        <p class="size-limit">Maximum file size: {{MAX_SIZE_MB}}MB</p>
+      </ng-container>
+
+      <ng-template #previewTpl>
+        <div class="preview-container">
+          <img [src]="previewUrl" alt="Preview" class="preview-image">
+          <button
+            mat-mini-fab
+            color="basic"
+            class="remove-button"
+            (click)="removePhoto()"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+          <div class="file-info" *ngIf="photo">
+            <span class="file-name">{{photo.name}}</span>
+            <span class="file-size">({{formatFileSize(photo.size)}})</span>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onNoClick()">Cancel</button>
+    <button
+      mat-raised-button
+      color="primary"
+      [disabled]="!photo"
+      (click)="onSaveClick()"
+    >
+      Save Changes
+    </button>
+  </mat-dialog-actions>
 </div>

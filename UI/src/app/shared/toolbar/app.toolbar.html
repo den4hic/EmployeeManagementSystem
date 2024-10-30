@@ -4,9 +4,15 @@
 
   <ng-container *ngIf="isAuthenticated(); else loginRegister">
     <ng-container *ngIf="loadUserDataIfNeeded()"></ng-container>
-    <button (click)="onNotificationMenuClick()" mat-icon-button [matMenuTriggerFor]="notificationMenu">
-      <mat-icon [matBadge]="notifications.length" matBadgeColor="warn">notifications</mat-icon>
-    </button>
+    <div class="button-container">
+      <button (click)="onNotificationMenuClick()" mat-icon-button [matMenuTriggerFor]="notificationMenu">
+        <mat-icon [matBadge]="notifications.length" matBadgeColor="warn">notifications</mat-icon>
+      </button>
+      <button class="profile-button" mat-icon-button [matMenuTriggerFor]="userMenu">
+        <img class="user-avatar" [src]="user != null && user.userPhoto != null ? 'data:' + user?.userPhoto?.contentType + ';base64,' + user?.userPhoto?.photoData : 'assets/default-avatar.png'" alt="No Photo">
+      </button>
+    </div>
+
     <mat-menu #notificationMenu="matMenu" class="notification-menu">
       <div *ngIf="isLoading" class="loading-indicator">Loading...</div>
       <ng-container *ngIf="!isLoading">
@@ -29,9 +35,6 @@
       </ng-container>
     </mat-menu>
 
-    <button mat-icon-button [matMenuTriggerFor]="userMenu">
-      <img [src]="user?.userPhoto?.photoData || 'assets/default-avatar.png'" alt="User photo" class="user-avatar">
-    </button>
     <mat-menu #userMenu="matMenu">
       <button mat-menu-item (click)="goToProfile()">Profile</button>
       <button mat-menu-item (click)="logout()">Logout</button>
