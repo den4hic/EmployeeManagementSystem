@@ -135,12 +135,12 @@ stages:
           - task: ArchiveFiles@2
             displayName: Archive files
             inputs:
-              rootFolderOrFile: '$(Build.SourcesDirectory)/'
+              rootFolderOrFile: '$(Build.SourcesDirectory)/terraform'
               includeRootFolder: false
               archiveType: 'zip'
-              archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+              archiveFile: '$(Build.ArtifactStagingDirectory)/Terraform.zip'
               replaceExistingArchive: true
           - task: PublishBuildArtifacts@1
             inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-              ArtifactName: '$(Build.BuildId)-build'
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/Terraform.zip'
+              ArtifactName: 'Terraform'
