@@ -95,3 +95,50 @@ stages:
             inputs:
               PathtoPublish: '$(uiPublishDir)/UI.zip'
               ArtifactName: 'UI'
+  - stage: Terraform
+    displayName: 'Validate and Publich Terraform'
+    jobs:
+      - job: BuildTerraform
+        steps:
+          - task: TerraformTaskV4@4
+            displayName: Tf init
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendServiceArm: 'Azure subscription 1 (3ec5c0ac-5b6f-4a11-9982-b335e0ba3b94)'
+              backendAzureRmResourceGroupName: 'employee-system-rg'
+              backendAzureRmStorageAccountName: 'employeesystemstorage'
+              backendAzureRmContainerName: 'prod-tfstate'
+              backendAzureRmKey: 'prod.terraform.tfstate'
+          - task: TerraformTaskV4@4
+            displayName: Tf validate
+            inputs:
+              provider: 'azurerm'
+              command: 'validate'
+          - task: TerraformTaskV4@4
+            displayName: Tf format
+            inputs:
+              provider: 'azurerm'
+              command: 'custom'
+              outputTo: 'console'
+              customCommand: 'fmt'
+              environmentServiceNameAzureRM: 'Azure subscription 1 (3ec5c0ac-5b6f-4a11-9982-b335e0ba3b94)'
+          - task: TerraformTaskV4@4
+            displayName: Tf plan
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              commandOptions: '-out $(Build.SourcesDirectory)/tfplanfile'
+              environmentServiceNameAzureRM: 'Azure subscription 1 (3ec5c0ac-5b6f-4a11-9982-b335e0ba3b94)'
+          - task: ArchiveFiles@2
+            displayName: Archive files
+            inputs:
+              rootFolderOrFile: '$(Build.SourcesDirectory)/'
+              includeRootFolder: false
+              archiveType: 'zip'
+              archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+              replaceExistingArchive: true
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              ArtifactName: '$(Build.BuildId)-build'
