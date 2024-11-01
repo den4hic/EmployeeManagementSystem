@@ -33,7 +33,6 @@ stages:
   #       environmentServiceNameAzureRM: 'Azure-ServiceConnection'
 
   - job: DeployApplication
-    dependsOn: DeployInfrastructure
     steps:
     - task: AzureWebApp@1
       inputs:
