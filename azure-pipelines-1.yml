@@ -1,0 +1,55 @@
+trigger: none
+
+pool:
+  name: 'Default'
+  demands:
+    - agent.name -equals SelfHostedAgent
+
+stages:
+- stage: Deploy
+  jobs:
+  # - job: DeployInfrastructure
+  #   steps:
+  #   - task: TerraformInstaller@0
+  #     inputs:
+  #       terraformVersion: 'latest'
+    
+  #   - task: TerraformTaskV4@4
+  #     inputs:
+  #       provider: 'azurerm'
+  #       command: 'init'
+  #       workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
+  #       backendServiceArm: 'Azure-ServiceConnection'
+  #       backendAzureRmResourceGroupName: 'rg-terraform-state'
+  #       backendAzureRmStorageAccountName: 'stterraformstate'
+  #       backendAzureRmContainerName: 'tfstate'
+  #       backendAzureRmKey: 'webapi.tfstate'
+
+  #   - task: TerraformTaskV4@4
+  #     inputs:
+  #       provider: 'azurerm'
+  #       command: 'apply'
+  #       workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
+  #       environmentServiceNameAzureRM: 'Azure-ServiceConnection'
+
+  - job: DeployApplication
+    dependsOn: DeployInfrastructure
+    steps:
+    - task: AzureWebApp@1
+      inputs:
+        azureSubscription: 'Azure subscription 1 (3ec5c0ac-5b6f-4a11-9982-b335e0ba3b94)'
+        appName: 'employee-system-api'
+        package: '$(System.DefaultWorkingDirectory)/**/*.zip'
+        deploymentMethod: 'zipDeploy'
+
+  # - job: DeployDatabase
+  #   dependsOn: DeployInfrastructure
+  #   steps:
+  #   - task: SqlAzureDacpacDeployment@1
+  #     inputs:
+  #       azureSubscription: 'Azure-ServiceConnection'
+  #       serverName: 'sql-webapi-prod.database.windows.net'
+  #       databaseName: 'sqldb-webapi-prod'
+  #       sqlUsername: 'sqladmin'
+  #       sqlPassword: '$(SqlAdminPassword)'
+  #       dacpacFile: '$(System.DefaultWorkingDirectory)/**/*.dacpac'
