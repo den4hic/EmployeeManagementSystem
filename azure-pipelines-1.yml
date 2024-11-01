@@ -1,15 +1,24 @@
 trigger: none
 
-pool:
-  name: 'Default'
-  demands:
-    - agent.name -equals SelfHostedAgent
+resources:
+  pipelines:
+    - pipeline: BuildPipeline
+      source: Build pipeline
+      trigger: true
 
 stages:
 - stage: Deploy
   jobs:
   # - job: DeployInfrastructure
   #   steps:
+  #   - download: BuildPipeline
+  #     artifact: Terraform
+      
+  #   - task: ExtractFiles@1
+  #     inputs:
+  #       archiveFilePatterns: '$(Pipeline.Workspace)/BuildPipeline/Terraform/*.zip'
+  #       destinationFolder: '$(System.DefaultWorkingDirectory)/terraform'
+        
   #   - task: TerraformInstaller@0
   #     inputs:
   #       terraformVersion: 'latest'
@@ -19,21 +28,21 @@ stages:
   #       provider: 'azurerm'
   #       command: 'init'
   #       workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
-  #       backendServiceArm: 'Azure-ServiceConnection'
-  #       backendAzureRmResourceGroupName: 'rg-terraform-state'
-  #       backendAzureRmStorageAccountName: 'stterraformstate'
-  #       backendAzureRmContainerName: 'tfstate'
-  #       backendAzureRmKey: 'webapi.tfstate'
+  #       backendServiceArm: 'Azure subscription 1'
+  #       backendAzureRmResourceGroupName: 'employee-system-rg'
+  #       backendAzureRmStorageAccountName: 'employeesystemstorage'
+  #       backendAzureRmContainerName: 'prod-tfstate'
+  #       backendAzureRmKey: 'prod.terraform.tfstate'
 
   #   - task: TerraformTaskV4@4
   #     inputs:
   #       provider: 'azurerm'
   #       command: 'apply'
   #       workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
-  #       environmentServiceNameAzureRM: 'Azure-ServiceConnection'
+  #       environmentServiceNameAzureRM: 'Azure subscription 1'
 
   - job: DeployWebAPI
-    steps:
+    steps:  
     - download: BuildPipeline
       artifact: WebAPI
       
@@ -43,15 +52,3 @@ stages:
         appName: 'employee-system-api'
         package: '$(Pipeline.Workspace)/BuildPipeline/WebAPI/WebAPI.zip'
         deploymentMethod: 'zipDeploy'
-  
-  # - job: DeployDatabase
-  #   dependsOn: DeployInfrastructure
-  #   steps:
-  #   - task: SqlAzureDacpacDeployment@1
-  #     inputs:
-  #       azureSubscription: 'Azure-ServiceConnection'
-  #       serverName: 'sql-webapi-prod.database.windows.net'
-  #       databaseName: 'sqldb-webapi-prod'
-  #       sqlUsername: 'sqladmin'
-  #       sqlPassword: '$(SqlAdminPassword)'
-  #       dacpacFile: '$(System.DefaultWorkingDirectory)/**/*.dacpac'
