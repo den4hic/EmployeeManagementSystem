@@ -77,7 +77,7 @@ resource "azurerm_service_plan" "plan" {
   resource_group_name = azurerm_resource_group.rg.name
   location            = var.location_app
 
-  sku_name            = "S1"
+  sku_name            = "B1"
   os_type             = "Windows"
 }
 
@@ -91,8 +91,6 @@ resource "azurerm_windows_web_app" "api" {
     application_stack {
       dotnet_version = "v8.0"
     }
-
-    always_on = false
   }
 
   app_settings = {
