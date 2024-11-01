@@ -10,3 +10,5 @@
 /WebAPI/obj
 /ProjectDatabase/bin/Debug
 /ProjectDatabase/obj/Debug
+/ProjectDatabase/ProjectDatabase.dbmdl
+/ProjectDatabase/ProjectDatabase.jfm
