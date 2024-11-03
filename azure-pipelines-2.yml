@@ -6,40 +6,14 @@ resources:
       source: Build pipeline
       trigger: true
 
+pool:
+  name: 'Default'
+  demands:
+    - agent.name -equals SelfHostedAgent
+
 stages:
 - stage: Deploy
   jobs:
-  # - job: DeployInfrastructure
-  #   steps:
-  #   - download: BuildPipeline
-  #     artifact: Terraform
-      
-  #   - task: ExtractFiles@1
-  #     inputs:
-  #       archiveFilePatterns: '$(Pipeline.Workspace)/BuildPipeline/Terraform/*.zip'
-  #       destinationFolder: '$(System.DefaultWorkingDirectory)/terraform'
-        
-  #   - task: TerraformInstaller@0
-  #     inputs:
-  #       terraformVersion: 'latest'
-    
-  #   - task: TerraformTaskV4@4
-  #     inputs:
-  #       provider: 'azurerm'
-  #       command: 'init'
-  #       workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
-  #       backendServiceArm: 'Azure subscription 1'
-  #       backendAzureRmResourceGroupName: 'employee-system-rg'
-  #       backendAzureRmStorageAccountName: 'employeesystemstorage'
-  #       backendAzureRmContainerName: 'prod-tfstate'
-  #       backendAzureRmKey: 'prod.terraform.tfstate'
-
-  #   - task: TerraformTaskV4@4
-  #     inputs:
-  #       provider: 'azurerm'
-  #       command: 'apply'
-  #       workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
-  #       environmentServiceNameAzureRM: 'Azure subscription 1'
   - job: DeployDatabase
     steps:
       - task: SqlAzureDacpacDeployment@1
