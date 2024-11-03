@@ -13,15 +13,18 @@ stages:
     pool:
       vmImage: 'windows-latest'
     steps:
-      - task: SqlAzureDacpacDeployment@1
-        displayName: 'Azure SQL DacpacTask'
-        inputs:
-          azureSubscription: 'Azure subscription 1 (3ec5c0ac-5b6f-4a11-9982-b335e0ba3b94)'
-          ServerName: 'employee-system-sql.database.windows.net'
-          DatabaseName: 'employee-system-db'
-          SqlUsername: sqladmin
-          SqlPassword: 'Password@123'
-          DacpacFile: '$(System.DefaultWorkingDirectory)/_Build pipeline/ProjectDB/ProjectDatabase.dacpac'
+    - download: BuildPipeline
+      artifact: ProjectDB
+      
+    - task: SqlAzureDacpacDeployment@1
+      displayName: 'Azure SQL DacpacTask'
+      inputs:
+        azureSubscription: 'Azure subscription 1 (3ec5c0ac-5b6f-4a11-9982-b335e0ba3b94)'
+        ServerName: 'employee-system-sql.database.windows.net'
+        DatabaseName: 'employee-system-db'
+        SqlUsername: sqladmin
+        SqlPassword: 'Password@123'
+        DacpacFile: '$(Pipeline.Workspace)/BuildPipeline/ProjectDB/ProjectDatabase.dacpac'
 
   - job: DeployWebAPI
     steps:  
