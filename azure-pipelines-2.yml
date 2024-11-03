@@ -1,0 +1,62 @@
+trigger: none
+
+resources:
+  pipelines:
+    - pipeline: BuildPipeline
+      source: Build pipeline
+      trigger: true
+
+stages:
+- stage: Deploy
+  jobs:
+  # - job: DeployInfrastructure
+  #   steps:
+  #   - download: BuildPipeline
+  #     artifact: Terraform
+      
+  #   - task: ExtractFiles@1
+  #     inputs:
+  #       archiveFilePatterns: '$(Pipeline.Workspace)/BuildPipeline/Terraform/*.zip'
+  #       destinationFolder: '$(System.DefaultWorkingDirectory)/terraform'
+        
+  #   - task: TerraformInstaller@0
+  #     inputs:
+  #       terraformVersion: 'latest'
+    
+  #   - task: TerraformTaskV4@4
+  #     inputs:
+  #       provider: 'azurerm'
+  #       command: 'init'
+  #       workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
+  #       backendServiceArm: 'Azure subscription 1'
+  #       backendAzureRmResourceGroupName: 'employee-system-rg'
+  #       backendAzureRmStorageAccountName: 'employeesystemstorage'
+  #       backendAzureRmContainerName: 'prod-tfstate'
+  #       backendAzureRmKey: 'prod.terraform.tfstate'
+
+  #   - task: TerraformTaskV4@4
+  #     inputs:
+  #       provider: 'azurerm'
+  #       command: 'apply'
+  #       workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
+  #       environmentServiceNameAzureRM: 'Azure subscription 1'
+
+  # - job: DeployWebAPI
+  #   steps:  
+  #   - download: BuildPipeline
+  #     artifact: WebAPI
+      
+  #   - task: AzureWebApp@1
+  #     inputs:
+  #       azureSubscription: 'Azure subscription 1 (3ec5c0ac-5b6f-4a11-9982-b335e0ba3b94)'
+  #       appName: 'employee-system-api'
+  #       package: '$(Pipeline.Workspace)/BuildPipeline/WebAPI/WebAPI.zip'
+  #       deploymentMethod: 'zipDeploy'
+  - job: DeployAngularApp
+    steps:
+    - task: AzureStaticWebApp@0
+      inputs:
+        azure_static_web_apps_api_token: 'dfecf923d0bafa0604b826f2ff23c1543e806d351237b84d942544969ea90a8f05-c3228320-6fbd-4dfc-9b78-f92f643f60aa00f132601df2610f'
+        cwd: '$(Pipeline.Workspace)'
+        app_location: 'BuildPipeline/UI/UI.zip'
+        output_location: 'dist/ui-app'
