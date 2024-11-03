@@ -56,7 +56,7 @@ stages:
     steps:
     - task: ExtractFiles@1
       inputs:
-        archiveFilePatterns: '$(System.DefaultWorkingDirectory)/BuildPipeline/UI/UI.zip'
+        archiveFilePatterns: '$(Pipeline.Workspace)/BuildPipeline/UI/UI.zip'
         destinationFolder: '$(System.DefaultWorkingDirectory)/ui-extracted'
         cleanDestinationFolder: true
 
