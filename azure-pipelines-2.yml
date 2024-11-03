@@ -54,13 +54,8 @@ stages:
   #       deploymentMethod: 'zipDeploy'
   - job: DeployAngularApp
     steps:
-    - task: AzureRmWebAppDeployment@4
+    - task: AzureStaticWebApp@0
       inputs:
-        ConnectionType: 'AzureRM'
-        azureSubscription: 'Azure subscription 1 (3ec5c0ac-5b6f-4a11-9982-b335e0ba3b94)'
-        appType: 'webApp'
-        WebAppName: 'employee-system-ui'
-        packageForLinux: '$(System.DefaultWorkingDirectory)/_build.artifacts/UI/UI.zip'
-        enableCustomDeployment: true
-        DeploymentType: 'webDeploy'
-        RemoveAdditionalFilesFlag: true
+        app_location: '$(Pipeline.Workspace)/BuildPipeline/UI/UI.zip'
+        output_location: 'dist/ui-app'
+        azure_static_web_apps_api_token: 'dfecf923d0bafa0604b826f2ff23c1543e806d351237b84d942544969ea90a8f05-c3228320-6fbd-4dfc-9b78-f92f643f60aa00f132601df2610f'
