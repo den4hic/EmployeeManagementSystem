@@ -56,6 +56,6 @@ stages:
     steps:
     - task: AzureStaticWebApp@0
       inputs:
-        app_location: '$(Pipeline.Workspace)/BuildPipeline/UI/UI.zip'
+        app_location: '$(System.DefaultWorkingDirectory)/BuildPipeline/UI/UI.zip'
         output_location: 'dist/ui-app'
         azure_static_web_apps_api_token: 'dfecf923d0bafa0604b826f2ff23c1543e806d351237b84d942544969ea90a8f05-c3228320-6fbd-4dfc-9b78-f92f643f60aa00f132601df2610f'
