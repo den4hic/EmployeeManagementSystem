@@ -54,9 +54,14 @@ stages:
   #       deploymentMethod: 'zipDeploy'
   - job: DeployAngularApp
     steps:
+    - task: ExtractFiles@1
+      inputs:
+        archiveFilePatterns: '$(Pipeline.Workspace)/BuildPipeline/UI/UI.zip'
+        destinationFolder: '$(Pipeline.Workspace)/BuildPipeline/UI/Unpacked'
+
     - task: AzureStaticWebApp@0
       inputs:
         azure_static_web_apps_api_token: 'dfecf923d0bafa0604b826f2ff23c1543e806d351237b84d942544969ea90a8f05-c3228320-6fbd-4dfc-9b78-f92f643f60aa00f132601df2610f'
-        cwd: '$(Pipeline.Workspace)'
-        app_location: 'BuildPipeline/UI/UI.zip'
+        cwd: '$(Pipeline.Workspace)/BuildPipeline/UI/Unpacked'
+        app_location: '.'
         output_location: 'dist/ui-app'
