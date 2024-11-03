@@ -56,20 +56,23 @@ stages:
     steps:
     - download: BuildPipeline
       artifact: UI
-    # - task: DownloadPipelineArtifact@2
-    #   inputs:
-    #     artifactName: UI
+    - task: ExtractFiles@1
+      inputs:
+        archiveFilePatterns: '$(Pipeline.Workspace)/BuildPipeline/UI/UI.zip'
+        destinationFolder: '$(Pipeline.Workspace)/ui-files'
+        cleanDestinationFolder: true
+        overwriteExistingFiles: true
     
     - script: |
         echo "Listing extracted contents:"
-        ls -la $(Pipeline.Workspace)/BuildPipeline
-        echo "\nListing contents of ui directory:"
-        ls -la $(Pipeline.Workspace)/BuildPipeline/UI
+        ls -la $(Pipeline.Workspace)/ui-files
+        echo "\nListing all files recursively:"
+        find $(Pipeline.Workspace)/ui-files -type f
       displayName: 'List Extracted Contents'
 
     - task: AzureStaticWebApp@0
       inputs:
         workingDirectory: '$(Pipeline.Workspace)'
-        app_location: 'BuildPipeline/UI'
+        app_location: 'ui-files'
         skip_app_build: true
         azure_static_web_apps_api_token: 'dfecf923d0bafa0604b826f2ff23c1543e806d351237b84d942544969ea90a8f05-c3228320-6fbd-4dfc-9b78-f92f643f60aa00f132601df2610f'
