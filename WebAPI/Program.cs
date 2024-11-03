@@ -12,7 +12,7 @@ using System.Text;
 using WebAPI.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("ManagementDbContextConnection") ?? throw new InvalidOperationException("Connection string 'ManagementDbContextConnection' not found.");
+var connectionString = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING") ?? throw new InvalidOperationException("Connection string 'AZURE_SQL_CONNECTIONSTRING' not found.");
 
 builder.Services.AddDbContext<EmployeeManagementSystemDbContext>(options => options.UseSqlServer(connectionString));
 
@@ -32,6 +32,17 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(options =>
 {
+    var jwtSecret = builder.Configuration["Jwt:Secret"];
+    if (string.IsNullOrEmpty(jwtSecret))
+    {
+        jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET");
+    }
+
+    if (string.IsNullOrEmpty(jwtSecret))
+    {
+        throw new InvalidOperationException("JWT secret is not configured");
+    }
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateActor = true,
@@ -39,9 +50,9 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         RequireExpirationTime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration.GetSection("Jwt:Issuer").Value,
-        ValidAudience = builder.Configuration.GetSection("Jwt:Audience").Value,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET")))
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret))
     };
 });
 
@@ -86,6 +97,10 @@ if (app.Environment.IsDevelopment())
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Your API v1");
     });
+} else
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();

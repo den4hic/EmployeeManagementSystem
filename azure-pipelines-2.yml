@@ -1,0 +1,89 @@
+trigger: none
+
+resources:
+  pipelines:
+    - pipeline: BuildPipeline
+      source: Build pipeline
+      trigger: true
+
+stages:
+- stage: Deploy
+  jobs:
+  # - job: DeployInfrastructure
+  #   steps:
+  #   - download: BuildPipeline
+  #     artifact: Terraform
+      
+  #   - task: ExtractFiles@1
+  #     inputs:
+  #       archiveFilePatterns: '$(Pipeline.Workspace)/BuildPipeline/Terraform/*.zip'
+  #       destinationFolder: '$(System.DefaultWorkingDirectory)/terraform'
+        
+  #   - task: TerraformInstaller@0
+  #     inputs:
+  #       terraformVersion: 'latest'
+    
+  #   - task: TerraformTaskV4@4
+  #     inputs:
+  #       provider: 'azurerm'
+  #       command: 'init'
+  #       workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
+  #       backendServiceArm: 'Azure subscription 1'
+  #       backendAzureRmResourceGroupName: 'employee-system-rg'
+  #       backendAzureRmStorageAccountName: 'employeesystemstorage'
+  #       backendAzureRmContainerName: 'prod-tfstate'
+  #       backendAzureRmKey: 'prod.terraform.tfstate'
+
+  #   - task: TerraformTaskV4@4
+  #     inputs:
+  #       provider: 'azurerm'
+  #       command: 'apply'
+  #       workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
+  #       environmentServiceNameAzureRM: 'Azure subscription 1'
+  - job: DeployDatabase
+    steps:
+      - task: SqlAzureDacpacDeployment@1
+        displayName: 'Azure SQL DacpacTask'
+        inputs:
+          azureSubscription: 'Azure subscription 1 (3ec5c0ac-5b6f-4a11-9982-b335e0ba3b94)'
+          ServerName: 'employee-system-sql.database.windows.net'
+          DatabaseName: 'employee-system-db'
+          SqlUsername: sqladmin
+          SqlPassword: 'Password@123'
+          DacpacFile: '$(System.DefaultWorkingDirectory)/_Build pipeline/ProjectDB/ProjectDatabase.dacpac'
+
+  - job: DeployWebAPI
+    steps:  
+    - download: BuildPipeline
+      artifact: WebAPI
+      
+    - task: AzureWebApp@1
+      inputs:
+        azureSubscription: 'Azure subscription 1 (3ec5c0ac-5b6f-4a11-9982-b335e0ba3b94)'
+        appName: 'employee-system-api'
+        package: '$(Pipeline.Workspace)/BuildPipeline/WebAPI/WebAPI.zip'
+        deploymentMethod: 'zipDeploy'
+  - job: DeployAngularApp
+    steps:
+    - download: BuildPipeline
+      artifact: UI
+    - task: ExtractFiles@1
+      inputs:
+        archiveFilePatterns: '$(Pipeline.Workspace)/BuildPipeline/UI/UI.zip'
+        destinationFolder: '$(Pipeline.Workspace)/ui-files'
+        cleanDestinationFolder: true
+        overwriteExistingFiles: true
+    
+    - script: |
+        echo "Listing extracted contents:"
+        ls -la $(Pipeline.Workspace)/ui-files
+        echo "\nListing all files recursively:"
+        find $(Pipeline.Workspace)/ui-files -type f
+      displayName: 'List Extracted Contents'
+
+    - task: AzureStaticWebApp@0
+      inputs:
+        workingDirectory: '$(Pipeline.Workspace)'
+        app_location: 'ui-files/ui/browser'
+        skip_app_build: true
+        azure_static_web_apps_api_token: 'dfecf923d0bafa0604b826f2ff23c1543e806d351237b84d942544969ea90a8f05-c3228320-6fbd-4dfc-9b78-f92f643f60aa00f132601df2610f'
