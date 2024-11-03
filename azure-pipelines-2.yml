@@ -41,17 +41,17 @@ stages:
   #       workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
   #       environmentServiceNameAzureRM: 'Azure subscription 1'
 
-  # - job: DeployWebAPI
-  #   steps:  
-  #   - download: BuildPipeline
-  #     artifact: WebAPI
+  - job: DeployWebAPI
+    steps:  
+    - download: BuildPipeline
+      artifact: WebAPI
       
-  #   - task: AzureWebApp@1
-  #     inputs:
-  #       azureSubscription: 'Azure subscription 1 (3ec5c0ac-5b6f-4a11-9982-b335e0ba3b94)'
-  #       appName: 'employee-system-api'
-  #       package: '$(Pipeline.Workspace)/BuildPipeline/WebAPI/WebAPI.zip'
-  #       deploymentMethod: 'zipDeploy'
+    - task: AzureWebApp@1
+      inputs:
+        azureSubscription: 'Azure subscription 1 (3ec5c0ac-5b6f-4a11-9982-b335e0ba3b94)'
+        appName: 'employee-system-api'
+        package: '$(Pipeline.Workspace)/BuildPipeline/WebAPI/WebAPI.zip'
+        deploymentMethod: 'zipDeploy'
   - job: DeployAngularApp
     steps:
     - task: ExtractFiles@1
