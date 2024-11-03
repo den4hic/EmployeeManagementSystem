@@ -54,8 +54,11 @@ stages:
   #       deploymentMethod: 'zipDeploy'
   - job: DeployAngularApp
     steps:
-    - download: BuildPipeline
-      artifact: UI
+    # - download: BuildPipeline
+    #   artifact: UI
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        artifactName: UI
     
     - script: |
         echo "Listing extracted contents:"
