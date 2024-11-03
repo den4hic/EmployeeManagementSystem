@@ -64,7 +64,7 @@ stages:
         echo "Listing extracted contents:"
         ls -la $(Pipeline.Workspace)/BuildPipeline
         echo "\nListing contents of ui directory:"
-        ls -la $(Pipeline.Workspace)/BuildPipeline/ui
+        ls -la $(Pipeline.Workspace)/BuildPipeline/UI
       displayName: 'List Extracted Contents'
 
     - task: AzureStaticWebApp@0
