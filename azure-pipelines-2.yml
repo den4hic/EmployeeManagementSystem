@@ -1,10 +1,5 @@
 trigger: none
 
-pool:
-  name: 'Default'
-  demands:
-    - agent.name -equals SelfHostedAgent
-
 resources:
   pipelines:
     - pipeline: BuildPipeline
@@ -15,6 +10,8 @@ stages:
 - stage: Deploy
   jobs:
   - job: DeployDatabase
+    pool:
+      vmImage: 'windows-latest'
     steps:
       - task: SqlAzureDacpacDeployment@1
         displayName: 'Azure SQL DacpacTask'
@@ -47,13 +44,6 @@ stages:
         destinationFolder: '$(Pipeline.Workspace)/ui-files'
         cleanDestinationFolder: true
         overwriteExistingFiles: true
-    
-    - script: |
-        echo "Listing extracted contents:"
-        ls -la $(Pipeline.Workspace)/ui-files
-        echo "\nListing all files recursively:"
-        find $(Pipeline.Workspace)/ui-files -type f
-      displayName: 'List Extracted Contents'
 
     - task: AzureStaticWebApp@0
       inputs:
