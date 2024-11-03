@@ -1,15 +1,15 @@
 trigger: none
 
+pool:
+  name: 'Default'
+  demands:
+    - agent.name -equals SelfHostedAgent
+
 resources:
   pipelines:
     - pipeline: BuildPipeline
       source: Build pipeline
       trigger: true
-
-pool:
-  name: 'Default'
-  demands:
-    - agent.name -equals SelfHostedAgent
 
 stages:
 - stage: Deploy
