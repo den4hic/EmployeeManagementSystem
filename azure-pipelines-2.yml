@@ -17,7 +17,7 @@ stages:
     - task: ExtractFiles@1
       inputs:
         archiveFilePatterns: '$(Pipeline.Workspace)/BuildPipeline/Terraform/Terraform.zip'
-        destinationFolder: '$(Pipeline.Workspace)'
+        destinationFolder: '$(Pipeline.Workspace)/Terraform'
         cleanDestinationFolder: true
         overwriteExistingFiles: true
     - task: TerraformInstaller@1
