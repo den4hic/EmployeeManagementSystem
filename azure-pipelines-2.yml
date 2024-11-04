@@ -9,50 +9,58 @@ resources:
 stages:
 - stage: Deploy
   jobs:
-  # - job: DeployInfrastructure
-  #   steps:
-  #   - download: BuildPipeline
-  #     artifact: Terraform
-      
-  #   - task: ExtractFiles@1
-  #     inputs:
-  #       archiveFilePatterns: '$(Pipeline.Workspace)/BuildPipeline/Terraform/*.zip'
-  #       destinationFolder: '$(System.DefaultWorkingDirectory)/terraform'
-        
-  #   - task: TerraformInstaller@0
-  #     inputs:
-  #       terraformVersion: 'latest'
-    
-  #   - task: TerraformTaskV4@4
-  #     inputs:
-  #       provider: 'azurerm'
-  #       command: 'init'
-  #       workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
-  #       backendServiceArm: 'Azure subscription 1'
-  #       backendAzureRmResourceGroupName: 'employee-system-rg'
-  #       backendAzureRmStorageAccountName: 'employeesystemstorage'
-  #       backendAzureRmContainerName: 'prod-tfstate'
-  #       backendAzureRmKey: 'prod.terraform.tfstate'
-
-  #   - task: TerraformTaskV4@4
-  #     inputs:
-  #       provider: 'azurerm'
-  #       command: 'apply'
-  #       workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
-  #       environmentServiceNameAzureRM: 'Azure subscription 1'
-  - job: DeployDatabase
+  - job: DeployServices
     steps:
-      - task: SqlAzureDacpacDeployment@1
-        displayName: 'Azure SQL DacpacTask'
-        inputs:
-          azureSubscription: 'Azure subscription 1 (3ec5c0ac-5b6f-4a11-9982-b335e0ba3b94)'
-          ServerName: 'employee-system-sql.database.windows.net'
-          DatabaseName: 'employee-system-db'
-          SqlUsername: sqladmin
-          SqlPassword: 'Password@123'
-          DacpacFile: '$(System.DefaultWorkingDirectory)/_Build pipeline/ProjectDB/ProjectDatabase.dacpac'
+    - download: BuildPipeline
+      artifact: Terraform
+
+    - task: ExtractFiles@1
+      inputs:
+        archiveFilePatterns: '$(Pipeline.Workspace)/BuildPipeline/Terraform/Terraform.zip'
+        destinationFolder: '$(Pipeline.Workspace)/Terraform'
+        cleanDestinationFolder: true
+        overwriteExistingFiles: true
+    - task: TerraformInstaller@1
+      inputs:
+        terraformVersion: 'latest'
+    - task: TerraformTaskV4@4
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        backendServiceArm: 'Azure subscription 1 (3ec5c0ac-5b6f-4a11-9982-b335e0ba3b94)'
+        backendAzureRmResourceGroupName: 'employee-system-rg'
+        backendAzureRmStorageAccountName: 'employeesystemstorage'
+        backendAzureRmContainerName: 'prod-tfstate'
+        backendAzureRmKey: 'prod.terraform.tfstate'
+    - task: TerraformTaskV4@4
+      inputs:
+        command: apply
+        workingDirectory: '$(Pipeline.Workspace)/Terraform'
+        commandOptions: '--auto-approve'
+        environmentServiceNameAzureRM: 'Azure subscription 1 (3ec5c0ac-5b6f-4a11-9982-b335e0ba3b94)'
+        backendAzureRmUseEnvironmentVariablesForAuthentication: false
+        backendAzureRmUseEntraIdForAuthentication: false
+    
+  - job: DeployDatabase
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+    - download: BuildPipeline
+      artifact: ProjectDB
+      
+    - task: SqlAzureDacpacDeployment@1
+      displayName: 'Azure SQL DacpacTask'
+      inputs:
+        azureSubscription: 'Azure subscription 1 (3ec5c0ac-5b6f-4a11-9982-b335e0ba3b94)'
+        ServerName: 'employee-system-sql.database.windows.net'
+        DatabaseName: 'employee-system-db'
+        SqlUsername: sqladmin
+        SqlPassword: 'Password@123'
+        DacpacFile: '$(Pipeline.Workspace)/BuildPipeline/ProjectDB/ProjectDatabase.dacpac'
 
   - job: DeployWebAPI
+    dependsOn: DeployDatabase
+    condition: succeeded()
     steps:  
     - download: BuildPipeline
       artifact: WebAPI
@@ -64,6 +72,8 @@ stages:
         package: '$(Pipeline.Workspace)/BuildPipeline/WebAPI/WebAPI.zip'
         deploymentMethod: 'zipDeploy'
   - job: DeployAngularApp
+    dependsOn: DeployDatabase
+    condition: succeeded()
     steps:
     - download: BuildPipeline
       artifact: UI
@@ -73,13 +83,6 @@ stages:
         destinationFolder: '$(Pipeline.Workspace)/ui-files'
         cleanDestinationFolder: true
         overwriteExistingFiles: true
-    
-    - script: |
-        echo "Listing extracted contents:"
-        ls -la $(Pipeline.Workspace)/ui-files
-        echo "\nListing all files recursively:"
-        find $(Pipeline.Workspace)/ui-files -type f
-      displayName: 'List Extracted Contents'
 
     - task: AzureStaticWebApp@0
       inputs:
