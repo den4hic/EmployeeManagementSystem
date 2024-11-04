@@ -96,7 +96,7 @@ export class SignalRService {
 
   public connect() {
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl('https://localhost:7110/notificationHub', {
+      .withUrl('https://employee-system-api-fre4cmdvake3dea2.westeurope-01.azurewebsites.net/notificationHub', {
         accessTokenFactory: () => {
           const token = localStorage.getItem('accessToken');
           if (!token) {
