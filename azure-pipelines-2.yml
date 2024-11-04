@@ -9,6 +9,35 @@ resources:
 stages:
 - stage: Deploy
   jobs:
+  - job: DeployServices
+    steps:
+    - task: ExtractFiles@1
+      inputs:
+        archiveFilePatterns: '$(Pipeline.Workspace)/BuildPipeline/Terraform/Terraform.zip'
+        destinationFolder: '$(Pipeline.Workspace)'
+        cleanDestinationFolder: true
+        overwriteExistingFiles: true
+    - task: TerraformInstaller@1
+      inputs:
+        terraformVersion: 'latest'
+    - task: TerraformTaskV4@4
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        backendServiceArm: 'Azure subscription 1 (3ec5c0ac-5b6f-4a11-9982-b335e0ba3b94)'
+        backendAzureRmResourceGroupName: 'employee-system-rg'
+        backendAzureRmStorageAccountName: 'employeesystemstorage'
+        backendAzureRmContainerName: 'prod-tfstate'
+        backendAzureRmKey: 'prod.terraform.tfstate'
+    - task: TerraformTaskV4@4
+      inputs:
+        command: apply
+        workingDirectory: '$(Pipeline.Workspace)/Terraform'
+        commandOptions: '--auto-approve'
+        environmentServiceNameAzureRM: 'Azure subscription 1 (3ec5c0ac-5b6f-4a11-9982-b335e0ba3b94)'
+        backendAzureRmUseEnvironmentVariablesForAuthentication: false
+        backendAzureRmUseEntraIdForAuthentication: false
+    
   - job: DeployDatabase
     pool:
       vmImage: 'windows-latest'
@@ -27,6 +56,8 @@ stages:
         DacpacFile: '$(Pipeline.Workspace)/BuildPipeline/ProjectDB/ProjectDatabase.dacpac'
 
   - job: DeployWebAPI
+    dependsOn: DeployDatabase
+    condition: succeeded()
     steps:  
     - download: BuildPipeline
       artifact: WebAPI
@@ -38,6 +69,8 @@ stages:
         package: '$(Pipeline.Workspace)/BuildPipeline/WebAPI/WebAPI.zip'
         deploymentMethod: 'zipDeploy'
   - job: DeployAngularApp
+    dependsOn: DeployDatabase
+    condition: succeeded()
     steps:
     - download: BuildPipeline
       artifact: UI
