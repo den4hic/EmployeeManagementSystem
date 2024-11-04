@@ -11,6 +11,9 @@ stages:
   jobs:
   - job: DeployServices
     steps:
+    - download: BuildPipeline
+      artifact: Terraform
+
     - task: ExtractFiles@1
       inputs:
         archiveFilePatterns: '$(Pipeline.Workspace)/BuildPipeline/Terraform/Terraform.zip'
