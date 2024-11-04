@@ -27,6 +27,7 @@ stages:
       inputs:
         provider: 'azurerm'
         command: 'init'
+        workingDirectory: '$(Pipeline.Workspace)/Terraform'
         backendServiceArm: 'Azure subscription 1 (3ec5c0ac-5b6f-4a11-9982-b335e0ba3b94)'
         backendAzureRmResourceGroupName: 'employee-system-rg'
         backendAzureRmStorageAccountName: 'employeesystemstorage'
@@ -42,6 +43,8 @@ stages:
         backendAzureRmUseEntraIdForAuthentication: false
     
   - job: DeployDatabase
+    dependsOn: DeployServices
+    condition: succeeded()
     pool:
       vmImage: 'windows-latest'
     steps:
